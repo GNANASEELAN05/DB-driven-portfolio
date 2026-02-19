@@ -32,6 +32,12 @@ public class AuthController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // ================= KEEP SERVER AWAKE (UPTIMEROBOT) =================
+    @GetMapping("/ping")
+    public String ping() {
+        return "awake";
+    }
+
     // ================= ADMIN LOGIN =================
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {

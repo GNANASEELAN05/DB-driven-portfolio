@@ -9,6 +9,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/api/portfolio")
+@CrossOrigin("*")
 public class PortfolioController {
 
     private final PortfolioProfileRepository profileRepo;
@@ -37,7 +38,37 @@ public class PortfolioController {
         this.languageRepo = languageRepo;
     }
 
-    // ====================== GET ======================
+    // ====================== 🔥 ULTRA FAST SINGLE API ======================
+    // This loads EVERYTHING in one call → dashboard becomes instant
+
+    @GetMapping("/all")
+    public Map<String, Object> getAllPortfolioData() {
+
+        Map<String, Object> data = new HashMap<>();
+
+        // profile
+        data.put("profile",
+                profileRepo.findAll().stream().findFirst().orElse(new PortfolioProfile()));
+
+        // skills
+        data.put("skills",
+                skillsRepo.findAll().stream().findFirst().orElse(new PortfolioSkills()));
+
+        // lists
+        data.put("experience", expRepo.findAll());
+        data.put("education", eduRepo.findAll());
+
+        // socials
+        data.put("socials",
+                socialsRepo.findAll().stream().findFirst().orElse(new SocialLinks()));
+
+        data.put("achievements", achievementRepo.findAll());
+        data.put("languages", languageRepo.findAll());
+
+        return data;
+    }
+
+    // ====================== NORMAL GET ======================
 
     @GetMapping("/profile")
     public PortfolioProfile getProfile() {
@@ -74,7 +105,7 @@ public class PortfolioController {
         return languageRepo.findAll();
     }
 
-    // ====================== PROFILE ======================
+    // ====================== SAVE METHODS ======================
 
     @PutMapping("/profile")
     @Transactional
@@ -99,8 +130,6 @@ public class PortfolioController {
         return profileRepo.save(profile);
     }
 
-    // ====================== SKILLS ======================
-
     @PutMapping("/skills")
     @Transactional
     public PortfolioSkills saveSkills(@RequestBody PortfolioSkills req) {
@@ -120,8 +149,6 @@ public class PortfolioController {
 
         return skillsRepo.save(skills);
     }
-
-    // ====================== SOCIALS (FIXED) ======================
 
     @PutMapping("/socials")
     @Transactional
@@ -146,8 +173,6 @@ public class PortfolioController {
         return socialsRepo.save(socials);
     }
 
-    // ====================== EDUCATION ======================
-
     @PutMapping("/education")
     @Transactional
     public List<EducationItem> saveEducation(@RequestBody List<EducationItem> items) {
@@ -155,8 +180,6 @@ public class PortfolioController {
         if (items == null) return List.of();
         return eduRepo.saveAll(items);
     }
-
-    // ====================== EXPERIENCE ======================
 
     @PutMapping("/experience")
     @Transactional
@@ -166,8 +189,6 @@ public class PortfolioController {
         return expRepo.saveAll(items);
     }
 
-    // ====================== ACHIEVEMENTS ======================
-
     @PutMapping("/achievements")
     @Transactional
     public List<AchievementItem> saveAchievements(@RequestBody List<AchievementItem> items) {
@@ -175,8 +196,6 @@ public class PortfolioController {
         if (items == null) return List.of();
         return achievementRepo.saveAll(items);
     }
-
-    // ====================== LANGUAGES ======================
 
     @PutMapping("/languages")
     @Transactional
