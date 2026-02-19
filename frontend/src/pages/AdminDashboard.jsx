@@ -692,68 +692,59 @@ const [editValue, setEditValue] = useState("");
   const handleDrawerToggle = () => setMobileOpen((p) => !p);
 
   const fetchAllAdmin = async () => {
-  try {
-    setErr("");
-    setOk("");
-    setLoading(true);
+    try {
+      setErr("");
+      setOk("");
+      setLoading(true);
 
-    // 🔥 SINGLE FAST API CALL
-    const res = await http.get("/api/portfolio/all");
-    const data = res?.data || {};
+      const [p, s, pr, so, a, l, edu, exp] = await Promise.all([
+        getProfile(),
+        getSkills(),
+        getAllProjectsAdmin(),
+        getSocials(),
+        getAchievements(),
+        getLanguageExperience(),
+        getEducation(),
+        getExperience(),
+      ]);
 
-    // ===== PROFILE =====
-    setProfile(data.profile || {});
+      setProfile(p?.data || {});
+      setSkills(s?.data || {});
+      // convert DB csv → table
+const table = [];
+const data = s?.data || {};
 
-    // ===== SKILLS =====
-    setSkills(data.skills || {});
-    const table = [];
-    const sk = data.skills || {};
-
-    ["frontend","backend","database","tools"].forEach(cat=>{
-      if(sk[cat]){
-        sk[cat].split(",").forEach(s=>{
-          if(s.trim()){
-            table.push({category:cat,name:s.trim()});
-          }
-        });
+["frontend","backend","database","tools"].forEach(cat=>{
+  if(data[cat]){
+    data[cat].split(",").forEach(sk=>{
+      if(sk.trim()){
+        table.push({category:cat,name:sk.trim()});
       }
     });
-    setSkillTable(table);
-
-    // ===== PROJECTS (still separate because different controller) =====
-    const pr = await getAllProjectsAdmin();
-    setProjects(pr?.data || []);
-
-    // ===== SOCIALS =====
-    setSocials(data.socials || {});
-
-    // ===== ACHIEVEMENTS =====
-    setAchievements(Array.isArray(data.achievements) ? data.achievements : []);
-
-    // ===== LANGUAGES =====
-    setLanguages(Array.isArray(data.languages) ? data.languages : []);
-
-    // ===== EDUCATION =====
-    setEducation(Array.isArray(data.education) ? data.education : []);
-
-    // ===== EXPERIENCE =====
-    setExperience(Array.isArray(data.experience) ? data.experience : []);
-
-    // ===== RESUMES =====
-    try {
-      const r = await listResumesAdmin();
-      if (r?.data && Array.isArray(r.data)) setResumes(r.data);
-    } catch {}
-
-    setOk("Admin data loaded instantly ⚡");
-  } catch (e) {
-    console.error(e);
-    setErr("Failed to load Admin data.");
-  } finally {
-    setLoading(false);
   }
-};
+});
 
+setSkillTable(table);
+
+      setProjects(pr?.data || []);
+      setSocials(so?.data || {});
+      setAchievements(Array.isArray(a?.data) ? a.data : []);
+      setLanguages(Array.isArray(l?.data) ? l.data : []);
+      setEducation(Array.isArray(edu?.data) ? edu.data : []);
+      setExperience(Array.isArray(exp?.data) ? exp.data : []);
+
+      try {
+        const r = await listResumesAdmin();
+        if (r?.data && Array.isArray(r.data)) setResumes(r.data);
+      } catch {}
+
+      setOk("Admin data loaded from DB.");
+    } catch {
+      setErr("Failed to load Admin data. Check backend is running + token + CORS.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   React.useEffect(() => {
     fetchAllAdmin();
