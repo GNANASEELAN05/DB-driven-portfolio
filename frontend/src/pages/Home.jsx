@@ -858,13 +858,13 @@ export default function Home({ toggleTheme }) {
             viewport={{ once: true, amount: 0.25 }}
           >
             <SectionHeading title="About" subtitle="A short introduction and profile summary." />
-            <GlassPanel sx={{ p: { xs: 2.5, md: 4 } }}>
+            
               {loading ? (
                 <Skeleton height={180} />
               ) : (
                 <Typography className="body-copy">{about}</Typography>
               )}
-            </GlassPanel>
+            
           </MotionBox>
 
           <MotionBox
