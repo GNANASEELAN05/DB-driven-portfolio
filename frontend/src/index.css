@@ -262,7 +262,7 @@ button {
   display: flex;
   flex-direction: column;
   /* FIXED: sidebar is 46px wide + 22px from right edge + extra buffer */
-  padding-right: calc(46px + 22px + 24px);
+  padding-right: calc(46px + 22px + 60px);
 }
 
 .portfolio-topbar {
@@ -945,7 +945,7 @@ table td {
    ============================================= */
 @media (max-width: 1199px) {
   .portfolio-shell {
-    padding-right: calc(46px + 22px + 16px);
+    padding-right: calc(46px + 22px + 60px);
   }
 
   .hero-layout {
