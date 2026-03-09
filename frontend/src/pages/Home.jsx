@@ -250,7 +250,7 @@ function HeroActionButton({ children, ...props }) {
   );
 }
 
-// Removed duplicate small colored kicker title — only big section title shown
+// SectionHeading — no duplicate kicker title
 function SectionHeading({ title, subtitle }) {
   return (
     <Stack spacing={1.1} sx={{ mb: 3 }}>
@@ -268,21 +268,14 @@ function GlassPanel({ children, sx, className = "" }) {
   );
 }
 
-// FIX: MiniOrbitBadge — reads profile.initials from admin dashboard About Me section
-// Falls back to first letters of name words if initials field is empty
-function MiniOrbitBadge({ initials, name }) {
-  const resolvedInitials =
-    safeString(initials).trim() ||
-    safeString(name)
-      .split(" ")
-      .filter(Boolean)
-      .slice(0, 2)
-      .map((w) => w[0].toUpperCase())
-      .join("");
+// FIX: MiniOrbitBadge — use profile.initials from AdminDashboard "About Me" page
+// Falls back to initials derived from name if profile.initials is not set
+function MiniOrbitBadge({ initials }) {
+  const displayInitials = safeString(initials).trim().toUpperCase() || "•";
 
-  const spinText = resolvedInitials
-    ? `${resolvedInitials} • ${resolvedInitials} • ${resolvedInitials} • ${resolvedInitials} •`
-    : "• • • • • • • • • •";
+  // Repeat initials to fill the spinning circle text
+  const repeat = Math.max(1, Math.ceil(16 / (displayInitials.length + 3)));
+  const spinText = Array.from({ length: repeat }, () => `${displayInitials} • `).join("").trimEnd();
 
   return (
     <Box className="hero-name-spinner-badge" aria-hidden="true">
@@ -296,22 +289,26 @@ function MiniOrbitBadge({ initials, name }) {
                a43,43 0 1,1 -86,0"
           />
         </defs>
-        <circle className="hero-name-spinner-ring" cx="60" cy="60" r="42" />
+
+        {/* Dashed outer ring like reference image */}
+        <circle className="hero-name-spinner-ring" cx="60" cy="60" r="55" />
+        {/* Solid inner ring */}
+        <circle className="hero-name-spinner-ring-inner" cx="60" cy="60" r="42" />
+
         <text className="hero-name-spinner-text">
           <textPath href="#miniOrbitPath" startOffset="0%">
             {spinText}
           </textPath>
         </text>
-        {/* Center: shows initials large and static */}
-        <text x="60" y="64" textAnchor="middle" className="hero-name-spinner-center-initials">
-          {resolvedInitials || "?"}
+        <text x="60" y="68" textAnchor="middle" className="hero-name-spinner-arrow">
+          →
         </text>
       </svg>
     </Box>
   );
 }
 
-// FIX: "Featured Project" label removed
+// ProjectCard — no "Featured Project" label
 function ProjectCard({ project }) {
   const title = safeString(project?.title) || "Untitled Project";
   const description = safeString(project?.description);
@@ -473,15 +470,26 @@ export default function Home({ toggleTheme }) {
     return map;
   }, [sectionIds]);
 
-  // Name preserves original casing from admin
   const name = safeString(profile?.name) || "Your Name";
-  // FIX: read initials field from admin dashboard profile (About Me section)
-  const profileInitials = safeString(profile?.initials) || "";
   const title = safeString(profile?.title) || "Full Stack Developer";
   const tagline = safeString(profile?.tagline) || "Transforming Ideas Into Digital Reality";
   const about = safeString(profile?.about) || "Add your about content from admin.";
   const location = safeString(profile?.location) || "";
   const emailPublic = safeString(profile?.emailPublic) || "";
+
+  // FIX: use profile.initials from AdminDashboard "About Me" → "Initials" field
+  // Falls back to auto-deriving from name if not set
+  const profileInitials = useMemo(() => {
+    const fromAdmin = safeString(profile?.initials).trim();
+    if (fromAdmin) return fromAdmin;
+    // fallback: derive from name
+    return safeString(profile?.name)
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join("");
+  }, [profile]);
 
   const contactEmail = useMemo(() => {
     const ep = safeString(emailPublic).trim();
@@ -706,18 +714,16 @@ export default function Home({ toggleTheme }) {
             exit="exit"
             className="portfolio-page-frame"
           >
-            {/* FIX: home uses scrollable area on mobile so all buttons are reachable */}
             <Box className="section-scroll-area home-scroll-area">
               <MotionBox className="portfolio-section hero-section" initial="hidden" animate="show" variants={fadeUp}>
                 <Box className="hero-layout hero-layout-single">
                   <Box className="hero-left hero-left-expanded">
                     <MotionBox variants={fadeUp}>
-                      {/* Spinner beside the 4 info lines */}
+                      {/* hero-name-row with spinner beside name+meta block */}
                       <Box className="hero-name-row">
-                        {/* FIX: passes profileInitials from admin dashboard About Me */}
-                        <MiniOrbitBadge initials={profileInitials} name={name} />
+                        {/* FIX: pass profileInitials (from profile.initials in AdminDashboard) */}
+                        <MiniOrbitBadge initials={profileInitials} />
                         <Box className="hero-name-text-block">
-                          {/* Name respects admin casing — no uppercase */}
                           <Typography className="hero-name hero-name-display">{name}</Typography>
                           <Stack spacing={0.8} className="hero-meta-stack">
                             <Typography className="hero-role-line">{title}</Typography>
@@ -733,8 +739,13 @@ export default function Home({ toggleTheme }) {
 
                       <Typography className="hero-description">{about}</Typography>
 
-                      {/* FIX: action buttons always shown on mobile via scroll */}
-                      <Stack className="hero-action-stack" direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
+                      {/* FIX: hero action buttons — visible on mobile too */}
+                      <Stack
+                        direction={{ xs: "column", sm: "row" }}
+                        spacing={1.5}
+                        sx={{ mt: 3 }}
+                        className="hero-action-buttons"
+                      >
                         <HeroActionButton
                           variant="contained"
                           startIcon={<MdArrowOutward />}
@@ -761,8 +772,13 @@ export default function Home({ toggleTheme }) {
                         </HeroActionButton>
                       </Stack>
 
-                      {/* FIX: social icons always present, reachable via mobile scroll */}
-                      <Stack className="hero-social-stack" direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
+                      {/* FIX: social icons — always visible, including on mobile */}
+                      <Stack
+                        direction="row"
+                        spacing={1.2}
+                        sx={{ mt: 4, flexWrap: "wrap" }}
+                        className="hero-social-row"
+                      >
                         {socials?.github ? (
                           <IconButton
                             className="hero-social-btn"
@@ -1099,7 +1115,7 @@ export default function Home({ toggleTheme }) {
               <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
                 <SectionHeading title="Contact" subtitle="Let's build something great together." />
 
-                {/* FIX: Contact details — separate full-width card, not in a side-by-side grid */}
+                {/* FIX: Contact Info panel is full-width (no grid), Programming Languages is BELOW separately */}
                 <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 }, mb: 3 }}>
                   <Typography className="timeline-title">Get in touch</Typography>
 
@@ -1168,14 +1184,14 @@ export default function Home({ toggleTheme }) {
                   </Stack>
                 </GlassPanel>
 
-                {/* FIX: Programming Languages — completely separate full-width section */}
-                <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 }, mb: 3 }}>
+                {/* FIX: Programming Languages is a SEPARATE section below Contact Info */}
+                <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
                   <Typography className="timeline-title">Programming Languages</Typography>
 
                   {loading ? (
                     <Skeleton height={220} sx={{ mt: 2 }} />
                   ) : languages.length ? (
-                    <Stack spacing={2} sx={{ mt: 2 }}>
+                    <Box className="lang-grid">
                       {languages.map((lang, idx) => (
                         <Box key={lang?.id ?? idx} className="language-card">
                           <Box className="language-card-head">
@@ -1190,7 +1206,7 @@ export default function Home({ toggleTheme }) {
                           </Stack>
                         </Box>
                       ))}
-                    </Stack>
+                    </Box>
                   ) : (
                     <Typography sx={{ mt: 2 }}>No language experience added yet.</Typography>
                   )}
@@ -1223,7 +1239,7 @@ export default function Home({ toggleTheme }) {
         <span className="portfolio-grid" />
         <span className="portfolio-grid-glow" />
         <span className="portfolio-mesh-lines" />
-        {/* Canvas-based animated web/network structure */}
+        {/* Canvas-based web/network structure background */}
         <NetworkCanvas mode={mode} />
       </Box>
 
@@ -1271,7 +1287,7 @@ export default function Home({ toggleTheme }) {
   );
 }
 
-// Canvas-based animated network/web structure background
+// Canvas-based web/network structure background
 function NetworkCanvas({ mode }) {
   const canvasRef = useRef(null);
 
@@ -1310,6 +1326,7 @@ function NetworkCanvas({ mode }) {
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+      // Update positions
       nodes.forEach((n) => {
         n.x += n.vx;
         n.y += n.vy;
@@ -1317,6 +1334,7 @@ function NetworkCanvas({ mode }) {
         if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
       });
 
+      // Draw lines
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
           const dx = nodes[i].x - nodes[j].x;
@@ -1339,6 +1357,7 @@ function NetworkCanvas({ mode }) {
         }
       }
 
+      // Draw nodes
       nodes.forEach((n) => {
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
