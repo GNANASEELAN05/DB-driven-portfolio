@@ -265,29 +265,31 @@ function GlassPanel({ children, sx, className = "" }) {
   );
 }
 
-function MiniOrbitBadge() {
-  return (
-    <Box className="hero-name-spinner-badge" aria-hidden="true">
-      <svg viewBox="0 0 120 120" className="hero-name-spinner-svg">
-        <defs>
-          <path
-            id="miniOrbitPath"
-            d="M60,60
-               m-43,0
-               a43,43 0 1,1 86,0
-               a43,43 0 1,1 -86,0"
-          />
-        </defs>
+function MiniOrbitBadge({ name }) {
 
-        <circle className="hero-name-spinner-ring" cx="60" cy="60" r="42" />
-        <text className="hero-name-spinner-text">
-          <textPath href="#miniOrbitPath" startOffset="0%">
-            MY PROJECTS • MY PROJECTS •
-          </textPath>
+  const initial = name ? name.charAt(0).toUpperCase() : "P";
+
+  return (
+    <Box className="hero-name-spinner-badge">
+      <svg viewBox="0 0 120 120">
+
+        <circle cx="60" cy="60" r="42"
+          stroke="rgba(255,255,255,0.2)"
+          strokeWidth="2"
+          fill="transparent"
+        />
+
+        <text
+          x="60"
+          y="70"
+          textAnchor="middle"
+          fontSize="32"
+          fill="#f13024"
+          fontWeight="700"
+        >
+          {initial}
         </text>
-        <text x="60" y="68" textAnchor="middle" className="hero-name-spinner-arrow">
-          →
-        </text>
+
       </svg>
     </Box>
   );
@@ -302,9 +304,7 @@ function ProjectCard({ project }) {
 
   return (
     <MotionPaper variants={fadeUp} className="project-card" whileHover={{ y: -8 }}>
-      <Box className="project-card-topline">
-        <Typography className="project-mini-label">Featured Project</Typography>
-      </Box>
+
 
       <Typography className="project-title">{title}</Typography>
 
