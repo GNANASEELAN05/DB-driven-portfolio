@@ -72,15 +72,6 @@ const fadeUp = {
   },
 };
 
-const floatIn = {
-  hidden: { opacity: 0, scale: 0.92 },
-  show: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.9, ease: [0.25, 0.25, 0.25, 0.75] },
-  },
-};
-
 const pageVariants = {
   enter: (direction) => ({
     opacity: 0,
@@ -121,6 +112,18 @@ function splitCSV(s) {
     .split(",")
     .map((x) => x.trim())
     .filter(Boolean);
+}
+
+function getInitials(name) {
+  const parts = safeString(name)
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (!parts.length) return "GV";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+
+  return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
 }
 
 async function blobDownload(url) {
@@ -209,6 +212,7 @@ function VerticalNav({ items, activeId, onJump }) {
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = activeId === item.id;
+
         return (
           <button
             key={item.id}
@@ -218,10 +222,8 @@ function VerticalNav({ items, activeId, onJump }) {
             aria-label={item.label}
             title={item.label}
           >
-            <span className="icon-bubble">
-              <span className="icon-inner">
-                <Icon />
-              </span>
+            <span className="icon-wrap">
+              <Icon />
             </span>
             <span className="label">{item.label}</span>
           </button>
@@ -250,7 +252,6 @@ function HeroActionButton({ children, ...props }) {
   );
 }
 
-// FIX: SectionHeading — removed the duplicate small colored kicker title
 function SectionHeading({ title, subtitle }) {
   return (
     <Stack spacing={1.1} sx={{ mb: 3 }}>
@@ -268,48 +269,35 @@ function GlassPanel({ children, sx, className = "" }) {
   );
 }
 
-// FIX: MiniOrbitBadge — show initials instead of "MY PROJECTS"
-function MiniOrbitBadge({ name }) {
-  // Get initials from name
-  const initials = safeString(name)
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((w) => w[0].toUpperCase())
-    .join("");
-
-  const spinText = initials
-    ? `${initials} • ${initials} • ${initials} • ${initials} •`
-    : "• • • • • • • • • •";
-
+function MiniOrbitBadge({ initials = "GV" }) {
   return (
     <Box className="hero-name-spinner-badge" aria-hidden="true">
-      <svg viewBox="0 0 120 120" className="hero-name-spinner-svg">
+      <svg viewBox="0 0 160 160" className="hero-name-spinner-svg">
         <defs>
           <path
             id="miniOrbitPath"
-            d="M60,60
-               m-43,0
-               a43,43 0 1,1 86,0
-               a43,43 0 1,1 -86,0"
+            d="M80,80
+               m-58,0
+               a58,58 0 1,1 116,0
+               a58,58 0 1,1 -116,0"
           />
         </defs>
 
-        <circle className="hero-name-spinner-ring" cx="60" cy="60" r="42" />
+        <circle className="hero-name-spinner-ring" cx="80" cy="80" r="56" />
+        <circle className="hero-name-spinner-ring inner" cx="80" cy="80" r="46" />
         <text className="hero-name-spinner-text">
           <textPath href="#miniOrbitPath" startOffset="0%">
-            {spinText}
+            PORTFOLIO • PORTFOLIO • PORTFOLIO •
           </textPath>
         </text>
-        <text x="60" y="68" textAnchor="middle" className="hero-name-spinner-arrow">
-          →
+        <text x="80" y="93" textAnchor="middle" className="hero-name-spinner-initials">
+          {initials}
         </text>
       </svg>
     </Box>
   );
 }
 
-// FIX: ProjectCard — removed "Featured Project" label
 function ProjectCard({ project }) {
   const title = safeString(project?.title) || "Untitled Project";
   const description = safeString(project?.description);
@@ -471,13 +459,13 @@ export default function Home({ toggleTheme }) {
     return map;
   }, [sectionIds]);
 
-  // FIX: name preserves original casing from admin (no text-transform: uppercase applied to the value)
   const name = safeString(profile?.name) || "Your Name";
   const title = safeString(profile?.title) || "Full Stack Developer";
   const tagline = safeString(profile?.tagline) || "Transforming Ideas Into Digital Reality";
   const about = safeString(profile?.about) || "Add your about content from admin.";
   const location = safeString(profile?.location) || "";
   const emailPublic = safeString(profile?.emailPublic) || "";
+  const initials = useMemo(() => getInitials(name), [name]);
 
   const contactEmail = useMemo(() => {
     const ep = safeString(emailPublic).trim();
@@ -636,7 +624,7 @@ export default function Home({ toggleTheme }) {
   }, []);
 
   const jumpTo = (id) => {
-    if (!sectionIndexMap[id] && sectionIndexMap[id] !== 0) return;
+    if (!Object.prototype.hasOwnProperty.call(sectionIndexMap, id)) return;
     const currentIndex = sectionIndexMap[activeSection] ?? 0;
     const nextIndex = sectionIndexMap[id] ?? 0;
     setNavDirection(nextIndex >= currentIndex ? 1 : -1);
@@ -689,6 +677,60 @@ export default function Home({ toggleTheme }) {
     }
   };
 
+  const renderHeroSocials = () => (
+    <Stack direction="row" spacing={1.2} className="hero-socials-row">
+      {socials?.github ? (
+        <IconButton
+          className="hero-social-btn"
+          onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}
+          aria-label="GitHub"
+        >
+          <FaGithub />
+        </IconButton>
+      ) : null}
+
+      {socials?.linkedin ? (
+        <IconButton
+          className="hero-social-btn"
+          onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}
+          aria-label="LinkedIn"
+        >
+          <FaLinkedin />
+        </IconButton>
+      ) : null}
+
+      {socials?.website ? (
+        <IconButton
+          className="hero-social-btn"
+          onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}
+          aria-label="Website"
+        >
+          <MdLink />
+        </IconButton>
+      ) : null}
+
+      {contactEmail ? (
+        <IconButton
+          className="hero-social-btn"
+          onClick={() => window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")}
+          aria-label="Email"
+        >
+          <MdEmail />
+        </IconButton>
+      ) : null}
+
+      {socials?.phone ? (
+        <IconButton
+          className="hero-social-btn"
+          onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")}
+          aria-label="Phone"
+        >
+          <MdPhone />
+        </IconButton>
+      ) : null}
+    </Stack>
+  );
+
   const renderSection = () => {
     switch (activeSection) {
       case "home":
@@ -707,13 +749,13 @@ export default function Home({ toggleTheme }) {
                 <Box className="hero-layout hero-layout-single">
                   <Box className="hero-left hero-left-expanded">
                     <MotionBox variants={fadeUp}>
-                      {/* FIX: hero-name-row with spinner sized to cover the 4 meta lines */}
-                      <Box className="hero-name-row">
-                        <MiniOrbitBadge name={name} />
-                        <Box className="hero-name-text-block">
-                          {/* FIX: name uses hero-name-display (no uppercase transform) */}
-                          <Typography className="hero-name hero-name-display">{name}</Typography>
-                          <Stack spacing={0.8} className="hero-meta-stack">
+                      <Box className="hero-identity-row">
+                        <MiniOrbitBadge initials={initials} />
+
+                        <Box className="hero-identity-content">
+                          <Typography className="hero-name">{name}</Typography>
+
+                          <Stack spacing={0.7} className="hero-meta-stack">
                             <Typography className="hero-role-line">{title}</Typography>
                             {location ? <Typography className="hero-detail-line">📍 {location}</Typography> : null}
                             {contactEmail ? (
@@ -724,6 +766,8 @@ export default function Home({ toggleTheme }) {
                       </Box>
 
                       <Typography className="hero-title">{tagline}</Typography>
+
+                      {renderHeroSocials()}
 
                       <Typography className="hero-description">{about}</Typography>
 
@@ -753,64 +797,6 @@ export default function Home({ toggleTheme }) {
                           Preview Resume
                         </HeroActionButton>
                       </Stack>
-
-                      {/* FIX: social icons are always shown (they were removed from index.css unintentionally) */}
-                      <Stack direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
-                        {socials?.github ? (
-                          <IconButton
-                            className="hero-social-btn"
-                            onClick={() =>
-                              window.open(socials.github, "_blank", "noopener,noreferrer")
-                            }
-                          >
-                            <FaGithub />
-                          </IconButton>
-                        ) : null}
-
-                        {socials?.linkedin ? (
-                          <IconButton
-                            className="hero-social-btn"
-                            onClick={() =>
-                              window.open(socials.linkedin, "_blank", "noopener,noreferrer")
-                            }
-                          >
-                            <FaLinkedin />
-                          </IconButton>
-                        ) : null}
-
-                        {contactEmail ? (
-                          <IconButton
-                            className="hero-social-btn"
-                            onClick={() =>
-                              window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")
-                            }
-                          >
-                            <MdEmail />
-                          </IconButton>
-                        ) : null}
-
-                        {socials?.phone ? (
-                          <IconButton
-                            className="hero-social-btn"
-                            onClick={() =>
-                              window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")
-                            }
-                          >
-                            <MdPhone />
-                          </IconButton>
-                        ) : null}
-
-                        {socials?.website ? (
-                          <IconButton
-                            className="hero-social-btn"
-                            onClick={() =>
-                              window.open(safeString(socials.website), "_blank", "noopener,noreferrer")
-                            }
-                          >
-                            <MdLink />
-                          </IconButton>
-                        ) : null}
-                      </Stack>
                     </MotionBox>
                   </Box>
                 </Box>
@@ -832,7 +818,7 @@ export default function Home({ toggleTheme }) {
           >
             <Box className="section-scroll-area">
               <MotionBox
-                className="portfolio-section section-static about-section-plain"
+                className="portfolio-section section-static about-section-plain about-page"
                 variants={fadeUp}
                 initial="hidden"
                 animate="show"
@@ -860,7 +846,7 @@ export default function Home({ toggleTheme }) {
             className="portfolio-page-frame"
           >
             <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+              <MotionBox className="portfolio-section section-static content-page" variants={fadeUp} initial="hidden" animate="show">
                 <SectionHeading
                   title="Skills"
                   subtitle="Tech stack grouped the same way your backend already returns it."
@@ -906,7 +892,7 @@ export default function Home({ toggleTheme }) {
             className="portfolio-page-frame"
           >
             <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+              <MotionBox className="portfolio-section section-static content-page" variants={fadeUp} initial="hidden" animate="show">
                 <SectionHeading title="Work" subtitle="Featured projects in a modern portfolio card layout." />
                 {loading ? (
                   <Stack spacing={2}>
@@ -941,7 +927,7 @@ export default function Home({ toggleTheme }) {
             className="portfolio-page-frame"
           >
             <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+              <MotionBox className="portfolio-section section-static content-page" variants={fadeUp} initial="hidden" animate="show">
                 <SectionHeading title="Experience" subtitle="Career and internship timeline." />
                 <Stack spacing={2}>
                   {loading ? (
@@ -989,7 +975,7 @@ export default function Home({ toggleTheme }) {
             className="portfolio-page-frame"
           >
             <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+              <MotionBox className="portfolio-section section-static content-page" variants={fadeUp} initial="hidden" animate="show">
                 <SectionHeading title="Education" subtitle="Academic background and qualifications." />
                 <Stack spacing={2}>
                   {loading ? (
@@ -1034,7 +1020,7 @@ export default function Home({ toggleTheme }) {
             className="portfolio-page-frame"
           >
             <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+              <MotionBox className="portfolio-section section-static content-page" variants={fadeUp} initial="hidden" animate="show">
                 <SectionHeading title="Achievements" subtitle="Certifications, awards, and recognitions." />
                 <Box className="achievement-grid">
                   {loading ? (
@@ -1089,8 +1075,8 @@ export default function Home({ toggleTheme }) {
             className="portfolio-page-frame"
           >
             <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Contact" subtitle="Let's build something great together." />
+              <MotionBox className="portfolio-section section-static content-page" variants={fadeUp} initial="hidden" animate="show">
+                <SectionHeading title="Contact" subtitle="Let’s build something great together." />
 
                 <Box className="contact-grid">
                   <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
@@ -1216,14 +1202,12 @@ export default function Home({ toggleTheme }) {
         <span className="portfolio-grid" />
         <span className="portfolio-grid-glow" />
         <span className="portfolio-mesh-lines" />
-        {/* FIX: Web-like network structure canvas */}
-        <NetworkCanvas mode={mode} />
+        <span className="portfolio-web-structure" />
       </Box>
 
       <VerticalNav items={sectionIds} activeId={activeSection} onJump={jumpTo} />
 
       <Container maxWidth="xl" className="portfolio-shell">
-        {/* FIX: topbar padding-top removed (was causing top space), now flush to top */}
         <Box className="portfolio-topbar">
           <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: "auto" }}>
             <Tooltip title="Reload">
@@ -1262,116 +1246,5 @@ export default function Home({ toggleTheme }) {
         loading={resumePreviewLoading}
       />
     </Box>
-  );
-}
-
-// FIX: Canvas-based web/network structure background (like the reference image)
-function NetworkCanvas({ mode }) {
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-
-    let animationId;
-    let nodes = [];
-    const NODE_COUNT = 55;
-    const MAX_DIST = 160;
-
-    const isDark = mode === "dark";
-    const nodeColor = isDark ? "rgba(255,255,255,0.55)" : "rgba(17,24,39,0.45)";
-    const lineColor = isDark ? "rgba(255,255,255,0.09)" : "rgba(17,24,39,0.08)";
-    const accentNodeColor = "rgba(241,48,36,0.7)";
-    const accentLineColor = isDark ? "rgba(241,48,36,0.18)" : "rgba(241,48,36,0.12)";
-
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-
-    const initNodes = () => {
-      nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.38,
-        vy: (Math.random() - 0.5) * 0.38,
-        r: Math.random() * 2.2 + 1.2,
-        accent: i < 6,
-      }));
-    };
-
-    const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Update positions
-      nodes.forEach((n) => {
-        n.x += n.vx;
-        n.y += n.vy;
-        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
-        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
-      });
-
-      // Draw lines
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < MAX_DIST) {
-            const alpha = 1 - dist / MAX_DIST;
-            const isAccent = nodes[i].accent || nodes[j].accent;
-            ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
-            if (isAccent) {
-              ctx.strokeStyle = accentLineColor.replace("0.18", `${0.18 * alpha}`).replace("0.12", `${0.12 * alpha}`);
-            } else {
-              ctx.strokeStyle = lineColor.replace("0.09", `${0.09 * alpha}`).replace("0.08", `${0.08 * alpha}`);
-            }
-            ctx.lineWidth = isAccent ? 1.1 : 0.8;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw nodes
-      nodes.forEach((n) => {
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-        ctx.fillStyle = n.accent ? accentNodeColor : nodeColor;
-        ctx.fill();
-      });
-
-      animationId = requestAnimationFrame(draw);
-    };
-
-    resize();
-    initNodes();
-    draw();
-
-    window.addEventListener("resize", () => {
-      resize();
-      initNodes();
-    });
-
-    return () => {
-      cancelAnimationFrame(animationId);
-    };
-  }, [mode]);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      style={{
-        position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: 0,
-        opacity: 0.7,
-      }}
-    />
   );
 }
