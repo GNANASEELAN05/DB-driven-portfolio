@@ -313,7 +313,7 @@ function ProjectCard({ project }) {
 
 export default function Home({ toggleTheme }) {
   useEffect(() => {
-    document.title = "Portfolio";
+    document.title = "Gnanaseelan V Portfolio";
   }, []);
 
   const theme = useTheme();
