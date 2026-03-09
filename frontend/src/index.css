@@ -261,8 +261,8 @@ button {
   padding-bottom: 20px;
   display: flex;
   flex-direction: column;
-  /* FIXED: sidebar is 46px wide + 22px from right edge + extra buffer */
-  padding-right: calc(46px + 22px + 60px);
+  padding-left: 24px;
+  padding-right: 110px;
 }
 
 .portfolio-topbar {
@@ -945,7 +945,7 @@ table td {
    ============================================= */
 @media (max-width: 1199px) {
   .portfolio-shell {
-    padding-right: calc(46px + 22px + 60px);
+    padding-right: 110px;
   }
 
   .hero-layout {
@@ -961,16 +961,10 @@ table td {
 }
 
 @media (max-width: 899px) {
-  .portfolio-root {
-    min-height: 100vh;
-    height: 100vh;
-    overflow: hidden;
-  }
-
   .portfolio-shell {
     padding-top: 10px;
-    /* FIXED: on mobile sidebar moves to bottom — no right padding for sidebar */
     padding-right: 16px;
+    padding-left: 16px;
     padding-bottom: calc(var(--side-nav-mobile-space) + 10px);
   }
 
