@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
-  Avatar,
   Box,
   Button,
   Chip,
@@ -21,10 +20,9 @@ import {
   TableRow,
   Tooltip,
   Typography,
-  useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import {
   MdArrowOutward,
@@ -46,7 +44,6 @@ import {
   MdTimeline,
   MdEmojiEvents,
   MdContacts,
-  MdMenuBook,
 } from "react-icons/md";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
@@ -82,6 +79,35 @@ const floatIn = {
     scale: 1,
     transition: { duration: 0.9, ease: [0.25, 0.25, 0.25, 0.75] },
   },
+};
+
+const pageVariants = {
+  enter: (direction) => ({
+    opacity: 0,
+    x: direction >= 0 ? 90 : -90,
+    scale: 0.985,
+    filter: "blur(10px)",
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+    scale: 1,
+    filter: "blur(0px)",
+    transition: {
+      duration: 0.62,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+  exit: (direction) => ({
+    opacity: 0,
+    x: direction >= 0 ? -70 : 70,
+    scale: 0.985,
+    filter: "blur(8px)",
+    transition: {
+      duration: 0.44,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  }),
 };
 
 function safeString(v) {
@@ -177,39 +203,28 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   );
 }
 
-function VerticalNav({ items, activeId, onJump, mobileOpen, setMobileOpen }) {
+function VerticalNav({ items, activeId, onJump }) {
   return (
-    <>
-      <Box className={`portfolio-side-nav ${mobileOpen ? "open" : ""}`}>
-        {items.map((item) => {
-          const Icon = item.icon;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              className={`portfolio-side-nav-item ${activeId === item.id ? "active" : ""}`}
-              onClick={() => {
-                onJump(item.id);
-                setMobileOpen(false);
-              }}
-              aria-label={item.label}
-              title={item.label}
-            >
-              <span className="icon-wrap">
-                <Icon />
-              </span>
-              <span className="label">{item.label}</span>
-            </button>
-          );
-        })}
-      </Box>
-
-      <Box className="portfolio-mobile-nav-toggle">
-        <IconButton onClick={() => setMobileOpen((v) => !v)} size="small">
-          <MdMenuBook />
-        </IconButton>
-      </Box>
-    </>
+    <Box className="portfolio-side-nav">
+      {items.map((item) => {
+        const Icon = item.icon;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            className={`portfolio-side-nav-item ${activeId === item.id ? "active" : ""}`}
+            onClick={() => onJump(item.id)}
+            aria-label={item.label}
+            title={item.label}
+          >
+            <span className="icon-wrap">
+              <Icon />
+            </span>
+            <span className="label">{item.label}</span>
+          </button>
+        );
+      })}
+    </Box>
   );
 }
 
@@ -232,15 +247,6 @@ function HeroActionButton({ children, ...props }) {
   );
 }
 
-function StatCard({ value, label }) {
-  return (
-    <Box className="hero-stat-card">
-      <Typography className="hero-stat-value">{value}</Typography>
-      <Typography className="hero-stat-label">{label}</Typography>
-    </Box>
-  );
-}
-
 function SectionHeading({ title, subtitle }) {
   return (
     <Stack spacing={1.1} sx={{ mb: 3 }}>
@@ -256,6 +262,34 @@ function GlassPanel({ children, sx, className = "" }) {
     <Paper className={`glass-panel ${className}`.trim()} sx={sx}>
       {children}
     </Paper>
+  );
+}
+
+function MiniOrbitBadge() {
+  return (
+    <Box className="hero-name-spinner-badge" aria-hidden="true">
+      <svg viewBox="0 0 120 120" className="hero-name-spinner-svg">
+        <defs>
+          <path
+            id="miniOrbitPath"
+            d="M60,60
+               m-43,0
+               a43,43 0 1,1 86,0
+               a43,43 0 1,1 -86,0"
+          />
+        </defs>
+
+        <circle className="hero-name-spinner-ring" cx="60" cy="60" r="42" />
+        <text className="hero-name-spinner-text">
+          <textPath href="#miniOrbitPath" startOffset="0%">
+            MY PROJECTS • MY PROJECTS •
+          </textPath>
+        </text>
+        <text x="60" y="68" textAnchor="middle" className="hero-name-spinner-arrow">
+          →
+        </text>
+      </svg>
+    </Box>
   );
 }
 
@@ -327,9 +361,7 @@ function LanguageLevelBar({ level }) {
     <Box className="meter-block">
       <Box className="meter-head">
         <Typography className="meter-label">Level</Typography>
-        <Typography className="meter-value">
-          {safeString(level) || "—"}
-        </Typography>
+        <Typography className="meter-value">{safeString(level) || "—"}</Typography>
       </Box>
 
       <Box className="segmented-meter" aria-label={`Language level ${safeString(level) || "unknown"}`}>
@@ -378,7 +410,6 @@ export default function Home({ toggleTheme }) {
 
   const theme = useTheme();
   const navigate = useNavigate();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const mode = theme.palette.mode;
 
   const [loading, setLoading] = useState(true);
@@ -401,9 +432,8 @@ export default function Home({ toggleTheme }) {
   const [resumePreviewLoading, setResumePreviewLoading] = useState(false);
 
   const [activeSection, setActiveSection] = useState("home");
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [navFlashId, setNavFlashId] = useState("");
-  const flashTimerRef = useRef(null);
+  const [navDirection, setNavDirection] = useState(1);
+
   const rootRef = useRef(null);
 
   const sectionIds = useMemo(
@@ -419,6 +449,14 @@ export default function Home({ toggleTheme }) {
     ],
     []
   );
+
+  const sectionIndexMap = useMemo(() => {
+    const map = {};
+    sectionIds.forEach((item, idx) => {
+      map[item.id] = idx;
+    });
+    return map;
+  }, [sectionIds]);
 
   const name = safeString(profile?.name) || "Your Name";
   const title = safeString(profile?.title) || "Full Stack Developer";
@@ -550,31 +588,6 @@ export default function Home({ toggleTheme }) {
   }, []);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-
-        if (visible[0]?.target?.id) {
-          setActiveSection(visible[0].target.id);
-        }
-      },
-      {
-        root: document.querySelector(".portfolio-shell-scroll"),
-        threshold: [0.35, 0.55, 0.75],
-      }
-    );
-
-    sectionIds.forEach(({ id }) => {
-      const el = document.getElementById(id);
-      if (el) observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, [loading, sectionIds]);
-
-  useEffect(() => {
     const target = rootRef.current;
     if (!target) return;
 
@@ -609,22 +622,11 @@ export default function Home({ toggleTheme }) {
   }, []);
 
   const jumpTo = (id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-
-    if (flashTimerRef.current) {
-      window.clearTimeout(flashTimerRef.current);
-    }
-
-    setNavFlashId(id);
-
-    requestAnimationFrame(() => {
-      el.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-
-    flashTimerRef.current = window.setTimeout(() => {
-      setNavFlashId("");
-    }, 900);
+    if (!sectionIndexMap[id] && sectionIndexMap[id] !== 0) return;
+    const currentIndex = sectionIndexMap[activeSection] ?? 0;
+    const nextIndex = sectionIndexMap[id] ?? 0;
+    setNavDirection(nextIndex >= currentIndex ? 1 : -1);
+    setActiveSection(id);
   };
 
   const closeResumePreview = () => {
@@ -673,11 +675,505 @@ export default function Home({ toggleTheme }) {
     }
   };
 
-  const completedSections = [
-    projects.length ? projects.length : "0",
-    experience.length ? experience.length : "0",
-    education.length ? education.length : "0",
-  ];
+  const renderSection = () => {
+    switch (activeSection) {
+      case "home":
+        return (
+          <MotionBox
+            key="home"
+            custom={navDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="portfolio-page-frame"
+          >
+            <Box className="section-scroll-area home-scroll-area">
+              <MotionBox className="portfolio-section hero-section" initial="hidden" animate="show" variants={fadeUp}>
+                <Box className="hero-layout hero-layout-single">
+                  <Box className="hero-left hero-left-expanded">
+                    <MotionBox variants={fadeUp}>
+                      <Box className="hero-name-row">
+                        <MiniOrbitBadge />
+                        <Typography className="hero-name">{name}</Typography>
+                      </Box>
+
+                      <Stack spacing={0.8} className="hero-meta-stack">
+                        <Typography className="hero-role-line">{title}</Typography>
+                        {location ? <Typography className="hero-detail-line">📍 {location}</Typography> : null}
+                        {contactEmail ? (
+                          <Typography className="hero-detail-line">✉️ {contactEmail}</Typography>
+                        ) : null}
+                      </Stack>
+
+                      <Typography className="hero-title">{tagline}</Typography>
+
+                      <Typography className="hero-description">{about}</Typography>
+
+                      <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
+                        <HeroActionButton
+                          variant="contained"
+                          startIcon={<MdArrowOutward />}
+                          onClick={() => jumpTo("projects")}
+                        >
+                          View Work
+                        </HeroActionButton>
+
+                        <HeroActionButton
+                          variant="outlined"
+                          startIcon={<MdDownload />}
+                          onClick={onDownloadResume}
+                          disabled={downloading}
+                        >
+                          {downloading ? "Downloading..." : "Download Resume"}
+                        </HeroActionButton>
+
+                        <HeroActionButton
+                          variant="outlined"
+                          startIcon={<MdVisibility />}
+                          onClick={onPreviewResume}
+                        >
+                          Preview Resume
+                        </HeroActionButton>
+                      </Stack>
+
+                      <Stack direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
+                        {socials?.github ? (
+                          <IconButton
+                            className="hero-social-btn"
+                            onClick={() =>
+                              window.open(socials.github, "_blank", "noopener,noreferrer")
+                            }
+                          >
+                            <FaGithub />
+                          </IconButton>
+                        ) : null}
+
+                        {socials?.linkedin ? (
+                          <IconButton
+                            className="hero-social-btn"
+                            onClick={() =>
+                              window.open(socials.linkedin, "_blank", "noopener,noreferrer")
+                            }
+                          >
+                            <FaLinkedin />
+                          </IconButton>
+                        ) : null}
+
+                        {contactEmail ? (
+                          <IconButton
+                            className="hero-social-btn"
+                            onClick={() =>
+                              window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")
+                            }
+                          >
+                            <MdEmail />
+                          </IconButton>
+                        ) : null}
+
+                        {socials?.phone ? (
+                          <IconButton
+                            className="hero-social-btn"
+                            onClick={() =>
+                              window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")
+                            }
+                          >
+                            <MdPhone />
+                          </IconButton>
+                        ) : null}
+                      </Stack>
+                    </MotionBox>
+                  </Box>
+                </Box>
+              </MotionBox>
+            </Box>
+          </MotionBox>
+        );
+
+      case "about":
+        return (
+          <MotionBox
+            key="about"
+            custom={navDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="portfolio-page-frame"
+          >
+            <Box className="section-scroll-area">
+              <MotionBox
+                className="portfolio-section section-static about-section-plain"
+                variants={fadeUp}
+                initial="hidden"
+                animate="show"
+              >
+                <SectionHeading title="About" subtitle="A short introduction and profile summary." />
+                {loading ? (
+                  <Skeleton height={180} />
+                ) : (
+                  <Typography className="body-copy about-body-copy">{about}</Typography>
+                )}
+              </MotionBox>
+            </Box>
+          </MotionBox>
+        );
+
+      case "skills":
+        return (
+          <MotionBox
+            key="skills"
+            custom={navDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="portfolio-page-frame"
+          >
+            <Box className="section-scroll-area">
+              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+                <SectionHeading
+                  title="Skills"
+                  subtitle="Tech stack grouped the same way your backend already returns it."
+                />
+                <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+                  {loading ? (
+                    <Skeleton height={220} />
+                  ) : (
+                    <TableContainer>
+                      <Table size="small">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
+                            <TableCell sx={{ fontWeight: 800 }}>Skills</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {skillRows.map((row, idx) => (
+                            <TableRow key={idx}>
+                              <TableCell sx={{ fontWeight: 700 }}>{row.category}</TableCell>
+                              <TableCell>{row.value}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  )}
+                </GlassPanel>
+              </MotionBox>
+            </Box>
+          </MotionBox>
+        );
+
+      case "projects":
+        return (
+          <MotionBox
+            key="projects"
+            custom={navDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="portfolio-page-frame"
+          >
+            <Box className="section-scroll-area">
+              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+                <SectionHeading title="Work" subtitle="Featured projects in a modern portfolio card layout." />
+                {loading ? (
+                  <Stack spacing={2}>
+                    <Skeleton height={220} />
+                    <Skeleton height={220} />
+                  </Stack>
+                ) : projects.length ? (
+                  <Box className="project-grid">
+                    {projects.map((project, idx) => (
+                      <ProjectCard key={project?.id ?? idx} project={project} />
+                    ))}
+                  </Box>
+                ) : (
+                  <GlassPanel sx={{ p: 3 }}>
+                    <Typography>No projects yet. Add them in Admin → Projects.</Typography>
+                  </GlassPanel>
+                )}
+              </MotionBox>
+            </Box>
+          </MotionBox>
+        );
+
+      case "experience":
+        return (
+          <MotionBox
+            key="experience"
+            custom={navDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="portfolio-page-frame"
+          >
+            <Box className="section-scroll-area">
+              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+                <SectionHeading title="Experience" subtitle="Career and internship timeline." />
+                <Stack spacing={2}>
+                  {loading ? (
+                    <Skeleton height={220} />
+                  ) : experience.length ? (
+                    experience.map((item, idx) => (
+                      <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
+                        <Typography className="timeline-title">
+                          {safeString(item?.role) || "Role"}
+                        </Typography>
+                        <Typography className="timeline-subtitle">
+                          {safeString(item?.company) || "Company"}
+                        </Typography>
+                        <Typography className="timeline-meta">
+                          {safeString(item?.start)}
+                          {safeString(item?.end) ? ` - ${safeString(item?.end)}` : ""}
+                        </Typography>
+                        {safeString(item?.description) ? (
+                          <Typography className="body-copy" sx={{ mt: 1.5 }}>
+                            {safeString(item?.description)}
+                          </Typography>
+                        ) : null}
+                      </GlassPanel>
+                    ))
+                  ) : (
+                    <GlassPanel sx={{ p: 3 }}>
+                      <Typography>No experience added yet.</Typography>
+                    </GlassPanel>
+                  )}
+                </Stack>
+              </MotionBox>
+            </Box>
+          </MotionBox>
+        );
+
+      case "education":
+        return (
+          <MotionBox
+            key="education"
+            custom={navDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="portfolio-page-frame"
+          >
+            <Box className="section-scroll-area">
+              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+                <SectionHeading title="Education" subtitle="Academic background and qualifications." />
+                <Stack spacing={2}>
+                  {loading ? (
+                    <Skeleton height={220} />
+                  ) : education.length ? (
+                    education.map((item, idx) => (
+                      <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
+                        <Typography className="timeline-title">
+                          {safeString(item?.degree) || "Degree"}
+                        </Typography>
+                        <Typography className="timeline-subtitle">
+                          {safeString(item?.institution) || "Institution"}
+                        </Typography>
+                        <Typography className="timeline-meta">{safeString(item?.year) || ""}</Typography>
+                        {safeString(item?.details) ? (
+                          <Typography className="body-copy" sx={{ mt: 1.5 }}>
+                            {safeString(item?.details)}
+                          </Typography>
+                        ) : null}
+                      </GlassPanel>
+                    ))
+                  ) : (
+                    <GlassPanel sx={{ p: 3 }}>
+                      <Typography>No education added yet.</Typography>
+                    </GlassPanel>
+                  )}
+                </Stack>
+              </MotionBox>
+            </Box>
+          </MotionBox>
+        );
+
+      case "achievements":
+        return (
+          <MotionBox
+            key="achievements"
+            custom={navDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="portfolio-page-frame"
+          >
+            <Box className="section-scroll-area">
+              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+                <SectionHeading title="Achievements" subtitle="Certifications, awards, and recognitions." />
+                <Box className="achievement-grid">
+                  {loading ? (
+                    <Skeleton height={220} />
+                  ) : achievements.length ? (
+                    achievements.map((item, idx) => (
+                      <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
+                        <Typography className="timeline-title">
+                          {safeString(item?.title) || "Achievement"}
+                        </Typography>
+                        <Typography className="timeline-subtitle">
+                          {safeString(item?.issuer) || ""}
+                        </Typography>
+                        <Typography className="timeline-meta">
+                          {safeString(item?.year) || ""}
+                        </Typography>
+
+                        {safeString(item?.link) ? (
+                          <Button
+                            variant="outlined"
+                            startIcon={<MdLink />}
+                            sx={{ mt: 2, borderRadius: 999, fontWeight: 700 }}
+                            onClick={() =>
+                              window.open(safeString(item?.link), "_blank", "noopener,noreferrer")
+                            }
+                          >
+                            View
+                          </Button>
+                        ) : null}
+                      </GlassPanel>
+                    ))
+                  ) : (
+                    <GlassPanel sx={{ p: 3 }}>
+                      <Typography>No achievements yet.</Typography>
+                    </GlassPanel>
+                  )}
+                </Box>
+              </MotionBox>
+            </Box>
+          </MotionBox>
+        );
+
+      case "contact":
+        return (
+          <MotionBox
+            key="contact"
+            custom={navDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="portfolio-page-frame"
+          >
+            <Box className="section-scroll-area">
+              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+                <SectionHeading title="Contact" subtitle="Let’s build something great together." />
+
+                <Box className="contact-grid">
+                  <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
+                    <Typography className="timeline-title">Get in touch</Typography>
+
+                    <Stack spacing={1.6} sx={{ mt: 2 }}>
+                      {contactEmail ? (
+                        <Typography className="contact-line">
+                          <MdEmail style={{ marginRight: 10 }} />
+                          {contactEmail}
+                        </Typography>
+                      ) : null}
+
+                      {socials?.phone ? (
+                        <Typography className="contact-line">
+                          <MdPhone style={{ marginRight: 10 }} />
+                          {safeString(socials.phone)}
+                        </Typography>
+                      ) : null}
+
+                      {location ? (
+                        <Typography className="contact-line">
+                          <MdSchool style={{ marginRight: 10 }} />
+                          {location}
+                        </Typography>
+                      ) : null}
+                    </Stack>
+
+                    <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
+                      {socials?.github ? (
+                        <Button
+                          variant="outlined"
+                          startIcon={<FaGithub />}
+                          sx={{ borderRadius: 999, fontWeight: 700 }}
+                          onClick={() =>
+                            window.open(socials.github, "_blank", "noopener,noreferrer")
+                          }
+                        >
+                          GitHub
+                        </Button>
+                      ) : null}
+
+                      {socials?.linkedin ? (
+                        <Button
+                          variant="outlined"
+                          startIcon={<FaLinkedin />}
+                          sx={{ borderRadius: 999, fontWeight: 700 }}
+                          onClick={() =>
+                            window.open(socials.linkedin, "_blank", "noopener,noreferrer")
+                          }
+                        >
+                          LinkedIn
+                        </Button>
+                      ) : null}
+
+                      {socials?.website ? (
+                        <Button
+                          variant="outlined"
+                          startIcon={<MdLink />}
+                          sx={{ borderRadius: 999, fontWeight: 700 }}
+                          onClick={() =>
+                            window.open(safeString(socials.website), "_blank", "noopener,noreferrer")
+                          }
+                        >
+                          Website
+                        </Button>
+                      ) : null}
+                    </Stack>
+                  </GlassPanel>
+
+                  <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
+                    <Typography className="timeline-title">Programming Languages</Typography>
+
+                    {loading ? (
+                      <Skeleton height={220} sx={{ mt: 2 }} />
+                    ) : languages.length ? (
+                      <Stack spacing={2} sx={{ mt: 2 }}>
+                        {languages.map((lang, idx) => (
+                          <Box key={lang?.id ?? idx} className="language-card">
+                            <Box className="language-card-head">
+                              <Typography className="language-name">
+                                {safeString(lang?.language) || "—"}
+                              </Typography>
+                            </Box>
+
+                            <Stack spacing={1.4} sx={{ mt: 1.25 }}>
+                              <LanguageLevelBar level={lang?.level} />
+                              <LanguageYearsBar years={lang?.years} />
+                            </Stack>
+                          </Box>
+                        ))}
+                      </Stack>
+                    ) : (
+                      <Typography sx={{ mt: 2 }}>No language experience added yet.</Typography>
+                    )}
+                  </GlassPanel>
+                </Box>
+
+                <Box className="portfolio-footer">
+                  <Typography>
+                    © {new Date().getFullYear()} {name}. All rights reserved.
+                  </Typography>
+                </Box>
+              </MotionBox>
+            </Box>
+          </MotionBox>
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <Box
@@ -693,13 +1189,7 @@ export default function Home({ toggleTheme }) {
         <span className="portfolio-mesh-lines" />
       </Box>
 
-      <VerticalNav
-        items={sectionIds}
-        activeId={activeSection}
-        onJump={jumpTo}
-        mobileOpen={mobileNavOpen}
-        setMobileOpen={setMobileNavOpen}
-      />
+      <VerticalNav items={sectionIds} activeId={activeSection} onJump={jumpTo} />
 
       <Container maxWidth="xl" className="portfolio-shell">
         <Box className="portfolio-topbar">
@@ -724,455 +1214,10 @@ export default function Home({ toggleTheme }) {
           </Stack>
         </Box>
 
-        <Box className="portfolio-shell-scroll">
-          <MotionBox
-            id="home"
-            className={`portfolio-section hero-section ${
-              navFlashId === "home" ? "section-nav-focus" : ""
-            }`}
-            initial="hidden"
-            animate="show"
-            variants={fadeUp}
-          >
-            <Box className="hero-layout">
-              <Box className="hero-left">
-                <MotionBox variants={fadeUp}>
-                  <Box className="hero-name-row">
-                    <span className="hero-name-spinner" />
-                    <Typography className="hero-name">{name}</Typography>
-                  </Box>
-
-                  <Typography className="hero-title">{tagline}</Typography>
-
-                  <Typography className="hero-description">{about}</Typography>
-
-                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
-                    <HeroActionButton
-                      variant="contained"
-                      startIcon={<MdArrowOutward />}
-                      onClick={() => jumpTo("projects")}
-                    >
-                      View Work
-                    </HeroActionButton>
-
-                    <HeroActionButton
-                      variant="outlined"
-                      startIcon={<MdDownload />}
-                      onClick={onDownloadResume}
-                      disabled={downloading}
-                    >
-                      {downloading ? "Downloading..." : "Download Resume"}
-                    </HeroActionButton>
-
-                    <HeroActionButton
-                      variant="outlined"
-                      startIcon={<MdVisibility />}
-                      onClick={onPreviewResume}
-                    >
-                      Preview Resume
-                    </HeroActionButton>
-                  </Stack>
-
-                  <Stack direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
-                    {socials?.github ? (
-                      <IconButton
-                        className="hero-social-btn"
-                        onClick={() =>
-                          window.open(socials.github, "_blank", "noopener,noreferrer")
-                        }
-                      >
-                        <FaGithub />
-                      </IconButton>
-                    ) : null}
-
-                    {socials?.linkedin ? (
-                      <IconButton
-                        className="hero-social-btn"
-                        onClick={() =>
-                          window.open(socials.linkedin, "_blank", "noopener,noreferrer")
-                        }
-                      >
-                        <FaLinkedin />
-                      </IconButton>
-                    ) : null}
-
-                    {contactEmail ? (
-                      <IconButton
-                        className="hero-social-btn"
-                        onClick={() =>
-                          window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")
-                        }
-                      >
-                        <MdEmail />
-                      </IconButton>
-                    ) : null}
-
-                    {socials?.phone ? (
-                      <IconButton
-                        className="hero-social-btn"
-                        onClick={() =>
-                          window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")
-                        }
-                      >
-                        <MdPhone />
-                      </IconButton>
-                    ) : null}
-                  </Stack>
-
-                  <Stack direction="row" spacing={2} sx={{ mt: 5, flexWrap: "wrap", rowGap: 1.5 }}>
-                    <StatCard value={completedSections[0]} label="Projects" />
-                    <StatCard value={completedSections[1]} label="Experience" />
-                    <StatCard value={completedSections[2]} label="Education" />
-                  </Stack>
-                </MotionBox>
-              </Box>
-
-              <Box className="hero-right">
-                <MotionBox variants={floatIn} className="hero-visual-wrap">
-                  <Box className="hero-avatar-ring">
-                    <Box className="hero-avatar-core">
-                      <Avatar className="hero-main-avatar">
-                        {(safeString(profile?.initials) || name || "Y").slice(0, 2).toUpperCase()}
-                      </Avatar>
-                    </Box>
-                  </Box>
-
-                  <GlassPanel sx={{ p: 2, mt: 3 }}>
-                    <Typography className="mini-card-title">{title}</Typography>
-                    {location ? <Typography className="mini-card-line">📍 {location}</Typography> : null}
-                    {contactEmail ? (
-                      <Typography className="mini-card-line">✉️ {contactEmail}</Typography>
-                    ) : null}
-                  </GlassPanel>
-                </MotionBox>
-              </Box>
-            </Box>
-          </MotionBox>
-
-          <MotionBox
-            id="about"
-            className={`portfolio-section ${navFlashId === "about" ? "section-nav-focus" : ""}`}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.25 }}
-          >
-            <SectionHeading title="About" subtitle="A short introduction and profile summary." />
-            
-              {loading ? (
-                <Skeleton height={180} />
-              ) : (
-                <Typography className="body-copy">{about}</Typography>
-              )}
-            
-          </MotionBox>
-
-          <MotionBox
-            id="skills"
-            className={`portfolio-section ${navFlashId === "skills" ? "section-nav-focus" : ""}`}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.25 }}
-          >
-            <SectionHeading
-              title="Skills"
-              subtitle="Tech stack grouped the same way your backend already returns it."
-            />
-            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
-              {loading ? (
-                <Skeleton height={220} />
-              ) : (
-                <TableContainer>
-                  <Table size="small">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
-                        <TableCell sx={{ fontWeight: 800 }}>Skills</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {skillRows.map((row, idx) => (
-                        <TableRow key={idx}>
-                          <TableCell sx={{ fontWeight: 700 }}>{row.category}</TableCell>
-                          <TableCell>{row.value}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </GlassPanel>
-          </MotionBox>
-
-          <MotionBox
-            id="projects"
-            className={`portfolio-section ${navFlashId === "projects" ? "section-nav-focus" : ""}`}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <SectionHeading title="Work" subtitle="Featured projects in a modern portfolio card layout." />
-            {loading ? (
-              <Stack spacing={2}>
-                <Skeleton height={220} />
-                <Skeleton height={220} />
-              </Stack>
-            ) : projects.length ? (
-              <Box className="project-grid">
-                {projects.map((project, idx) => (
-                  <ProjectCard key={project?.id ?? idx} project={project} />
-                ))}
-              </Box>
-            ) : (
-              <GlassPanel sx={{ p: 3 }}>
-                <Typography>No projects yet. Add them in Admin → Projects.</Typography>
-              </GlassPanel>
-            )}
-          </MotionBox>
-
-          <MotionBox
-            id="experience"
-            className={`portfolio-section ${
-              navFlashId === "experience" ? "section-nav-focus" : ""
-            }`}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <SectionHeading title="Experience" subtitle="Career and internship timeline." />
-            <Stack spacing={2}>
-              {loading ? (
-                <Skeleton height={220} />
-              ) : experience.length ? (
-                experience.map((item, idx) => (
-                  <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
-                    <Typography className="timeline-title">
-                      {safeString(item?.role) || "Role"}
-                    </Typography>
-                    <Typography className="timeline-subtitle">
-                      {safeString(item?.company) || "Company"}
-                    </Typography>
-                    <Typography className="timeline-meta">
-                      {safeString(item?.start)}
-                      {safeString(item?.end) ? ` - ${safeString(item?.end)}` : ""}
-                    </Typography>
-                    {safeString(item?.description) ? (
-                      <Typography className="body-copy" sx={{ mt: 1.5 }}>
-                        {safeString(item?.description)}
-                      </Typography>
-                    ) : null}
-                  </GlassPanel>
-                ))
-              ) : (
-                <GlassPanel sx={{ p: 3 }}>
-                  <Typography>No experience added yet.</Typography>
-                </GlassPanel>
-              )}
-            </Stack>
-          </MotionBox>
-
-          <MotionBox
-            id="education"
-            className={`portfolio-section ${navFlashId === "education" ? "section-nav-focus" : ""}`}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <SectionHeading title="Education" subtitle="Academic background and qualifications." />
-            <Stack spacing={2}>
-              {loading ? (
-                <Skeleton height={220} />
-              ) : education.length ? (
-                education.map((item, idx) => (
-                  <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
-                    <Typography className="timeline-title">
-                      {safeString(item?.degree) || "Degree"}
-                    </Typography>
-                    <Typography className="timeline-subtitle">
-                      {safeString(item?.institution) || "Institution"}
-                    </Typography>
-                    <Typography className="timeline-meta">{safeString(item?.year) || ""}</Typography>
-                    {safeString(item?.details) ? (
-                      <Typography className="body-copy" sx={{ mt: 1.5 }}>
-                        {safeString(item?.details)}
-                      </Typography>
-                    ) : null}
-                  </GlassPanel>
-                ))
-              ) : (
-                <GlassPanel sx={{ p: 3 }}>
-                  <Typography>No education added yet.</Typography>
-                </GlassPanel>
-              )}
-            </Stack>
-          </MotionBox>
-
-          <MotionBox
-            id="achievements"
-            className={`portfolio-section ${
-              navFlashId === "achievements" ? "section-nav-focus" : ""
-            }`}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <SectionHeading title="Achievements" subtitle="Certifications, awards, and recognitions." />
-            <Box className="achievement-grid">
-              {loading ? (
-                <Skeleton height={220} />
-              ) : achievements.length ? (
-                achievements.map((item, idx) => (
-                  <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
-                    <Typography className="timeline-title">
-                      {safeString(item?.title) || "Achievement"}
-                    </Typography>
-                    <Typography className="timeline-subtitle">
-                      {safeString(item?.issuer) || ""}
-                    </Typography>
-                    <Typography className="timeline-meta">
-                      {safeString(item?.year) || ""}
-                    </Typography>
-
-                    {safeString(item?.link) ? (
-                      <Button
-                        variant="outlined"
-                        startIcon={<MdLink />}
-                        sx={{ mt: 2, borderRadius: 999, fontWeight: 700 }}
-                        onClick={() =>
-                          window.open(safeString(item?.link), "_blank", "noopener,noreferrer")
-                        }
-                      >
-                        View
-                      </Button>
-                    ) : null}
-                  </GlassPanel>
-                ))
-              ) : (
-                <GlassPanel sx={{ p: 3 }}>
-                  <Typography>No achievements yet.</Typography>
-                </GlassPanel>
-              )}
-            </Box>
-          </MotionBox>
-
-          <MotionBox
-            id="contact"
-            className={`portfolio-section ${navFlashId === "contact" ? "section-nav-focus" : ""}`}
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, amount: 0.2 }}
-          >
-            <SectionHeading title="Contact" subtitle="Let’s build something great together." />
-
-            <Box className="contact-grid">
-              <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
-                <Typography className="timeline-title">Get in touch</Typography>
-
-                <Stack spacing={1.6} sx={{ mt: 2 }}>
-                  {contactEmail ? (
-                    <Typography className="contact-line">
-                      <MdEmail style={{ marginRight: 10 }} />
-                      {contactEmail}
-                    </Typography>
-                  ) : null}
-
-                  {socials?.phone ? (
-                    <Typography className="contact-line">
-                      <MdPhone style={{ marginRight: 10 }} />
-                      {safeString(socials.phone)}
-                    </Typography>
-                  ) : null}
-
-                  {location ? (
-                    <Typography className="contact-line">
-                      <MdSchool style={{ marginRight: 10 }} />
-                      {location}
-                    </Typography>
-                  ) : null}
-                </Stack>
-
-                <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
-                  {socials?.github ? (
-                    <Button
-                      variant="outlined"
-                      startIcon={<FaGithub />}
-                      sx={{ borderRadius: 999, fontWeight: 700 }}
-                      onClick={() =>
-                        window.open(socials.github, "_blank", "noopener,noreferrer")
-                      }
-                    >
-                      GitHub
-                    </Button>
-                  ) : null}
-
-                  {socials?.linkedin ? (
-                    <Button
-                      variant="outlined"
-                      startIcon={<FaLinkedin />}
-                      sx={{ borderRadius: 999, fontWeight: 700 }}
-                      onClick={() =>
-                        window.open(socials.linkedin, "_blank", "noopener,noreferrer")
-                      }
-                    >
-                      LinkedIn
-                    </Button>
-                  ) : null}
-
-                  {socials?.website ? (
-                    <Button
-                      variant="outlined"
-                      startIcon={<MdLink />}
-                      sx={{ borderRadius: 999, fontWeight: 700 }}
-                      onClick={() =>
-                        window.open(safeString(socials.website), "_blank", "noopener,noreferrer")
-                      }
-                    >
-                      Website
-                    </Button>
-                  ) : null}
-                </Stack>
-              </GlassPanel>
-
-              <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
-                <Typography className="timeline-title">Programming Languages</Typography>
-
-                {loading ? (
-                  <Skeleton height={220} sx={{ mt: 2 }} />
-                ) : languages.length ? (
-                  <Stack spacing={2} sx={{ mt: 2 }}>
-                    {languages.map((lang, idx) => (
-                      <Box key={lang?.id ?? idx} className="language-card">
-                        <Box className="language-card-head">
-                          <Typography className="language-name">
-                            {safeString(lang?.language) || "—"}
-                          </Typography>
-                        </Box>
-
-                        <Stack spacing={1.4} sx={{ mt: 1.25 }}>
-                          <LanguageLevelBar level={lang?.level} />
-                          <LanguageYearsBar years={lang?.years} />
-                        </Stack>
-                      </Box>
-                    ))}
-                  </Stack>
-                ) : (
-                  <Typography sx={{ mt: 2 }}>No language experience added yet.</Typography>
-                )}
-              </GlassPanel>
-            </Box>
-          </MotionBox>
-
-          <Box className="portfolio-footer">
-            <Typography>
-              © {new Date().getFullYear()} {name}. All rights reserved.
-            </Typography>
-          </Box>
+        <Box className="portfolio-page-stage">
+          <AnimatePresence mode="wait" custom={navDirection}>
+            {renderSection()}
+          </AnimatePresence>
         </Box>
       </Container>
 
