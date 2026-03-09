@@ -30,7 +30,7 @@
   --mouse-rx: 0deg;
   --mouse-ry: 0deg;
 
-  --side-nav-desktop-space: 140px;
+  --side-nav-desktop-space: 108px;
   --side-nav-mobile-space: 104px;
 }
 
@@ -114,13 +114,15 @@ button {
     linear-gradient(90deg, rgba(17, 24, 39, 0.035) 1px, transparent 1px);
 }
 
-.portfolio-root.mode-light .portfolio-grid-glow {
+.portfolio-grid-glow {
+  position: absolute;
+  inset: 0;
   background:
     radial-gradient(
       circle at var(--mouse-x) var(--mouse-y),
-      rgba(241,48,36,0.22),
-      rgba(241,48,36,0.10) 14%,
-      transparent 40%
+      rgba(241, 48, 36, 0.16),
+      rgba(241, 48, 36, 0.06) 14%,
+      transparent 34%
     );
   opacity: 0.95;
   transition: background-position 0.16s linear;
@@ -129,7 +131,7 @@ button {
 .portfolio-mesh-lines {
   position: absolute;
   inset: 0;
-  opacity: 0.75;
+  opacity: 0.55;
   background:
     radial-gradient(circle at 18% 78%, rgba(241, 48, 36, 0.35) 0 2px, transparent 3px),
     radial-gradient(circle at 32% 66%, rgba(255, 255, 255, 0.16) 0 2px, transparent 3px),
@@ -218,10 +220,11 @@ button {
   position: relative;
   z-index: 2;
   height: 100vh;
-  padding-top: 8px;
+  padding-top: 26px;
   padding-bottom: 20px;
+  display: flex;
   flex-direction: column;
-  padding-right: calc(var(--side-nav-desktop-space) + 24px);
+  padding-right: calc(var(--side-nav-desktop-space) + 8px);
 }
 
 .portfolio-topbar {
@@ -325,7 +328,7 @@ button {
 }
 
 .hero-section {
-  padding-top: 0;
+  padding-top: 10px;
 }
 
 .hero-layout {
@@ -403,10 +406,10 @@ button {
 }
 
 .hero-name {
-  font-size: clamp(1.6rem, 3vw, 2.2rem) !important;
+  font-size: clamp(1.25rem, 2.6vw, 1.65rem) !important;
   font-weight: 800 !important;
   letter-spacing: 0.12em;
-  text-transform: none;
+  text-transform: uppercase;
   color: var(--accent);
 }
 
@@ -818,15 +821,12 @@ button {
   border: 1px solid rgba(17, 24, 39, 0.08);
 }
 
-.portfolio-side-nav-item.active {
+.portfolio-side-nav-item.active .icon-wrap {
+  opacity: 1;
+  color: white;
   background: linear-gradient(135deg, #f13024, #f97316);
-  box-shadow: 0 14px 32px rgba(241,48,36,0.24);
-}
-
-.portfolio-side-nav-item.active .icon-wrap{
-  background: transparent;
-  border: none;
-  color:white;
+  border-color: transparent;
+  box-shadow: 0 14px 32px rgba(241, 48, 36, 0.24);
 }
 
 .portfolio-side-nav-item:hover .icon-wrap {
@@ -927,29 +927,20 @@ table td {
     padding: 26px 0;
   }
 
-/* MOBILE TEXT ALIGNMENT RULES */
-@media (max-width: 899px) {
-
-  /* only home & about center */
   .hero-name-row,
   .hero-meta-stack,
+  .section-kicker,
+  .section-title,
+  .section-subtitle,
   .hero-title,
   .hero-description,
-  .about-body-copy {
+  .body-copy,
+  .project-description {
     text-align: center;
     text-align-last: center;
     margin-left: auto;
     margin-right: auto;
   }
-
-  /* other sections justify */
-  .body-copy,
-  .project-description,
-  .section-subtitle {
-    text-align: justify;
-    text-align-last: left;
-  }
-}
 
   .hero-name-row {
     justify-content: center;
