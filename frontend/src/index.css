@@ -15,11 +15,11 @@
   --dark-text: #ffffff;
   --dark-muted: rgba(255, 255, 255, 0.7);
 
-  --light-bg: #eef2f8;
-  --light-panel: rgba(255, 255, 255, 0.78);
-  --light-border: rgba(17, 24, 39, 0.12);
+  --light-bg: #f6f8fc;
+  --light-panel: rgba(255, 255, 255, 0.72);
+  --light-border: rgba(17, 24, 39, 0.09);
   --light-text: #111827;
-  --light-muted: rgba(17, 24, 39, 0.72);
+  --light-muted: rgba(17, 24, 39, 0.66);
 
   --accent: #f13024;
   --accent-soft: rgba(241, 48, 36, 0.16);
@@ -30,8 +30,8 @@
   --mouse-rx: 0deg;
   --mouse-ry: 0deg;
 
-  --side-nav-desktop-space: 138px;
-  --side-nav-mobile-space: 108px;
+  --side-nav-desktop-space: 108px;
+  --side-nav-mobile-space: 104px;
 }
 
 * {
@@ -77,9 +77,9 @@ button {
 
 .portfolio-root.mode-light {
   background:
-    radial-gradient(circle at top left, rgba(241, 48, 36, 0.12), transparent 28%),
-    radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.16), transparent 34%),
-    linear-gradient(180deg, #edf1f8 0%, #e6ecf6 50%, #edf1f8 100%);
+    radial-gradient(circle at top left, rgba(241, 48, 36, 0.08), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.12), transparent 32%),
+    linear-gradient(180deg, #f6f8fc 0%, #eef2f9 50%, #f7f9fd 100%);
   color: var(--light-text);
 }
 
@@ -110,9 +110,8 @@ button {
 
 .mode-light .portfolio-grid {
   background-image:
-    linear-gradient(rgba(17, 24, 39, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(17, 24, 39, 0.055) 1px, transparent 1px);
-  opacity: 0.55;
+    linear-gradient(rgba(17, 24, 39, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(17, 24, 39, 0.035) 1px, transparent 1px);
 }
 
 .portfolio-grid-glow {
@@ -121,28 +120,19 @@ button {
   background:
     radial-gradient(
       circle at var(--mouse-x) var(--mouse-y),
-      rgba(241, 48, 36, 0.18),
-      rgba(241, 48, 36, 0.08) 14%,
+      rgba(241, 48, 36, 0.16),
+      rgba(241, 48, 36, 0.06) 14%,
       transparent 34%
     );
   opacity: 0.95;
   transition: background-position 0.16s linear;
 }
 
-.mode-light .portfolio-grid-glow {
-  background:
-    radial-gradient(
-      circle at var(--mouse-x) var(--mouse-y),
-      rgba(241, 48, 36, 0.16),
-      rgba(99, 102, 241, 0.08) 18%,
-      transparent 38%
-    );
-}
-
 .portfolio-mesh-lines {
   position: absolute;
   inset: 0;
-  opacity: 0.62;
+  /* FIX light mode: darker animation colors */
+  opacity: 0.55;
   background:
     radial-gradient(circle at 18% 78%, rgba(241, 48, 36, 0.35) 0 2px, transparent 3px),
     radial-gradient(circle at 32% 66%, rgba(255, 255, 255, 0.16) 0 2px, transparent 3px),
@@ -155,14 +145,15 @@ button {
   transition: transform 0.18s ease-out;
 }
 
+/* FIX: darker animation colors in light mode */
 .mode-light .portfolio-mesh-lines {
-  opacity: 0.72;
   background:
-    radial-gradient(circle at 18% 78%, rgba(241, 48, 36, 0.28) 0 2px, transparent 3px),
-    radial-gradient(circle at 32% 66%, rgba(17, 24, 39, 0.16) 0 2px, transparent 3px),
-    radial-gradient(circle at 46% 58%, rgba(17, 24, 39, 0.18) 0 2px, transparent 3px),
-    radial-gradient(circle at 64% 46%, rgba(17, 24, 39, 0.15) 0 2px, transparent 3px),
-    radial-gradient(circle at 78% 34%, rgba(241, 48, 36, 0.22) 0 2px, transparent 3px);
+    radial-gradient(circle at 18% 78%, rgba(241, 48, 36, 0.5) 0 2px, transparent 3px),
+    radial-gradient(circle at 32% 66%, rgba(17, 24, 39, 0.28) 0 2px, transparent 3px),
+    radial-gradient(circle at 46% 58%, rgba(17, 24, 39, 0.32) 0 2px, transparent 3px),
+    radial-gradient(circle at 64% 46%, rgba(17, 24, 39, 0.28) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 34%, rgba(241, 48, 36, 0.42) 0 2px, transparent 3px);
+  opacity: 0.75;
 }
 
 .portfolio-mesh-lines::before,
@@ -182,27 +173,20 @@ button {
     linear-gradient(125deg, transparent 20%, rgba(255, 255, 255, 0.08) 20.4%, transparent 21%)
       44% 53% / 24% 1px no-repeat,
     linear-gradient(132deg, transparent 20%, rgba(255, 255, 255, 0.08) 20.4%, transparent 21%)
-      60% 42% / 24% 1px no-repeat,
-    linear-gradient(140deg, transparent 20%, rgba(255, 255, 255, 0.08) 20.4%, transparent 21%)
-      68% 32% / 20% 1px no-repeat,
-    linear-gradient(101deg, transparent 20%, rgba(255, 255, 255, 0.08) 20.4%, transparent 21%)
-      22% 50% / 18% 1px no-repeat;
+      60% 42% / 24% 1px no-repeat;
 }
 
+/* FIX: darker lines in light mode */
 .mode-light .portfolio-mesh-lines::before {
   background:
-    linear-gradient(112deg, transparent 20%, rgba(17, 24, 39, 0.12) 20.4%, transparent 21%)
+    linear-gradient(112deg, transparent 20%, rgba(17, 24, 39, 0.18) 20.4%, transparent 21%)
       16% 70% / 22% 1px no-repeat,
-    linear-gradient(118deg, transparent 20%, rgba(17, 24, 39, 0.11) 20.4%, transparent 21%)
+    linear-gradient(118deg, transparent 20%, rgba(17, 24, 39, 0.18) 20.4%, transparent 21%)
       30% 62% / 22% 1px no-repeat,
-    linear-gradient(125deg, transparent 20%, rgba(17, 24, 39, 0.11) 20.4%, transparent 21%)
+    linear-gradient(125deg, transparent 20%, rgba(17, 24, 39, 0.16) 20.4%, transparent 21%)
       44% 53% / 24% 1px no-repeat,
-    linear-gradient(132deg, transparent 20%, rgba(17, 24, 39, 0.11) 20.4%, transparent 21%)
-      60% 42% / 24% 1px no-repeat,
-    linear-gradient(140deg, transparent 20%, rgba(17, 24, 39, 0.11) 20.4%, transparent 21%)
-      68% 32% / 20% 1px no-repeat,
-    linear-gradient(101deg, transparent 20%, rgba(17, 24, 39, 0.1) 20.4%, transparent 21%)
-      22% 50% / 18% 1px no-repeat;
+    linear-gradient(132deg, transparent 20%, rgba(17, 24, 39, 0.16) 20.4%, transparent 21%)
+      60% 42% / 24% 1px no-repeat;
 }
 
 .portfolio-mesh-lines::after {
@@ -210,31 +194,6 @@ button {
     linear-gradient(0deg, transparent 49%, rgba(241, 48, 36, 0.14) 50%, transparent 51%) center center /
       100% 100% no-repeat;
   mask-image: radial-gradient(circle at var(--mouse-x) var(--mouse-y), black 0, transparent 42%);
-}
-
-.portfolio-web-structure {
-  position: absolute;
-  inset: 0;
-  opacity: 0.42;
-  background:
-    linear-gradient(33deg, transparent 48%, rgba(255, 255, 255, 0.08) 49%, transparent 50%) 8% 24% / 16% 14% no-repeat,
-    linear-gradient(108deg, transparent 48%, rgba(255, 255, 255, 0.08) 49%, transparent 50%) 18% 34% / 18% 12% no-repeat,
-    linear-gradient(148deg, transparent 48%, rgba(255, 255, 255, 0.08) 49%, transparent 50%) 28% 46% / 18% 12% no-repeat,
-    linear-gradient(32deg, transparent 48%, rgba(255, 255, 255, 0.08) 49%, transparent 50%) 62% 20% / 18% 13% no-repeat,
-    linear-gradient(92deg, transparent 48%, rgba(255, 255, 255, 0.08) 49%, transparent 50%) 74% 28% / 14% 18% no-repeat,
-    linear-gradient(142deg, transparent 48%, rgba(255, 255, 255, 0.08) 49%, transparent 50%) 70% 40% / 18% 13% no-repeat;
-  transform: translate3d(calc((var(--mouse-x) - 50%) / 55), calc((var(--mouse-y) - 50%) / 55), 0);
-}
-
-.mode-light .portfolio-web-structure {
-  opacity: 0.5;
-  background:
-    linear-gradient(33deg, transparent 48%, rgba(17, 24, 39, 0.12) 49%, transparent 50%) 8% 24% / 16% 14% no-repeat,
-    linear-gradient(108deg, transparent 48%, rgba(17, 24, 39, 0.12) 49%, transparent 50%) 18% 34% / 18% 12% no-repeat,
-    linear-gradient(148deg, transparent 48%, rgba(17, 24, 39, 0.12) 49%, transparent 50%) 28% 46% / 18% 12% no-repeat,
-    linear-gradient(32deg, transparent 48%, rgba(17, 24, 39, 0.12) 49%, transparent 50%) 62% 20% / 18% 13% no-repeat,
-    linear-gradient(92deg, transparent 48%, rgba(17, 24, 39, 0.12) 49%, transparent 50%) 74% 28% / 14% 18% no-repeat,
-    linear-gradient(142deg, transparent 48%, rgba(17, 24, 39, 0.12) 49%, transparent 50%) 70% 40% / 18% 13% no-repeat;
 }
 
 .portfolio-orb {
@@ -272,16 +231,18 @@ button {
   animation-delay: -8s;
 }
 
+/* FIX: light mode orbs are more visible/darker */
 .mode-light .orb-one {
-  background: rgba(241, 48, 36, 0.16);
+  background: rgba(241, 48, 36, 0.32);
+  opacity: 0.6;
 }
-
 .mode-light .orb-two {
-  background: rgba(99, 102, 241, 0.14);
+  background: rgba(139, 92, 246, 0.32);
+  opacity: 0.6;
 }
-
 .mode-light .orb-three {
-  background: rgba(59, 130, 246, 0.12);
+  background: rgba(59, 130, 246, 0.28);
+  opacity: 0.6;
 }
 
 @keyframes floatOrb {
@@ -294,27 +255,30 @@ button {
   }
 }
 
+/* FIX: portfolio-shell — removed excessive top padding, topbar will align flush at top */
 .portfolio-shell {
   position: relative;
   z-index: 2;
   height: 100vh;
-  padding-top: 12px;
-  padding-bottom: 18px;
+  padding-top: 10px;
+  padding-bottom: 20px;
   display: flex;
   flex-direction: column;
-  padding-right: calc(var(--side-nav-desktop-space) + 18px);
+  /* FIX: padding-right accounts for sidebar so content never goes behind it */
+  padding-right: calc(var(--side-nav-desktop-space) + 8px);
 }
 
 .portfolio-topbar {
   position: sticky;
-  top: 8px;
+  top: 10px;
   z-index: 25;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 16px;
-  margin-bottom: 8px;
-  padding: 10px 12px;
+  /* FIX: reduced margin-bottom so name starts same line as icons */
+  margin-bottom: 10px;
+  padding: 8px 12px;
   border-radius: 999px;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -329,8 +293,8 @@ button {
 }
 
 .mode-light .portfolio-topbar {
-  background: rgba(255, 255, 255, 0.82);
-  border-color: rgba(17, 24, 39, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(17, 24, 39, 0.08);
 }
 
 .topbar-icon-btn {
@@ -345,7 +309,7 @@ button {
 }
 
 .mode-light .topbar-icon-btn {
-  background: rgba(17, 24, 39, 0.04) !important;
+  background: rgba(17, 24, 39, 0.03) !important;
   border-color: rgba(17, 24, 39, 0.08) !important;
   color: #111827 !important;
 }
@@ -380,7 +344,6 @@ button {
   overflow-x: hidden;
   scrollbar-width: none;
   padding-right: 6px;
-  padding-bottom: 4px;
 }
 
 .section-scroll-area::-webkit-scrollbar {
@@ -397,7 +360,7 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 12px 0 20px;
+  padding: 34px 0;
   position: relative;
 }
 
@@ -406,8 +369,9 @@ button {
   min-height: 100%;
 }
 
+/* FIX: hero section has minimal top padding so content is flush with topbar */
 .hero-section {
-  padding-top: 2px;
+  padding-top: 4px;
 }
 
 .hero-layout {
@@ -422,32 +386,27 @@ button {
 }
 
 .hero-left-expanded {
-  max-width: 980px;
+  max-width: 920px;
 }
 
-.hero-identity-row {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 18px;
-  align-items: start;
-  margin-bottom: 8px;
-}
-
-.hero-identity-content {
+/* FIX: hero-name-row — spinner covers the height of all 4 meta items */
+.hero-name-row {
   display: flex;
-  flex-direction: column;
   align-items: flex-start;
-  justify-content: flex-start;
-  min-height: 146px;
+  gap: 16px;
+  margin-bottom: 14px;
 }
 
+/* FIX: spinner sized to match the 4 info lines block height */
 .hero-name-spinner-badge {
-  width: 146px;
-  height: 146px;
+  width: clamp(80px, 8vw, 110px);
+  height: clamp(80px, 8vw, 110px);
   flex: 0 0 auto;
   animation: heroBadgeSpin 16s linear infinite;
   transform-origin: center;
   filter: drop-shadow(0 0 18px rgba(241, 48, 36, 0.18));
+  /* align to center of the text block */
+  align-self: center;
 }
 
 .hero-name-spinner-svg {
@@ -462,12 +421,8 @@ button {
   stroke-width: 1.4;
 }
 
-.hero-name-spinner-ring.inner {
-  stroke-opacity: 0.55;
-}
-
 .mode-light .hero-name-spinner-ring {
-  stroke: rgba(17, 24, 39, 0.18);
+  stroke: rgba(17, 24, 39, 0.25);
 }
 
 .hero-name-spinner-text {
@@ -479,13 +434,12 @@ button {
 }
 
 .mode-light .hero-name-spinner-text {
-  fill: rgba(17, 24, 39, 0.78);
+  fill: rgba(17, 24, 39, 0.68);
 }
 
-.hero-name-spinner-initials {
-  font-size: 34px;
-  font-weight: 900;
-  letter-spacing: 0.08em;
+.hero-name-spinner-arrow {
+  font-size: 22px;
+  font-weight: 700;
   fill: var(--accent);
 }
 
@@ -498,19 +452,31 @@ button {
   }
 }
 
+/* FIX: name text block to sit beside the spinner */
+.hero-name-text-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* FIX: hero-name — larger size, NO uppercase transform (respects admin input casing) */
 .hero-name {
-  font-size: clamp(1.55rem, 2.8vw, 2rem) !important;
   font-weight: 800 !important;
-  letter-spacing: 0.01em;
-  text-transform: none;
+  letter-spacing: 0.04em;
   color: var(--accent);
-  margin-top: 0 !important;
-  line-height: 1.08 !important;
+  line-height: 1.15 !important;
+}
+
+/* Use hero-name-display class to set the font-size without uppercase */
+.hero-name-display {
+  font-size: clamp(1.45rem, 3vw, 1.9rem) !important;
+  text-transform: none !important;
+  letter-spacing: 0.04em !important;
 }
 
 .hero-meta-stack {
-  margin-top: 8px;
   margin-bottom: 0;
+  margin-top: 4px;
 }
 
 .hero-role-line {
@@ -531,7 +497,6 @@ button {
   line-height: 1.02 !important;
   letter-spacing: -0.04em;
   max-width: 760px;
-  margin-top: 8px !important;
 }
 
 .hero-description {
@@ -544,34 +509,41 @@ button {
   text-align-last: left;
 }
 
-.hero-socials-row {
-  margin-top: 22px;
-  flex-wrap: wrap;
-}
-
+/* FIX: social icon buttons — styled with bubble background (matching reference image) */
 .hero-social-btn {
-  width: 50px !important;
-  height: 50px !important;
   border: 1px solid transparent !important;
-  border-radius: 18px !important;
   transition: all 0.24s ease !important;
+  width: 46px !important;
+  height: 46px !important;
+  border-radius: 50% !important;
 }
 
 .mode-dark .hero-social-btn {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.08) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
   color: white !important;
 }
 
 .mode-light .hero-social-btn {
-  background: rgba(255, 255, 255, 0.9) !important;
-  border-color: rgba(17, 24, 39, 0.08) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  border-color: rgba(17, 24, 39, 0.12) !important;
   color: #111827 !important;
+  box-shadow: 0 2px 8px rgba(17, 24, 39, 0.07);
 }
 
 .hero-social-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
+}
+
+.mode-dark .hero-social-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.22) !important;
+}
+
+.mode-light .hero-social-btn:hover {
+  background: white !important;
+  border-color: rgba(17, 24, 39, 0.2) !important;
 }
 
 .glass-panel {
@@ -596,6 +568,9 @@ button {
   background: var(--light-panel) !important;
   border: 1px solid var(--light-border);
 }
+
+/* FIX: removed section-kicker class (was showing small colored duplicate title) */
+/* .section-kicker is no longer used in SectionHeading */
 
 .section-title {
   font-size: clamp(2rem, 4vw, 3.4rem) !important;
@@ -659,9 +634,11 @@ button {
 }
 
 .mode-light .project-card {
-  background: rgba(255, 255, 255, 0.86) !important;
+  background: rgba(255, 255, 255, 0.82) !important;
   border-color: rgba(17, 24, 39, 0.08) !important;
 }
+
+/* FIX: .project-card-topline and .project-mini-label removed (Featured Project label gone) */
 
 .project-title {
   font-size: 1.45rem !important;
@@ -847,6 +824,9 @@ button {
   opacity: 0.7;
 }
 
+/* =============================================
+   SIDEBAR NAV — FIX: bubble fills the whole icon button (not just the icon)
+   ============================================= */
 .portfolio-side-nav {
   position: fixed;
   right: 22px;
@@ -867,15 +847,15 @@ button {
 }
 
 .mode-light .portfolio-side-nav {
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(17, 24, 39, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(17, 24, 39, 0.08);
 }
 
 .portfolio-side-nav-item {
   position: relative;
-  width: 52px;
-  height: 52px;
-  border: 1px solid transparent;
+  width: 46px;
+  height: 46px;
+  border: none;
   background: transparent;
   border-radius: 999px;
   cursor: pointer;
@@ -886,49 +866,69 @@ button {
   padding: 0;
 }
 
-.mode-dark .portfolio-side-nav-item {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
-.mode-light .portfolio-side-nav-item {
-  background: rgba(17, 24, 39, 0.03);
-  border-color: rgba(17, 24, 39, 0.08);
-}
-
-.portfolio-side-nav-item .icon-wrap {
+/* FIX: icon-bubble is the full circle background (what fills with gradient on active) */
+.portfolio-side-nav-item .icon-bubble {
   width: 100%;
   height: 100%;
+  border-radius: 50%;
   display: grid;
   place-items: center;
-  border-radius: inherit;
-  font-size: 1.08rem;
-  opacity: 0.82;
   transition: all 0.22s ease;
+  font-size: 1.08rem;
 }
 
-.portfolio-side-nav-item.active {
+.mode-dark .portfolio-side-nav-item .icon-bubble {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mode-light .portfolio-side-nav-item .icon-bubble {
+  background: rgba(17, 24, 39, 0.04);
+  border: 1px solid rgba(17, 24, 39, 0.1);
+}
+
+/* FIX: active state fills the full bubble with gradient */
+.portfolio-side-nav-item.active .icon-bubble {
+  background: linear-gradient(135deg, #f13024, #f97316) !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 24px rgba(241, 48, 36, 0.35);
+}
+
+.portfolio-side-nav-item.active .icon-inner {
   color: white;
-  background: linear-gradient(135deg, #f13024, #f97316);
-  border-color: transparent;
-  box-shadow: 0 14px 32px rgba(241, 48, 36, 0.24);
 }
 
-.portfolio-side-nav-item.active .icon-wrap {
-  opacity: 1;
+/* FIX: hover state — subtle bubble highlight */
+.portfolio-side-nav-item:hover .icon-bubble {
+  transform: scale(1.06);
 }
 
-.portfolio-side-nav-item:hover {
-  transform: translateX(-2px) scale(1.04);
+.mode-dark .portfolio-side-nav-item:hover .icon-bubble {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
-.portfolio-side-nav-item:hover .icon-wrap {
+.mode-light .portfolio-side-nav-item:hover .icon-bubble {
+  background: rgba(17, 24, 39, 0.08);
+  border-color: rgba(17, 24, 39, 0.16);
+}
+
+.portfolio-side-nav-item .icon-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.08rem;
+  opacity: 0.78;
+  transition: color 0.22s ease, opacity 0.22s ease;
+}
+
+.portfolio-side-nav-item.active .icon-inner {
   opacity: 1;
 }
 
 .portfolio-side-nav-item .label {
   position: absolute;
-  right: 64px;
+  right: 58px;
   white-space: nowrap;
   padding: 8px 12px;
   border-radius: 999px;
@@ -961,9 +961,12 @@ table td {
   border-color: rgba(127, 127, 127, 0.18) !important;
 }
 
+/* =============================================
+   RESPONSIVE — FIX: center only home & about on mobile; rest stays justified
+   ============================================= */
 @media (max-width: 1199px) {
   .portfolio-shell {
-    padding-right: calc(var(--side-nav-desktop-space) - 16px);
+    padding-right: calc(var(--side-nav-desktop-space) - 6px);
   }
 
   .hero-layout {
@@ -986,16 +989,15 @@ table td {
   }
 
   .portfolio-shell {
-    padding-top: 12px;
-    padding-right: 18px;
-    padding-bottom: calc(var(--side-nav-mobile-space) + 12px);
+    padding-top: 10px;
+    padding-right: 24px;
+    padding-bottom: calc(var(--side-nav-mobile-space) + 10px);
   }
 
   .portfolio-topbar {
     border-radius: 24px;
-    padding: 10px 12px;
-    top: 8px;
-    margin-bottom: 8px;
+    padding: 10px;
+    top: 10px;
   }
 
   .portfolio-side-nav {
@@ -1012,65 +1014,50 @@ table td {
     padding: 10px;
   }
 
-  .portfolio-side-nav-item {
-    width: 42px;
-    height: 42px;
-    flex: 0 0 auto;
-  }
-
   .portfolio-side-nav-item .label {
     display: none;
   }
 
   .portfolio-section {
-    padding: 18px 0 24px;
+    padding: 26px 0;
   }
 
-  .hero-identity-row {
-    grid-template-columns: 1fr;
-    justify-items: center;
-    gap: 12px;
-  }
-
-  .hero-identity-content {
-    min-height: auto;
-    align-items: center;
-  }
-
-  .hero-name-spinner-badge {
-    width: 110px;
-    height: 110px;
-  }
-
-  .hero-socials-row {
-    justify-content: center;
-  }
-
-  .home-page .hero-name,
-  .home-page .hero-meta-stack,
-  .home-page .hero-title,
-  .home-page .hero-description,
-  .about-page .section-title,
-  .about-page .section-subtitle,
-  .about-page .body-copy {
+  /* FIX: Only center home and about on mobile */
+  .hero-section .hero-name-row,
+  .hero-section .hero-meta-stack,
+  .hero-section .hero-title,
+  .hero-section .hero-description,
+  .about-section-plain .body-copy,
+  .about-section-plain .section-title,
+  .about-section-plain .section-subtitle {
     text-align: center;
     text-align-last: center;
     margin-left: auto;
     margin-right: auto;
   }
 
-  .home-page .hero-meta-stack {
+  .hero-section .hero-name-row {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .hero-section .hero-name-text-block {
     align-items: center;
   }
 
-  .content-page .section-title,
-  .content-page .section-subtitle,
-  .content-page .body-copy,
-  .content-page .project-description {
-    text-align: justify;
+  .hero-section .hero-meta-stack {
+    align-items: center;
+  }
+
+  /* All other sections (skills, projects, experience, education, achievements, contact) stay left/justify */
+  .section-static:not(.about-section-plain) .body-copy,
+  .section-static:not(.about-section-plain) .section-title,
+  .section-static:not(.about-section-plain) .section-subtitle,
+  .section-static:not(.about-section-plain) .timeline-title,
+  .section-static:not(.about-section-plain) .timeline-subtitle,
+  .section-static:not(.about-section-plain) .timeline-meta {
+    text-align: left;
     text-align-last: left;
-    margin-left: 0;
-    margin-right: 0;
   }
 
   .hero-left-expanded {
@@ -1081,7 +1068,7 @@ table td {
 @media (max-width: 767px) {
   .portfolio-section {
     min-height: 100%;
-    padding: 16px 0 22px;
+    padding: 24px 0;
   }
 
   .hero-title {
@@ -1093,13 +1080,23 @@ table td {
     border-radius: 22px;
   }
 
-  .hero-name {
-    font-size: clamp(1.3rem, 5.4vw, 1.6rem) !important;
+  .portfolio-side-nav-item {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+  }
+
+  .hero-name-row {
+    margin-bottom: 10px;
+  }
+
+  .hero-name-display {
+    font-size: clamp(1.25rem, 5vw, 1.55rem) !important;
   }
 
   .hero-name-spinner-badge {
-    width: 96px;
-    height: 96px;
+    width: 70px;
+    height: 70px;
   }
 
   .segmented-meter {
