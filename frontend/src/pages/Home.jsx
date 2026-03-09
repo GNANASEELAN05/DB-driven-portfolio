@@ -1,9 +1,9 @@
-// src/pages/Home.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Avatar,
   Box,
   Button,
+  Chip,
   Container,
   Dialog,
   DialogActions,
@@ -44,7 +44,6 @@ import {
   MdCode,
   MdVisibility,
   MdPhone,
-  MdClose,
 } from "react-icons/md";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
@@ -64,22 +63,25 @@ import {
 const MotionBox = motion(Box);
 const MotionPaper = motion(Paper);
 
-const reveal = {
-  hidden: { opacity: 0, y: 18 },
+const BRAND_PRIMARY = "#915EFF";
+const BRAND_SECONDARY = "#00CEA8";
+const BRAND_TEXT = "#DFD9FF";
+const BRAND_CARD = "#151030";
+const BRAND_CARD_2 = "#100D25";
+
+const revealUp = {
+  hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0 },
 };
 
-// ✅ scroll reveal for sections (no layout change, just animation)
-const sectionReveal = {
-  hidden: { opacity: 0, y: 22 },
-  visible: { opacity: 1, y: 0 },
+const staggerWrap = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
 };
-
-const BRAND_PRIMARY = "#c680f2";
-const BRAND_DARK = "#7A3F91";
-const ACCENT_A = "#22C55E"; // emerald
-const ACCENT_B = "#60A5FA"; // sky
-const ACCENT_C = "#F59E0B"; // amber
 
 function scrollToId(id) {
   const el = document.getElementById(id);
@@ -106,55 +108,80 @@ function splitCSV(s) {
     .filter(Boolean);
 }
 
-function SectionTitle({ title, icon }) {
+function blobSafeWindowOpen(url) {
+  try {
+    window.open(url, "_blank", "noopener,noreferrer");
+  } catch {
+    window.open(url, "_blank");
+  }
+}
+
+function SectionIntro({ subText, heading }) {
+  const theme = useTheme();
+
   return (
-    <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1.5 }}>
-      <Box
+    <Box sx={{ mb: 2.25 }}>
+      <Typography
         sx={{
-          width: 38,
-          height: 38,
-          borderRadius: 2.4,
-          display: "grid",
-          placeItems: "center",
-          background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-          color: "#0b0b0e",
-          boxShadow: "0 10px 30px rgba(122,63,145,0.25)",
-          // ✅ subtle hover polish (no layout change)
-          transition: "transform 180ms ease, box-shadow 180ms ease",
-          "&:hover": {
-            transform: "translateY(-2px)",
-            boxShadow: "0 16px 45px rgba(122,63,145,0.28)",
-          },
+          textTransform: "uppercase",
+          letterSpacing: "0.18em",
+          fontSize: { xs: 11, md: 12 },
+          fontWeight: 800,
+          color: theme.palette.mode === "dark" ? "rgba(223,217,255,0.72)" : "rgba(77,51,130,0.70)",
         }}
       >
-        {icon}
-      </Box>
-      <Typography sx={{ fontWeight: 950, fontSize: { xs: 18, md: 22 } }}>{title}</Typography>
-    </Stack>
+        {subText}
+      </Typography>
+
+      <Typography
+        sx={{
+          mt: 0.5,
+          fontSize: { xs: 26, md: 38 },
+          lineHeight: 1.08,
+          fontWeight: 900,
+          color: "text.primary",
+        }}
+      >
+        {heading}
+      </Typography>
+    </Box>
   );
 }
 
-function GlassCard({ sx, children }) {
+function GlassPanel({ children, sx }) {
+  const theme = useTheme();
+
   return (
     <Paper
       variant="outlined"
       sx={{
+        position: "relative",
         borderRadius: 4,
         overflow: "hidden",
-        // ✅ FIX: prevent horizontal scrollbar on hover transforms inside tables
-        overflowX: "hidden",
-        borderColor: (t) => (t.palette.mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)"),
-        background: (t) =>
-          t.palette.mode === "dark"
-            ? "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03))"
-            : "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,255,255,0.78))",
-        backdropFilter: "blur(10px)",
-        // ✅ hover polish (no layout change)
+        borderColor:
+          theme.palette.mode === "dark"
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(73,56,126,0.12)",
+        background:
+          theme.palette.mode === "dark"
+            ? "linear-gradient(180deg, rgba(21,16,48,0.92), rgba(16,13,37,0.94))"
+            : "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,242,255,0.88))",
+        backdropFilter: "blur(12px)",
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 20px 60px rgba(0,0,0,0.28)"
+            : "0 20px 60px rgba(73,56,126,0.10)",
         transition: "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
         "&:hover": {
-          transform: "translateY(-2px)",
-          boxShadow: "0 18px 55px rgba(0,0,0,0.14)",
-          borderColor: (t) => (t.palette.mode === "dark" ? "rgba(198,128,242,0.22)" : "rgba(122,63,145,0.22)"),
+          transform: "translateY(-3px)",
+          boxShadow:
+            theme.palette.mode === "dark"
+              ? "0 24px 70px rgba(0,0,0,0.34)"
+              : "0 24px 70px rgba(73,56,126,0.14)",
+          borderColor:
+            theme.palette.mode === "dark"
+              ? "rgba(145,94,255,0.22)"
+              : "rgba(145,94,255,0.20)",
         },
         ...sx,
       }}
@@ -164,7 +191,128 @@ function GlassCard({ sx, children }) {
   );
 }
 
+function TechBadge({ label }) {
+  const theme = useTheme();
+
+  return (
+    <Chip
+      label={label}
+      size="small"
+      sx={{
+        fontWeight: 800,
+        borderRadius: 999,
+        color: theme.palette.mode === "dark" ? BRAND_TEXT : "#4f3a87",
+        background:
+          theme.palette.mode === "dark"
+            ? "rgba(145,94,255,0.14)"
+            : "rgba(145,94,255,0.10)",
+        border: "1px solid",
+        borderColor:
+          theme.palette.mode === "dark"
+            ? "rgba(145,94,255,0.22)"
+            : "rgba(145,94,255,0.18)",
+        "& .MuiChip-label": {
+          px: 1.25,
+        },
+      }}
+    />
+  );
+}
+
+function FloatingStars() {
+  const dots = useMemo(
+    () =>
+      Array.from({ length: 42 }, (_, i) => ({
+        id: i,
+        size: (i % 3) + 2,
+        left: `${(i * 17) % 100}%`,
+        top: `${(i * 29) % 100}%`,
+        delay: `${(i % 8) * 0.4}s`,
+        duration: `${4 + (i % 5)}s`,
+        opacity: 0.25 + (i % 4) * 0.12,
+      })),
+    []
+  );
+
+  return (
+    <Box sx={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
+      {dots.map((d) => (
+        <Box
+          key={d.id}
+          sx={{
+            position: "absolute",
+            left: d.left,
+            top: d.top,
+            width: d.size,
+            height: d.size,
+            borderRadius: "50%",
+            background: "rgba(255,255,255,0.95)",
+            opacity: d.opacity,
+            boxShadow: "0 0 16px rgba(255,255,255,0.55)",
+            animation: `twinkle ${d.duration} ease-in-out ${d.delay} infinite`,
+          }}
+        />
+      ))}
+    </Box>
+  );
+}
+
+function VerticalAccent() {
+  const theme = useTheme();
+
+  return (
+    <Stack alignItems="center" spacing={1.25} sx={{ pt: 1, mr: { xs: 0.8, md: 1.6 } }}>
+      <Box
+        sx={{
+          width: 14,
+          height: 14,
+          borderRadius: "50%",
+          background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
+          boxShadow: "0 0 24px rgba(145,94,255,0.45)",
+        }}
+      />
+      <Box
+        sx={{
+          width: 4,
+          height: { xs: 110, md: 180 },
+          borderRadius: 999,
+          background:
+            theme.palette.mode === "dark"
+              ? "linear-gradient(180deg, #915EFF, rgba(145,94,255,0.08))"
+              : "linear-gradient(180deg, #915EFF, rgba(145,94,255,0.10))",
+        }}
+      />
+    </Stack>
+  );
+}
+
+function InfoStat({ label, value }) {
+  const theme = useTheme();
+
+  return (
+    <GlassPanel
+      sx={{
+        p: 1.6,
+        minHeight: 92,
+        display: "flex",
+        justifyContent: "center",
+        flexDirection: "column",
+        background:
+          theme.palette.mode === "dark"
+            ? "linear-gradient(180deg, rgba(145,94,255,0.10), rgba(16,13,37,0.92))"
+            : "linear-gradient(180deg, rgba(145,94,255,0.08), rgba(255,255,255,0.94))",
+      }}
+    >
+      <Typography sx={{ fontSize: 22, fontWeight: 950, lineHeight: 1.1 }}>{value}</Typography>
+      <Typography variant="body2" sx={{ opacity: 0.78, mt: 0.45 }}>
+        {label}
+      </Typography>
+    </GlassPanel>
+  );
+}
+
 function ProjectCardOneByOne({ index, p }) {
+  const theme = useTheme();
   const title = safeString(p?.title) || "Untitled Project";
   const description = safeString(p?.description) || "";
   const techList = splitCSV(p?.tech);
@@ -173,118 +321,125 @@ function ProjectCardOneByOne({ index, p }) {
 
   return (
     <MotionPaper
+      variants={revealUp}
+      whileHover={{ y: -8, rotateX: 2, rotateY: -2 }}
+      transition={{ type: "spring", stiffness: 260, damping: 20 }}
       variant="outlined"
-      whileHover={{ y: -4 }}
-      transition={{ type: "spring", stiffness: 380, damping: 26 }}
       sx={{
-        p: { xs: 2, md: 2.3 },
-        borderRadius: 3,
-        borderColor: (t) => (t.palette.mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)"),
-        background: (t) => (t.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.85)"),
-        // ✅ glow on hover (no layout change)
-        transition: "box-shadow 180ms ease, border-color 180ms ease",
-        "&:hover": {
-          boxShadow: "0 18px 55px rgba(122,63,145,0.18)",
-          borderColor: "rgba(198,128,242,0.25)",
-        },
+        p: { xs: 2, md: 2.6 },
+        borderRadius: 4,
+        borderColor:
+          theme.palette.mode === "dark"
+            ? "rgba(255,255,255,0.09)"
+            : "rgba(73,56,126,0.12)",
+        background:
+          theme.palette.mode === "dark"
+            ? "linear-gradient(180deg, rgba(21,16,48,0.95), rgba(16,13,37,0.98))"
+            : "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,242,255,0.92))",
+        boxShadow:
+          theme.palette.mode === "dark"
+            ? "0 18px 50px rgba(0,0,0,0.24)"
+            : "0 18px 50px rgba(73,56,126,0.12)",
       }}
     >
-      <Stack spacing={1}>
-        <Stack direction="row" spacing={1} alignItems="baseline">
-          <Typography
+      <Stack spacing={1.4}>
+        <Stack direction="row" alignItems="center" spacing={1.2}>
+          <Box
             sx={{
+              width: 42,
+              height: 42,
+              borderRadius: 3,
+              display: "grid",
+              placeItems: "center",
               fontWeight: 950,
-              minWidth: 10,
-              textAlign: "right",
-              fontSize: { xs: 16, md: 18 },
-              color: "text.primary",
+              fontSize: 14,
+              background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
+              color: "#0b0b0e",
+              boxShadow: "0 10px 25px rgba(145,94,255,0.25)",
             }}
           >
-            {index}.
+            {String(index).padStart(2, "0")}
+          </Box>
+
+          <Typography sx={{ fontWeight: 950, fontSize: { xs: 18, md: 20 } }}>
+            {title}
           </Typography>
-          <Typography sx={{ fontWeight: 950, fontSize: { xs: 16, md: 18 } }}>{title}</Typography>
         </Stack>
 
         {description ? (
-  <Typography
-    variant="body2"
-    sx={{
-      opacity: 0.9,
-      lineHeight: 1.6,
-      textAlign: "justify",  // ✅ makes paragraph justified
-    }}
-  >
-    {description}
-  </Typography>
-) : null}
+          <Typography
+            variant="body2"
+            sx={{
+              opacity: 0.9,
+              lineHeight: 1.75,
+              textAlign: "justify",
+              whiteSpace: "pre-wrap",
+            }}
+          >
+            {description}
+          </Typography>
+        ) : null}
 
         {techList.length ? (
-          <Box sx={{ pt: 0.2 }}>
-            <Typography variant="caption" sx={{ fontWeight: 800 }}>
-              Tech Stack
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9, mt: 0.4 }}>
-              {techList.join(" • ")}
-            </Typography>
-          </Box>
+          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+            {techList.map((item, idx) => (
+              <TechBadge key={`${item}-${idx}`} label={`#${item}`} />
+            ))}
+          </Stack>
         ) : null}
 
         {(repoUrl || liveUrl) && (
-          <Stack direction="row" spacing={1} sx={{ pt: 0.5 }}>
-            {repoUrl && (
+          <Stack direction="row" spacing={1.1} sx={{ pt: 0.5, flexWrap: "wrap" }}>
+            {repoUrl ? (
               <Button
                 variant="outlined"
                 size="small"
                 startIcon={<MdLink />}
-                onClick={() => window.open(repoUrl, "_blank")}
+                onClick={() => blobSafeWindowOpen(repoUrl)}
                 sx={{
-                borderRadius: 2,
-                fontWeight: 800,
-                fontSize: 12,
-                px: 1.8,
-                py: 0.6,
-                minWidth: "110px",
-                background: `linear-gradient(135deg, ${ACCENT_A}, ${ACCENT_B})`,
-                color: "#07121a",
-                transition: "transform 160ms ease, box-shadow 160ms ease, filter 160ms ease",
-                "&:hover": {
-                transform: "translateY(-2px)",
-                boxShadow: "0 14px 34px rgba(34,197,94,0.18)",
-                filter: "brightness(1.03)",
-                },
+                  borderRadius: 999,
+                  fontWeight: 900,
+                  px: 1.8,
+                  color: theme.palette.mode === "dark" ? BRAND_TEXT : "#4f3a87",
+                  borderColor:
+                    theme.palette.mode === "dark"
+                      ? "rgba(145,94,255,0.32)"
+                      : "rgba(145,94,255,0.24)",
+                  "&:hover": {
+                    borderColor: BRAND_PRIMARY,
+                    background:
+                      theme.palette.mode === "dark"
+                        ? "rgba(145,94,255,0.10)"
+                        : "rgba(145,94,255,0.07)",
+                  },
                 }}
               >
-                Repo
+                Source Code
               </Button>
-            )}
+            ) : null}
 
-            {liveUrl && (
+            {liveUrl ? (
               <Button
                 variant="contained"
                 size="small"
                 startIcon={<MdLink />}
-                onClick={() => window.open(liveUrl, "_blank")}
+                onClick={() => blobSafeWindowOpen(liveUrl)}
                 sx={{
-                  borderRadius: 2,
-                  fontWeight: 800,
-                  fontSize: 12,
+                  borderRadius: 999,
+                  fontWeight: 900,
                   px: 1.8,
-                  py: 0.6,
-                  minWidth: "110px",
-                  background: `linear-gradient(135deg, ${ACCENT_A}, ${ACCENT_B})`,
-                  color: "#07121a",
-                  // ✅ hover polish
-                  transition: "transform 160ms ease, box-shadow 160ms ease, filter 160ms ease",
+                  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
+                  color: "#0b0b0e",
+                  boxShadow: "0 12px 30px rgba(145,94,255,0.24)",
                   "&:hover": {
-                    transform: "translateY(-2px)",
-                    boxShadow: "0 14px 34px rgba(34,197,94,0.18)",
-                    filter: "brightness(1.03)",
+                    background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
+                    boxShadow: "0 16px 40px rgba(145,94,255,0.30)",
                   },
                 }}
               >
-                Live
+                Live Demo
               </Button>
-            )}
+            ) : null}
           </Stack>
         )}
       </Stack>
@@ -298,11 +453,11 @@ async function blobDownload(url) {
 
   const blob = await res.blob();
 
-  // Try filename from Content-Disposition
   let filename = "Resume.pdf";
   const cd = res.headers.get("content-disposition") || "";
   const match =
     cd.match(/filename\*=UTF-8''([^;]+)/i) || cd.match(/filename="([^"]+)"/i) || cd.match(/filename=([^;]+)/i);
+
   if (match?.[1]) {
     try {
       filename = decodeURIComponent(match[1]).replace(/["']/g, "").trim();
@@ -326,18 +481,18 @@ async function blobDownload(url) {
 
 function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   const src = blobUrl || url;
+  const theme = useTheme();
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
       <DialogTitle sx={{ fontWeight: 950 }}>{title}</DialogTitle>
 
-      {/* OUTER — REMOVE ALL SCROLLBARS */}
       <DialogContent
         sx={{
           height: 650,
           p: 0,
           overflow: "hidden",
-          background: "black", // hides pdf viewer scrollbar flash
+          background: "#000",
         }}
       >
         {loading ? (
@@ -352,17 +507,14 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
               overflowY: "scroll",
               overflowX: "hidden",
               position: "relative",
-
-              /* HIDE ALL SCROLLBARS BUT KEEP SCROLL */
-              scrollbarWidth: "none", // Firefox
-              msOverflowStyle: "none", // Edge/IE
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
               "&::-webkit-scrollbar": {
                 width: "0px",
                 background: "transparent",
               },
             }}
           >
-            {/* MASK RIGHT EDGE → hides chrome pdf scrollbar */}
             <Box
               sx={{
                 position: "absolute",
@@ -370,18 +522,17 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
                 top: 0,
                 width: "14px",
                 height: "100%",
-                background: (theme) => (theme.palette.mode === "dark" ? "#000" : "#fff"),
+                background: theme.palette.mode === "dark" ? "#000" : "#fff",
                 zIndex: 10,
                 pointerEvents: "none",
               }}
             />
-
             <iframe
               title="Resume Preview"
               src={src}
               style={{
                 width: "100%",
-                height: "200%", // important: prevents iframe scrollbar
+                height: "200%",
                 border: "none",
                 display: "block",
                 overflow: "hidden",
@@ -403,8 +554,8 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
           sx={{
             borderRadius: 999,
             fontWeight: 950,
-            borderColor: "rgba(122,63,145,0.55)",
-            color: "#c680f2",
+            borderColor: "rgba(145,94,255,0.45)",
+            color: BRAND_PRIMARY,
           }}
         >
           Close
@@ -414,11 +565,50 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   );
 }
 
+function TimelineCard({ title, subtitle, description }) {
+  const theme = useTheme();
+
+  return (
+    <MotionPaper
+      variants={revealUp}
+      whileHover={{ y: -6 }}
+      transition={{ type: "spring", stiffness: 280, damping: 22 }}
+      variant="outlined"
+      sx={{
+        p: 2,
+        borderRadius: 4,
+        borderColor:
+          theme.palette.mode === "dark"
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(73,56,126,0.12)",
+        background:
+          theme.palette.mode === "dark"
+            ? "linear-gradient(180deg, rgba(21,16,48,0.95), rgba(16,13,37,0.98))"
+            : "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(245,242,255,0.91))",
+      }}
+    >
+      <Typography sx={{ fontWeight: 900, fontSize: { xs: 16, md: 18 } }}>{title}</Typography>
+      {subtitle ? (
+        <Typography variant="body2" sx={{ opacity: 0.8, mt: 0.35 }}>
+          {subtitle}
+        </Typography>
+      ) : null}
+      {description ? (
+        <Typography
+          variant="body2"
+          sx={{ mt: 1.1, opacity: 0.92, lineHeight: 1.7, whiteSpace: "pre-wrap", textAlign: "justify" }}
+        >
+          {description}
+        </Typography>
+      ) : null}
+    </MotionPaper>
+  );
+}
+
 export default function Home({ toggleTheme }) {
-  // ⭐ change browser tab name for viewer
-useEffect(() => {
-  document.title = "Gnanaseelan Portfolio";   // <-- change to your name
-}, []);
+  useEffect(() => {
+    document.title = "Gnanaseelan Portfolio";
+  }, []);
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -427,9 +617,6 @@ useEffect(() => {
   const [loading, setLoading] = useState(true);
   const [reloadTick, setReloadTick] = useState(0);
 
-  
-
-  // DB data
   const [profile, setProfile] = useState(null);
   const [skills, setSkills] = useState(null);
   const [projects, setProjects] = useState([]);
@@ -439,7 +626,6 @@ useEffect(() => {
   const [achievements, setAchievements] = useState([]);
   const [languages, setLanguages] = useState([]);
 
-  // resume display
   const [resumeName, setResumeName] = useState("Resume.pdf");
   const [downloading, setDownloading] = useState(false);
   const [resumePreviewOpen, setResumePreviewOpen] = useState(false);
@@ -451,12 +637,16 @@ useEffect(() => {
 
   const name = safeString(profile?.name) || "Your Name";
   const title = safeString(profile?.title) || "Full Stack Developer";
-  const tagline = safeString(profile?.tagline) || "DB-driven portfolio with a modern viewer + admin studio.";
+  const tagline = safeString(profile?.tagline) || "I build modern, scalable, and user-focused digital experiences.";
   const about = safeString(profile?.about) || "";
   const location = safeString(profile?.location) || "";
   const emailPublic = safeString(profile?.emailPublic) || "";
 
-  // ✅ FIX: single source of truth for contact email
+  const frontendList = splitCSV(skills?.frontend);
+  const backendList = splitCSV(skills?.backend);
+  const databaseList = splitCSV(skills?.database);
+  const toolsList = splitCSV(skills?.tools);
+
   const contactEmail = useMemo(() => {
     const ep = safeString(emailPublic).trim();
     if (ep) return ep;
@@ -467,7 +657,6 @@ useEffect(() => {
 
   const reload = () => setReloadTick((x) => x + 1);
 
-  // ✅ cache-busting for resume (updates after admin delete/primary)
   const contentVersion = useMemo(() => localStorage.getItem("content_version") || "0", [reloadTick]);
   const resumeDownloadBase = useMemo(() => downloadResumeUrl(), []);
   const resumeDownloadUrlBusted = useMemo(() => {
@@ -475,7 +664,6 @@ useEffect(() => {
     return `${resumeDownloadBase}${joiner}v=${encodeURIComponent(contentVersion)}&t=${Date.now()}`;
   }, [resumeDownloadBase, contentVersion]);
 
-  // ✅ FIX: use the real /view endpoint + cache bust
   const resumeViewBase = useMemo(() => viewResumeUrl(), []);
   const resumeViewUrlBusted = useMemo(() => {
     const joiner = resumeViewBase.includes("?") ? "&" : "?";
@@ -528,7 +716,6 @@ useEffect(() => {
     };
   }, [reloadTick, name]);
 
-  // ✅ keep viewer resume in sync with Admin “push to viewer”
   useEffect(() => {
     const sync = () => {
       reload();
@@ -554,10 +741,8 @@ useEffect(() => {
       window.removeEventListener("focus", sync);
       document.removeEventListener("visibilitychange", onVis);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ SKILLS TABLE: ONLY skills categories
   const skillCategoryRows = useMemo(() => {
     const s = skills || {};
     const frontend = splitCSV(s.frontend).join(", ");
@@ -581,8 +766,10 @@ useEffect(() => {
       setResumeName(fname);
     } catch {
       try {
-        window.open(resumeDownloadUrlBusted, "_blank");
-      } catch {}
+        blobSafeWindowOpen(resumeDownloadUrlBusted);
+      } catch {
+        // ignore
+      }
     } finally {
       setDownloading(false);
     }
@@ -593,7 +780,9 @@ useEffect(() => {
     if (resumePreviewBlobUrl) {
       try {
         URL.revokeObjectURL(resumePreviewBlobUrl);
-      } catch {}
+      } catch {
+        // ignore
+      }
     }
     setResumePreviewBlobUrl("");
   };
@@ -617,28 +806,29 @@ useEffect(() => {
     }
   };
 
-  // ✅ UPDATED: make hero overlay glow look premium in BOTH modes
-  const heroBg = useMemo(() => {
-    return mode === "dark"
-      ? "radial-gradient(1000px 600px at 10% 10%, rgba(139,92,246,0.20), transparent 55%), radial-gradient(900px 520px at 90% 20%, rgba(34,211,238,0.16), transparent 55%), radial-gradient(1000px 520px at 40% 110%, rgba(139,92,246,0.12), transparent 50%)"
-      : "radial-gradient(1000px 620px at 12% 10%, rgba(122,63,145,0.16), transparent 60%), radial-gradient(980px 560px at 92% 20%, rgba(96,165,250,0.18), transparent 60%), radial-gradient(980px 520px at 45% 115%, rgba(198,128,242,0.14), transparent 58%)";
-  }, [mode]);
-
-  // ✅ FIXED: page background now switches properly for LIGHT mode
   const pageBg = useMemo(() => {
     return mode === "dark"
-      ? "linear-gradient(135deg,#0f0c29,#302b63,#24243e)" // ✅ keep AdminLogin (perfect)
-      : "linear-gradient(135deg,#f6f3ff,#eef5ff,#ffffff)"; // ✅ clean premium light
+      ? `
+        radial-gradient(circle at 12% 12%, rgba(145,94,255,0.18), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(0,206,168,0.12), transparent 24%),
+        radial-gradient(circle at 50% 80%, rgba(145,94,255,0.10), transparent 26%),
+        linear-gradient(180deg, #050816 0%, #0b1026 45%, #050816 100%)
+      `
+      : `
+        radial-gradient(circle at 12% 12%, rgba(145,94,255,0.12), transparent 28%),
+        radial-gradient(circle at 88% 18%, rgba(0,206,168,0.10), transparent 24%),
+        radial-gradient(circle at 50% 82%, rgba(145,94,255,0.08), transparent 26%),
+        linear-gradient(180deg, #f6f4ff 0%, #f3f7ff 48%, #f8f6ff 100%)
+      `;
   }, [mode]);
 
-  // ✅ mouse “cool” effect on hero card
   const heroRef = useRef(null);
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
   const mxSpring = useSpring(mx, { stiffness: 180, damping: 20, mass: 0.4 });
   const mySpring = useSpring(my, { stiffness: 180, damping: 20, mass: 0.4 });
-  const rotateY = useTransform(mxSpring, [-0.5, 0.5], [-4, 4]);
-  const rotateX = useTransform(mySpring, [-0.5, 0.5], [4, -4]);
+  const rotateY = useTransform(mxSpring, [-0.5, 0.5], [-5, 5]);
+  const rotateX = useTransform(mySpring, [-0.5, 0.5], [5, -5]);
 
   const onHeroMove = (e) => {
     const el = heroRef.current;
@@ -657,775 +847,849 @@ useEffect(() => {
     my.set(0);
   };
 
-  const iconBtnSx = {
-    borderRadius: 2,
-    border: "1px solid",
-    transition: "transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease",
-    "&:hover": {
-      transform: "translateY(-2px)",
-      boxShadow: "0 14px 40px rgba(0,0,0,0.14)",
-      borderColor: "rgba(198,128,242,0.22)",
+  const socialsButtons = [
+    {
+      show: !!socials?.github,
+      label: "GitHub",
+      icon: <FaGithub />,
+      action: () => blobSafeWindowOpen(socials.github),
     },
-  };
+    {
+      show: !!socials?.linkedin,
+      label: "LinkedIn",
+      icon: <FaLinkedin />,
+      action: () => blobSafeWindowOpen(socials.linkedin),
+    },
+    {
+      show: !!contactEmail,
+      label: "Email",
+      icon: <MdEmail />,
+      action: () => blobSafeWindowOpen(`mailto:${contactEmail}`),
+    },
+    {
+      show: !!socials?.website,
+      label: "Website",
+      icon: <MdLink />,
+      action: () => blobSafeWindowOpen(socials.website),
+    },
+    {
+      show: !!socials?.phone,
+      label: "Phone",
+      icon: <MdPhone />,
+      action: () => blobSafeWindowOpen(`tel:${safeString(socials.phone)}`),
+    },
+  ];
+
+  const summaryStats = [
+    { label: "Projects", value: projects.length || "00" },
+    { label: "Skills Groups", value: skillCategoryRows.filter((x) => x.value !== "—").length || "00" },
+    { label: "Achievements", value: achievements.length || "00" },
+    { label: "Experience Entries", value: experience.length || "00" },
+  ];
 
   return (
     <Box
       sx={{
         minHeight: "100vh",
-        width: "100vw",
+        width: "100%",
         overflowX: "hidden",
-        background: pageBg, // ✅ now adapts for light + dark
+        background: pageBg,
+        position: "relative",
       }}
     >
-      <Box sx={{ position: "relative", overflow: "hidden", width: "100%" }}>
-        <Box
-          sx={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            background: heroBg, // ✅ now adapts for light + dark
-            filter: "blur(0px)",
-          }}
-        />
-        <Container maxWidth="lg" sx={{ py: { xs: 3.2, md: 5.2 }, position: "relative" }}>
-          {/* Top Bar */}
-          <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1} sx={{ mb: 2 }}>
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Avatar
-                sx={{
-                  width: 44,
-                  height: 44,
-                  fontWeight: 950,
-                  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-                  color: "#0b0b0e",
-                  boxShadow: "0 12px 30px rgba(122,63,145,0.25)",
-                  transition: "transform 160ms ease, box-shadow 160ms ease",
-                  "&:hover": { transform: "translateY(-2px)", boxShadow: "0 16px 45px rgba(122,63,145,0.28)" },
-                }}
-              >
-                {(safeString(profile?.initials) || name || "Y").slice(0, 2).toUpperCase()}
-              </Avatar>
+      <FloatingStars />
 
-              <Box>
-                <Typography sx={{ fontWeight: 950, fontSize: 16 }}>{name}</Typography>
-                <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                  {title}
-                </Typography>
-              </Box>
-            </Stack>
+      <Box
+        sx={{
+          position: "absolute",
+          top: -120,
+          left: -120,
+          width: 280,
+          height: 280,
+          borderRadius: "50%",
+          background: "rgba(145,94,255,0.18)",
+          filter: "blur(90px)",
+          pointerEvents: "none",
+        }}
+      />
+      <Box
+        sx={{
+          position: "absolute",
+          right: -120,
+          top: 80,
+          width: 260,
+          height: 260,
+          borderRadius: "50%",
+          background: "rgba(0,206,168,0.12)",
+          filter: "blur(90px)",
+          pointerEvents: "none",
+        }}
+      />
 
-            <Stack direction="row" spacing={1} alignItems="center">
-              <Tooltip title="Reload Data">
-                <IconButton
-                  onClick={reload}
-                  size="small"
-                  sx={{
-                    ...iconBtnSx,
-                    borderColor: mode === "dark" ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)",
-                    background: mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.75)",
-                  }}
-                >
-                  <MdRefresh />
-                </IconButton>
-              </Tooltip>
+      <Container maxWidth="lg" sx={{ position: "relative", py: { xs: 3, md: 4.5 } }}>
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          spacing={1}
+          sx={{ mb: { xs: 2.5, md: 3.5 } }}
+        >
+          <Stack direction="row" spacing={1.25} alignItems="center">
+            <Avatar
+              sx={{
+                width: 48,
+                height: 48,
+                fontWeight: 950,
+                background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
+                color: "#0b0b0e",
+                boxShadow: "0 10px 30px rgba(145,94,255,0.26)",
+              }}
+            >
+              {(safeString(profile?.initials) || name || "Y").slice(0, 2).toUpperCase()}
+            </Avatar>
 
-              <Tooltip title={mode === "dark" ? "Light Theme" : "Dark Theme"}>
-                <IconButton
-                  onClick={toggleTheme}
-                  size="small"
-                  sx={{
-                    ...iconBtnSx,
-                    borderColor: mode === "dark" ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.12)",
-                    background: mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.75)",
-                  }}
-                >
-                  {mode === "dark" ? <MdLightMode /> : <MdDarkMode />}
-                </IconButton>
-              </Tooltip>
-
-              <Tooltip title="Go to Admin">
-                <IconButton
-                  onClick={() => navigate("/admin")}
-                  size="small"
-                  sx={{
-                    ...iconBtnSx,
-                    borderColor: "rgba(198,128,242,0.28)",
-                    background: "rgba(198,128,242,0.10)",
-                    color: BRAND_PRIMARY,
-                  }}
-                >
-                  <MdAdminPanelSettings />
-                </IconButton>
-              </Tooltip>
-            </Stack>
+            <Box>
+              <Typography sx={{ fontWeight: 950, fontSize: 16 }}>{name}</Typography>
+              <Typography variant="body2" sx={{ opacity: 0.8 }}>
+                {title}
+              </Typography>
+            </Box>
           </Stack>
 
-          {/* Hero */}
-          <MotionPaper
-            ref={heroRef}
-            onMouseMove={onHeroMove}
-            onMouseLeave={onHeroLeave}
-            initial="hidden"
-            animate="visible"
-            variants={reveal}
-            transition={{ duration: 0.45 }}
-            style={{
-              transformStyle: "preserve-3d",
-              rotateX,
-              rotateY,
-            }}
-            sx={{
-              p: { xs: 2.2, md: 3 },
-              borderRadius: 4,
-              border: "1px solid",
-              borderColor: mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)",
-              background:
-                mode === "dark"
-                  ? "linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03))"
-                  : "linear-gradient(180deg, rgba(255,255,255,0.90), rgba(255,255,255,0.78))",
-              backdropFilter: "blur(10px)",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.18)",
-              transition: "box-shadow 180ms ease",
-              "&:hover": { boxShadow: "0 26px 70px rgba(0,0,0,0.20)" },
-            }}
-          >
-            <Grid container spacing={2.2} alignItems="center">
-              <Grid item xs={12} md={7}>
-                <Typography sx={{ fontWeight: 950, fontSize: { xs: 26, md: 34 }, lineHeight: 1.15 }}>
-                  {tagline}
-                </Typography>
+          <Stack direction="row" spacing={1} alignItems="center">
+            <Tooltip title="Reload Data">
+              <IconButton
+                onClick={reload}
+                size="small"
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid",
+                  borderColor:
+                    mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(73,56,126,0.12)",
+                  background:
+                    mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.80)",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                  },
+                }}
+              >
+                <MdRefresh />
+              </IconButton>
+            </Tooltip>
 
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ mt: 1.2, opacity: 0.9 }}>
-                  {location ? (
-                    <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                      📍 {location}
-                    </Typography>
-                  ) : null}
-                  {emailPublic ? (
-                    <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                      ✉️ {emailPublic}
-                    </Typography>
-                  ) : null}
-                </Stack>
+            <Tooltip title={mode === "dark" ? "Light Theme" : "Dark Theme"}>
+              <IconButton
+                onClick={toggleTheme}
+                size="small"
+                sx={{
+                  borderRadius: 3,
+                  border: "1px solid",
+                  borderColor:
+                    mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(73,56,126,0.12)",
+                  background:
+                    mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.80)",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                  },
+                }}
+              >
+                {mode === "dark" ? <MdLightMode /> : <MdDarkMode />}
+              </IconButton>
+            </Tooltip>
 
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={1} sx={{ mt: 2 }}>
-                  <Button
-                    onClick={() => scrollToId("about")}
-                    variant="contained"
-                    size="small"
-                    startIcon={<MdArrowDownward />}
-                    sx={{
-                      borderRadius: 999,
-                      fontWeight: 950,
-                      px: 2.2,
-                      background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-                      color: "#0b0b0e",
-                      transition: "transform 160ms ease, box-shadow 160ms ease, filter 160ms ease",
-                      "&:hover": {
-                        transform: "translateY(-2px)",
-                        boxShadow: "0 14px 36px rgba(122,63,145,0.22)",
-                        filter: "brightness(1.02)",
-                      },
-                    }}
-                    fullWidth={isMobile}
-                  >
-                    Explore
-                  </Button>
+            <Tooltip title="Go to Admin">
+              <IconButton
+                onClick={() => navigate("/admin")}
+                size="small"
+                sx={{
+                  borderRadius: 3,
+                  color: BRAND_PRIMARY,
+                  border: "1px solid rgba(145,94,255,0.24)",
+                  background: "rgba(145,94,255,0.08)",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                  },
+                }}
+              >
+                <MdAdminPanelSettings />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+        </Stack>
 
-                  <Button
-                    onClick={onDownloadResume}
-                    variant="outlined"
-                    size="small"
-                    startIcon={<MdDownload />}
-                    disabled={downloading}
-                    sx={{
-  borderRadius: 999,
-  fontWeight: 950,
-  px: 2.2,
-  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-  color: "#0b0b0e",
-  transition: "transform 160ms ease, box-shadow 160ms ease, filter 160ms ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: "0 14px 36px rgba(122,63,145,0.22)",
-    filter: "brightness(1.02)",
-  },
-}}
-                    fullWidth={isMobile}
-                  >
-                    {downloading ? "Downloading…" : `Download (${resumeName})`}
-                  </Button>
+        <Grid container spacing={{ xs: 2.5, md: 3.5 }} alignItems="stretch">
+          <Grid item xs={12}>
+            <MotionPaper
+              ref={heroRef}
+              onMouseMove={onHeroMove}
+              onMouseLeave={onHeroLeave}
+              initial="hidden"
+              animate="visible"
+              variants={staggerWrap}
+              style={{
+                transformStyle: "preserve-3d",
+                rotateX,
+                rotateY,
+              }}
+              sx={{
+                borderRadius: 5,
+                position: "relative",
+                overflow: "hidden",
+                border: "1px solid",
+                borderColor:
+                  mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(73,56,126,0.12)",
+                background:
+                  mode === "dark"
+                    ? "linear-gradient(180deg, rgba(21,16,48,0.96), rgba(10,12,32,0.96))"
+                    : "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(243,239,255,0.90))",
+                boxShadow:
+                  mode === "dark"
+                    ? "0 28px 80px rgba(0,0,0,0.30)"
+                    : "0 28px 80px rgba(73,56,126,0.12)",
+                p: { xs: 2.2, md: 3.4 },
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  inset: 0,
+                  pointerEvents: "none",
+                  background:
+                    mode === "dark"
+                      ? "radial-gradient(circle at 80% 20%, rgba(145,94,255,0.20), transparent 30%), radial-gradient(circle at 15% 18%, rgba(0,206,168,0.12), transparent 24%)"
+                      : "radial-gradient(circle at 80% 20%, rgba(145,94,255,0.14), transparent 30%), radial-gradient(circle at 15% 18%, rgba(0,206,168,0.10), transparent 24%)",
+                }}
+              />
 
-                  <Button
-                    onClick={onPreviewResume}
-                    variant="outlined"
-                    size="small"
-                    startIcon={<MdVisibility />}
-                    sx={{
-  borderRadius: 999,
-  fontWeight: 950,
-  px: 2.2,
-  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-  color: "#0b0b0e",
-  transition: "transform 160ms ease, box-shadow 160ms ease, filter 160ms ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: "0 14px 36px rgba(122,63,145,0.22)",
-    filter: "brightness(1.02)",
-  },
-}}
-                    fullWidth={isMobile}
-                  >
-                    Preview
-                  </Button>
-                </Stack>
-              </Grid>
-
-              <Grid item xs={12} md={5}>
-                <Stack direction="row" spacing={1} justifyContent={{ xs: "flex-start", md: "flex-end" }}>
-                  <Tooltip title="GitHub">
-                    <IconButton
-                      onClick={() => socials?.github && window.open(socials.github, "_blank")}
-                      sx={{
-  borderRadius: 3,
-  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-  color: "#0b0b0e",
-  boxShadow: "0 10px 30px rgba(122,63,145,0.25)",
-  transition: "transform 160ms ease, box-shadow 160ms ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: "0 16px 45px rgba(122,63,145,0.35)",
-  },
-}}
-                    >
-                      <FaGithub />
-                    </IconButton>
-                  </Tooltip>
-
-                  <Tooltip title="LinkedIn">
-                    <IconButton
-                      onClick={() => socials?.linkedin && window.open(socials.linkedin, "_blank")}
-                      sx={{
-  borderRadius: 3,
-  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-  color: "#0b0b0e",
-  boxShadow: "0 10px 30px rgba(122,63,145,0.25)",
-  transition: "transform 160ms ease, box-shadow 160ms ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: "0 16px 45px rgba(122,63,145,0.35)",
-  },
-}}
-                    >
-                      <FaLinkedin />
-                    </IconButton>
-                  </Tooltip>
-
-                  <Tooltip title="Email">
-                    <IconButton
-                      onClick={() => contactEmail && window.open(`mailto:${contactEmail}`, "_blank")}
-                      sx={{
-  borderRadius: 3,
-  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-  color: "#0b0b0e",
-  boxShadow: "0 10px 30px rgba(122,63,145,0.25)",
-  transition: "transform 160ms ease, box-shadow 160ms ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: "0 16px 45px rgba(122,63,145,0.35)",
-  },
-}}
-                    >
-                      <MdEmail />
-                    </IconButton>
-                  </Tooltip>
-                  {/* ✅ ADDED: Website icon (same style as others) */}
-                      <Tooltip title="Website">
-                        <IconButton
-                          onClick={() => socials?.website && window.open(socials.website, "_blank")}
+              <Grid container spacing={{ xs: 2.2, md: 3.2 }} alignItems="center">
+                <Grid item xs={12} md={7}>
+                  <Stack direction="row" alignItems="flex-start">
+                    <VerticalAccent />
+                    <Box sx={{ pt: 0.15 }}>
+                      <MotionBox variants={revealUp}>
+                        <Typography
                           sx={{
-                            borderRadius: 3,
-                            background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-                            color: "#0b0b0e",
-                            boxShadow: "0 10px 30px rgba(122,63,145,0.25)",
-                            transition: "transform 160ms ease, box-shadow 160ms ease",
-                            "&:hover": {
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 16px 45px rgba(122,63,145,0.35)",
-                            },
+                            textTransform: "uppercase",
+                            letterSpacing: "0.18em",
+                            fontSize: { xs: 11, md: 12 },
+                            fontWeight: 800,
+                            color:
+                              mode === "dark"
+                                ? "rgba(223,217,255,0.74)"
+                                : "rgba(79,58,135,0.74)",
                           }}
                         >
-                          <MdLink />
-                        </IconButton>
-                      </Tooltip>
-
-                  <Tooltip title="Phone">
-                    <IconButton
-                      onClick={() => socials?.phone && window.open(`tel:${socials.phone}`, "_blank")}
-                      sx={{
-  borderRadius: 3,
-  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_DARK})`,
-  color: "#0b0b0e",
-  boxShadow: "0 10px 30px rgba(122,63,145,0.25)",
-  transition: "transform 160ms ease, box-shadow 160ms ease",
-  "&:hover": {
-    transform: "translateY(-2px)",
-    boxShadow: "0 16px 45px rgba(122,63,145,0.35)",
-  },
-}}
-                    >
-                      <MdPhone />
-                    </IconButton>
-                  </Tooltip>
-                </Stack>
-              </Grid>
-            </Grid>
-          </MotionPaper>
-
-          {/* Content */}
-          <Box sx={{ mt: { xs: 3.2, md: 4.2 } }}>
-            {/* ABOUT */}
-            <MotionBox
-              id="about"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.18 }}
-              variants={sectionReveal}
-              transition={{ duration: 0.45 }}
-              sx={{ mt: { xs: 2, md: 3 } }}
-            >
-              <SectionTitle title="About Me" icon={<MdSchool />} />
-              <GlassCard sx={{ p: { xs: 2, md: 3 } }}>
-                {loading ? (
-                  <Skeleton height={120} />
-                ) : (
-                  <Typography sx={{ lineHeight: 1.8,textAlign: "justify", opacity: 0.9, whiteSpace: "pre-wrap" }}>{about || "—"}</Typography>
-                )}
-              </GlassCard>
-            </MotionBox>
-
-            {/* SKILLS TABLE */}
-            <MotionBox
-              id="skills"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.18 }}
-              variants={sectionReveal}
-              transition={{ duration: 0.45 }}
-              sx={{ mt: { xs: 4, md: 6 } }}
-            >
-              <SectionTitle title="Skills" icon={<MdCode />} />
-              <GlassCard sx={{ p: { xs: 2, md: 3 } }}>
-                {loading ? (
-                  <Skeleton height={160} />
-                ) : (
-                  <TableContainer sx={{ overflowX: "hidden" }}>
-                    <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell sx={{ fontWeight: 950, width: "28%" }}>Category</TableCell>
-                          <TableCell sx={{ fontWeight: 950, width: "72%" }}>Skills</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {skillCategoryRows.map((r, idx) => (
-                          <TableRow
-                            key={idx}
-                            hover
-                            sx={{
-                              transition: "transform 140ms ease, background-color 140ms ease",
-                              "&:hover": { transform: "translateX(2px)" },
-                              "& > *": { overflow: "hidden" },
-                            }}
-                          >
-                            <TableCell
-                              sx={{
-                                fontWeight: 900,
-                                opacity: 0.85,
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {r.category}
-                            </TableCell>
-                            <TableCell sx={{ opacity: 0.9, overflow: "hidden" }}>{r.value}</TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                )}
-              </GlassCard>
-            </MotionBox>
-
-            {/* PROJECTS */}
-            <MotionBox
-              id="projects"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.12 }}
-              variants={sectionReveal}
-              transition={{ duration: 0.45 }}
-              sx={{ mt: { xs: 4, md: 6 } }}
-            >
-              <SectionTitle title="Projects" icon={<MdWork />} />
-              <GlassCard sx={{ p: { xs: 2, md: 3 } }}>
-                {loading ? (
-                  <Stack spacing={2}>
-                    <Skeleton height={120} />
-                    <Skeleton height={120} />
-                  </Stack>
-                ) : projects.length ? (
-                  <Stack spacing={2}>
-                    {projects.map((p, idx) => (
-                      <ProjectCardOneByOne key={p?.id ?? idx} index={idx + 1} p={p} />
-                    ))}
-                  </Stack>
-                ) : (
-                  <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                    No projects yet. Add them in Admin → Projects.
-                  </Typography>
-                )}
-              </GlassCard>
-            </MotionBox>
-
-            {/* ACHIEVEMENTS */}
-            <MotionBox
-              id="achievements"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.12 }}
-              variants={sectionReveal}
-              transition={{ duration: 0.45 }}
-              sx={{ mt: { xs: 4, md: 6 } }}
-            >
-              <SectionTitle title="Achievements" icon={<MdEmojiEvents />} />
-              <GlassCard sx={{ p: { xs: 2, md: 3 } }}>
-                {loading ? (
-                  <Skeleton height={140} />
-                ) : achievements.length ? (
-                  <Stack spacing={1.2}>
-                    {achievements.map((a, idx) => (
-                      <MotionPaper
-                        key={a?.id ?? idx}
-                        variant="outlined"
-                        whileHover={{ y: -3 }}
-                        transition={{ type: "spring", stiffness: 380, damping: 26 }}
-                        sx={{
-                          p: 2,
-                          borderRadius: 3,
-                          borderColor: (t) =>
-                            t.palette.mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)",
-                          background: (t) =>
-                            t.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.85)",
-                          transition: "box-shadow 180ms ease, border-color 180ms ease",
-                          "&:hover": {
-                            boxShadow: "0 18px 55px rgba(122,63,145,0.16)",
-                            borderColor: "rgba(198,128,242,0.22)",
-                          },
-                        }}
-                      >
-                        <Typography sx={{ fontWeight: 950 }}>{safeString(a?.title) || "Achievement"}</Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                          {safeString(a?.issuer) ? `${safeString(a?.issuer)} • ` : ""}
-                          {safeString(a?.year) || ""}
+                          Introduction
                         </Typography>
-                        {safeString(a?.link) ? (
+                      </MotionBox>
+
+                      <MotionBox variants={revealUp}>
+                        <Typography
+                          sx={{
+                            mt: 0.5,
+                            fontWeight: 950,
+                            lineHeight: 1.08,
+                            fontSize: { xs: 30, sm: 40, md: 58 },
+                          }}
+                        >
+                          Hi, I’m{" "}
+                          <Box component="span" sx={{ color: BRAND_PRIMARY }}>
+                            {name}
+                          </Box>
+                        </Typography>
+                      </MotionBox>
+
+                      <MotionBox variants={revealUp}>
+                        <Typography
+                          sx={{
+                            mt: 1.2,
+                            fontSize: { xs: 15, md: 18 },
+                            lineHeight: 1.8,
+                            maxWidth: 760,
+                            opacity: 0.92,
+                          }}
+                        >
+                          {tagline}
+                        </Typography>
+                      </MotionBox>
+
+                      <MotionBox variants={revealUp}>
+                        <Stack
+                          direction={{ xs: "column", sm: "row" }}
+                          spacing={1}
+                          sx={{ mt: 2.1, opacity: 0.88 }}
+                        >
+                          {location ? (
+                            <Chip
+                              label={`📍 ${location}`}
+                              sx={{ borderRadius: 999, fontWeight: 800, width: "fit-content" }}
+                            />
+                          ) : null}
+                          {contactEmail ? (
+                            <Chip
+                              label={`✉️ ${contactEmail}`}
+                              sx={{ borderRadius: 999, fontWeight: 800, width: "fit-content" }}
+                            />
+                          ) : null}
+                        </Stack>
+                      </MotionBox>
+
+                      <MotionBox variants={revealUp}>
+                        <Stack
+                          direction={{ xs: "column", sm: "row" }}
+                          spacing={1.2}
+                          sx={{ mt: 2.4 }}
+                        >
                           <Button
-                            onClick={() => window.open(safeString(a?.link), "_blank")}
-                            size="small"
-                            variant="outlined"
-                            startIcon={<MdLink />}
+                            onClick={() => scrollToId("about")}
+                            variant="contained"
+                            startIcon={<MdArrowDownward />}
+                            fullWidth={isMobile}
                             sx={{
-                              mt: 1,
                               borderRadius: 999,
-                              fontWeight: 900,
-                              borderColor: "rgba(198,128,242,0.55)",
-                              color: BRAND_PRIMARY,
-                              transition: "transform 160ms ease, box-shadow 160ms ease",
+                              fontWeight: 950,
+                              px: 2.4,
+                              py: 1.2,
+                              background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
+                              color: "#0b0b0e",
+                              boxShadow: "0 14px 34px rgba(145,94,255,0.24)",
                               "&:hover": {
-                                transform: "translateY(-2px)",
-                                boxShadow: "0 14px 34px rgba(198,128,242,0.16)",
+                                background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
+                                boxShadow: "0 18px 40px rgba(145,94,255,0.30)",
                               },
                             }}
                           >
-                            View
+                            Explore Portfolio
                           </Button>
-                        ) : null}
-                      </MotionPaper>
-                    ))}
-                  </Stack>
-                ) : (
-                  <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                    No achievements yet.
-                  </Typography>
-                )}
-              </GlassCard>
-            </MotionBox>
 
-            {/* EXPERIENCE */}
-            <MotionBox
-              id="experience"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.12 }}
-              variants={sectionReveal}
-              transition={{ duration: 0.45 }}
-              sx={{ mt: { xs: 4, md: 6 } }}
-            >
-              <SectionTitle title="Experience" icon={<MdTimeline />} />
-              <GlassCard sx={{ p: { xs: 2, md: 3 } }}>
-                {loading ? (
-                  <Skeleton height={160} />
-                ) : experience.length ? (
-                  <Stack spacing={1.2}>
-                    {experience.map((e, idx) => (
-                      <MotionPaper
-                        key={e?.id ?? idx}
-                        variant="outlined"
-                        whileHover={{ y: -3 }}
-                        transition={{ type: "spring", stiffness: 380, damping: 26 }}
-                        sx={{
-                          p: 2,
-                          borderRadius: 3,
-                          borderColor: (t) =>
-                            t.palette.mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)",
-                          background: (t) =>
-                            t.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.85)",
-                          transition: "box-shadow 180ms ease, border-color 180ms ease",
-                          "&:hover": {
-                            boxShadow: "0 18px 55px rgba(122,63,145,0.14)",
-                            borderColor: "rgba(198,128,242,0.20)",
-                          },
-                        }}
-                      >
-                        <Typography sx={{ fontWeight: 950 }}>
-                          {safeString(e?.role) || "Role"}{" "}
-                          {safeString(e?.company) ? (
-                            <Typography component="span" sx={{ opacity: 0.8, fontWeight: 900 }}>
-                              • {safeString(e?.company)}
-                            </Typography>
-                          ) : null}
-                        </Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.75 }}>
-                          {safeString(e?.start)} {safeString(e?.end) ? `– ${safeString(e?.end)}` : ""}
-                        </Typography>
-                        {safeString(e?.description) ? (
-                          <Typography variant="body2" sx={{ mt: 1, opacity: 0.9, whiteSpace: "pre-wrap" }}>
-                            {safeString(e?.description)}
-                          </Typography>
-                        ) : null}
-                      </MotionPaper>
-                    ))}
-                  </Stack>
-                ) : (
-                  <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                    No experience added yet.
-                  </Typography>
-                )}
-              </GlassCard>
-            </MotionBox>
-
-            {/* EDUCATION */}
-            <MotionBox
-              id="education"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.12 }}
-              variants={sectionReveal}
-              transition={{ duration: 0.45 }}
-              sx={{ mt: { xs: 4, md: 6 } }}
-            >
-              <SectionTitle title="Education" icon={<MdSchool />} />
-              <GlassCard sx={{ p: { xs: 2, md: 3 } }}>
-                {loading ? (
-                  <Skeleton height={140} />
-                ) : education.length ? (
-                  <Stack spacing={1.2}>
-                    {education.map((e, idx) => (
-                      <MotionPaper
-                        key={e?.id ?? idx}
-                        variant="outlined"
-                        whileHover={{ y: -3 }}
-                        transition={{ type: "spring", stiffness: 380, damping: 26 }}
-                        sx={{
-                          p: 2,
-                          borderRadius: 3,
-                          borderColor: (t) =>
-                            t.palette.mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)",
-                          background: (t) =>
-                            t.palette.mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.85)",
-                          transition: "box-shadow 180ms ease, border-color 180ms ease",
-                          "&:hover": {
-                            boxShadow: "0 18px 55px rgba(122,63,145,0.14)",
-                            borderColor: "rgba(198,128,242,0.20)",
-                          },
-                        }}
-                      >
-                        <Typography sx={{ fontWeight: 950 }}>{safeString(e?.degree) || "Degree"}</Typography>
-                        <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                          {safeString(e?.institution) ? `${safeString(e?.institution)} • ` : ""}
-                          {safeString(e?.year) || ""}
-                        </Typography>
-                        {safeString(e?.details) ? (
-                          <Typography variant="body2" sx={{ mt: 1, opacity: 0.9, whiteSpace: "pre-wrap" }}>
-                            {safeString(e?.details)}
-                          </Typography>
-                        ) : null}
-                      </MotionPaper>
-                    ))}
-                  </Stack>
-                ) : (
-                  <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                    No education added yet.
-                  </Typography>
-                )}
-              </GlassCard>
-            </MotionBox>
-
-            {/* PROGRAMMING LANGUAGES EXPERIENCE */}
-            <MotionBox
-              id="languages"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.12 }}
-              variants={sectionReveal}
-              transition={{ duration: 0.45 }}
-              sx={{ mt: { xs: 4, md: 6 } }}
-            >
-              <SectionTitle title="Programming Languages Experience" icon={<MdCode />} />
-              <GlassCard sx={{ p: { xs: 2, md: 3 } }}>
-                {loading ? (
-                  <Skeleton height={140} />
-                ) : languages.length ? (
-                  <TableContainer sx={{ overflowX: "hidden" }}>
-                    <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell sx={{ fontWeight: 950, width: "34%" }}>Language</TableCell>
-                          <TableCell sx={{ fontWeight: 950, width: "33%" }}>Level</TableCell>
-                          <TableCell sx={{ fontWeight: 950, width: "33%" }}>Experience</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {languages.map((l, idx) => (
-                          <TableRow
-                            key={l?.id ?? idx}
-                            hover
+                          <Button
+                            onClick={onPreviewResume}
+                            variant="outlined"
+                            startIcon={<MdVisibility />}
+                            fullWidth={isMobile}
                             sx={{
-                              transition: "transform 140ms ease",
-                              "&:hover": { transform: "translateX(2px)" },
-                              "& > *": { overflow: "hidden" },
+                              borderRadius: 999,
+                              fontWeight: 950,
+                              px: 2.4,
+                              py: 1.2,
+                              color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
+                              borderColor:
+                                mode === "dark"
+                                  ? "rgba(145,94,255,0.30)"
+                                  : "rgba(145,94,255,0.24)",
+                              "&:hover": {
+                                borderColor: BRAND_PRIMARY,
+                                background:
+                                  mode === "dark"
+                                    ? "rgba(145,94,255,0.10)"
+                                    : "rgba(145,94,255,0.06)",
+                              },
                             }}
                           >
-                            <TableCell
-                              sx={{
-                                fontWeight: 900,
-                                opacity: 0.85,
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {safeString(l?.language) || "—"}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                opacity: 0.85,
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {safeString(l?.level) || "—"}
-                            </TableCell>
-                            <TableCell
-                              sx={{
-                                opacity: 0.85,
-                                whiteSpace: "nowrap",
-                                overflow: "hidden",
-                                textOverflow: "ellipsis",
-                              }}
-                            >
-                              {typeof l?.years === "number" ? `${l.years} yr` : safeString(l?.years) || "—"}
-                            </TableCell>
-                          </TableRow>
+                            Preview Resume
+                          </Button>
+
+                          <Button
+                            onClick={onDownloadResume}
+                            variant="outlined"
+                            startIcon={<MdDownload />}
+                            disabled={downloading}
+                            fullWidth={isMobile}
+                            sx={{
+                              borderRadius: 999,
+                              fontWeight: 950,
+                              px: 2.4,
+                              py: 1.2,
+                              color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
+                              borderColor:
+                                mode === "dark"
+                                  ? "rgba(145,94,255,0.30)"
+                                  : "rgba(145,94,255,0.24)",
+                              "&:hover": {
+                                borderColor: BRAND_PRIMARY,
+                                background:
+                                  mode === "dark"
+                                    ? "rgba(145,94,255,0.10)"
+                                    : "rgba(145,94,255,0.06)",
+                              },
+                            }}
+                          >
+                            {downloading ? "Downloading…" : `Download Resume`}
+                          </Button>
+                        </Stack>
+                      </MotionBox>
+                    </Box>
+                  </Stack>
+                </Grid>
+
+                <Grid item xs={12} md={5}>
+                  <MotionBox variants={revealUp}>
+                    <GlassPanel
+                      sx={{
+                        p: { xs: 2, md: 2.25 },
+                        minHeight: { xs: "auto", md: 320 },
+                      }}
+                    >
+                      <Typography
+                        sx={{
+                          fontSize: 13,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.16em",
+                          fontWeight: 800,
+                          opacity: 0.74,
+                        }}
+                      >
+                        Connect
+                      </Typography>
+
+                      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.4 }}>
+                        {socialsButtons
+                          .filter((item) => item.show)
+                          .map((item, idx) => (
+                            <Tooltip key={`${item.label}-${idx}`} title={item.label}>
+                              <IconButton
+                                onClick={item.action}
+                                sx={{
+                                  width: 48,
+                                  height: 48,
+                                  borderRadius: 3,
+                                  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
+                                  color: "#0b0b0e",
+                                  boxShadow: "0 10px 25px rgba(145,94,255,0.22)",
+                                  "&:hover": {
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 16px 34px rgba(145,94,255,0.28)",
+                                  },
+                                }}
+                              >
+                                {item.icon}
+                              </IconButton>
+                            </Tooltip>
+                          ))}
+                      </Stack>
+
+                      <Grid container spacing={1.2} sx={{ mt: 1.2 }}>
+                        {summaryStats.map((item, idx) => (
+                          <Grid item xs={6} key={`${item.label}-${idx}`}>
+                            <InfoStat label={item.label} value={item.value} />
+                          </Grid>
                         ))}
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                ) : (
-                  <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                    No language experience added yet.
-                  </Typography>
-                )}
-              </GlassCard>
-            </MotionBox>
+                      </Grid>
 
-            {/* CONTACT */}
-            <MotionBox
-              id="contact"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.12 }}
-              variants={sectionReveal}
-              transition={{ duration: 0.45 }}
-              sx={{ mt: { xs: 4, md: 6 }, pb: 6 }}
-            >
-              <SectionTitle title="Contact" icon={<MdEmail />} />
-              <GlassCard sx={{ p: { xs: 2, md: 3 } }}>
-                {loading ? (
-                  <Skeleton height={120} />
-                ) : (
-                  <Stack spacing={1.2}>
-                    {contactEmail ? (
-                      <Typography
+                      <Box
                         sx={{
-                          opacity: 0.9,
-                          transition: "transform 140ms ease",
-                          "&:hover": { transform: "translateX(2px)" },
-                          cursor: "pointer",
+                          mt: 1.8,
+                          borderRadius: 4,
+                          p: 1.6,
+                          border: "1px solid",
+                          borderColor:
+                            mode === "dark"
+                              ? "rgba(255,255,255,0.08)"
+                              : "rgba(73,56,126,0.12)",
+                          background:
+                            mode === "dark"
+                              ? "rgba(255,255,255,0.02)"
+                              : "rgba(255,255,255,0.60)",
                         }}
-                        onClick={() => window.open(`mailto:${contactEmail}`, "_blank")}
                       >
-                        <MdEmail style={{ marginRight: 8, verticalAlign: "middle" }} />
-                        {contactEmail}
-                      </Typography>
-                    ) : null}
+                        <Typography sx={{ fontWeight: 900, fontSize: 14 }}>
+                          Current Role Focus
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 0.65, opacity: 0.86, lineHeight: 1.7 }}>
+                          {title}
+                        </Typography>
+                        <Typography variant="body2" sx={{ mt: 0.55, opacity: 0.8, lineHeight: 1.7 }}>
+                          {safeString(profile?.tagline) || "Building polished user experiences with scalable logic and clean engineering."}
+                        </Typography>
+                      </Box>
+                    </GlassPanel>
+                  </MotionBox>
+                </Grid>
+              </Grid>
+            </MotionPaper>
+          </Grid>
+        </Grid>
 
-                    {socials?.phone ? (
-                      <Typography
-                        sx={{
-                          opacity: 0.9,
-                          transition: "transform 140ms ease",
-                          "&:hover": { transform: "translateX(2px)" },
-                          cursor: "pointer",
-                        }}
-                        onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank")}
-                      >
-                        <MdPhone style={{ marginRight: 8, verticalAlign: "middle" }} />
-                        {safeString(socials.phone)}
-                      </Typography>
-                    ) : null}
+        <Box sx={{ mt: { xs: 4, md: 6 } }}>
+          <MotionBox
+            id="about"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.18 }}
+            variants={revealUp}
+            transition={{ duration: 0.45 }}
+          >
+            <SectionIntro subText="Introduction" heading="Overview." />
+            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+              {loading ? (
+                <Skeleton height={160} />
+              ) : (
+                <Typography
+                  sx={{
+                    lineHeight: 1.9,
+                    textAlign: "justify",
+                    opacity: 0.92,
+                    whiteSpace: "pre-wrap",
+                    fontSize: { xs: 14.5, md: 16 },
+                  }}
+                >
+                  {about || "—"}
+                </Typography>
+              )}
+            </GlassPanel>
+          </MotionBox>
 
-                    <Stack direction="row" spacing={1}>
+          <MotionBox
+            id="skills"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.16 }}
+            variants={revealUp}
+            transition={{ duration: 0.45 }}
+            sx={{ mt: { xs: 4, md: 6 } }}
+          >
+            <SectionIntro subText="What I work with" heading="Tech Stack." />
+            <Grid container spacing={2}>
+              <Grid item xs={12} md={7}>
+                <GlassPanel sx={{ p: { xs: 2, md: 3 }, height: "100%" }}>
+                  {loading ? (
+                    <Skeleton height={200} />
+                  ) : (
+                    <>
+                      <TableContainer sx={{ overflowX: "hidden" }}>
+                        <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell sx={{ fontWeight: 950, width: "30%" }}>Category</TableCell>
+                              <TableCell sx={{ fontWeight: 950, width: "70%" }}>Skills</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {skillCategoryRows.map((r, idx) => (
+                              <TableRow
+                                key={idx}
+                                hover
+                                sx={{
+                                  transition: "transform 140ms ease",
+                                  "&:hover": { transform: "translateX(2px)" },
+                                }}
+                              >
+                                <TableCell sx={{ fontWeight: 900, opacity: 0.9 }}>{r.category}</TableCell>
+                                <TableCell sx={{ opacity: 0.9 }}>{r.value}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    </>
+                  )}
+                </GlassPanel>
+              </Grid>
+
+              <Grid item xs={12} md={5}>
+                <GlassPanel sx={{ p: { xs: 2, md: 3 }, height: "100%" }}>
+                  {loading ? (
+                    <Skeleton height={200} />
+                  ) : (
+                    <Stack spacing={2}>
+                      <Box>
+                        <Typography sx={{ fontWeight: 900, mb: 1 }}>Frontend</Typography>
+                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                          {frontendList.length ? frontendList.map((x, i) => <TechBadge key={`${x}-${i}`} label={x} />) : <Typography variant="body2">—</Typography>}
+                        </Stack>
+                      </Box>
+
+                      <Box>
+                        <Typography sx={{ fontWeight: 900, mb: 1 }}>Backend</Typography>
+                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                          {backendList.length ? backendList.map((x, i) => <TechBadge key={`${x}-${i}`} label={x} />) : <Typography variant="body2">—</Typography>}
+                        </Stack>
+                      </Box>
+
+                      <Box>
+                        <Typography sx={{ fontWeight: 900, mb: 1 }}>Database & Tools</Typography>
+                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                          {[...databaseList, ...toolsList].length ? [...databaseList, ...toolsList].map((x, i) => <TechBadge key={`${x}-${i}`} label={x} />) : <Typography variant="body2">—</Typography>}
+                        </Stack>
+                      </Box>
+                    </Stack>
+                  )}
+                </GlassPanel>
+              </Grid>
+            </Grid>
+          </MotionBox>
+
+          <MotionBox
+            id="projects"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.12 }}
+            variants={staggerWrap}
+            sx={{ mt: { xs: 4, md: 6 } }}
+          >
+            <SectionIntro subText="My work" heading="Projects." />
+            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+              {loading ? (
+                <Stack spacing={2}>
+                  <Skeleton height={140} />
+                  <Skeleton height={140} />
+                </Stack>
+              ) : projects.length ? (
+                <Stack spacing={2}>
+                  {projects.map((p, idx) => (
+                    <ProjectCardOneByOne key={p?.id ?? idx} index={idx + 1} p={p} />
+                  ))}
+                </Stack>
+              ) : (
+                <Typography variant="body2" sx={{ opacity: 0.85 }}>
+                  No projects yet. Add them in Admin → Projects.
+                </Typography>
+              )}
+            </GlassPanel>
+          </MotionBox>
+
+          <MotionBox
+            id="achievements"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.12 }}
+            variants={staggerWrap}
+            sx={{ mt: { xs: 4, md: 6 } }}
+          >
+            <SectionIntro subText="Recognition" heading="Achievements." />
+            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+              {loading ? (
+                <Skeleton height={160} />
+              ) : achievements.length ? (
+                <Stack spacing={1.4}>
+                  {achievements.map((a, idx) => (
+                    <TimelineCard
+                      key={a?.id ?? idx}
+                      title={safeString(a?.title) || "Achievement"}
+                      subtitle={`${safeString(a?.issuer) ? `${safeString(a?.issuer)}${safeString(a?.year) ? " • " : ""}` : ""}${safeString(a?.year) || ""}`}
+                      description={
+                        safeString(a?.link)
+                          ? `Verification / reference link available below.`
+                          : ""
+                      }
+                    />
+                  ))}
+                  <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
+                    {achievements.map((a, idx) =>
+                      safeString(a?.link) ? (
+                        <Button
+                          key={`ach-link-${idx}`}
+                          onClick={() => blobSafeWindowOpen(safeString(a?.link))}
+                          size="small"
+                          variant="outlined"
+                          startIcon={<MdLink />}
+                          sx={{
+                            borderRadius: 999,
+                            fontWeight: 900,
+                            borderColor: "rgba(145,94,255,0.30)",
+                            color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
+                          }}
+                        >
+                          {safeString(a?.title) || `Achievement ${idx + 1}`}
+                        </Button>
+                      ) : null
+                    )}
+                  </Stack>
+                </Stack>
+              ) : (
+                <Typography variant="body2" sx={{ opacity: 0.85 }}>
+                  No achievements yet.
+                </Typography>
+              )}
+            </GlassPanel>
+          </MotionBox>
+
+          <MotionBox
+            id="experience"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.12 }}
+            variants={staggerWrap}
+            sx={{ mt: { xs: 4, md: 6 } }}
+          >
+            <SectionIntro subText="Where I’ve worked" heading="Experience." />
+            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+              {loading ? (
+                <Skeleton height={180} />
+              ) : experience.length ? (
+                <Stack spacing={1.4}>
+                  {experience.map((e, idx) => (
+                    <TimelineCard
+                      key={e?.id ?? idx}
+                      title={`${safeString(e?.role) || "Role"}${safeString(e?.company) ? ` • ${safeString(e?.company)}` : ""}`}
+                      subtitle={`${safeString(e?.start)}${safeString(e?.end) ? ` – ${safeString(e?.end)}` : ""}`}
+                      description={safeString(e?.description)}
+                    />
+                  ))}
+                </Stack>
+              ) : (
+                <Typography variant="body2" sx={{ opacity: 0.85 }}>
+                  No experience added yet.
+                </Typography>
+              )}
+            </GlassPanel>
+          </MotionBox>
+
+          <MotionBox
+            id="education"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.12 }}
+            variants={staggerWrap}
+            sx={{ mt: { xs: 4, md: 6 } }}
+          >
+            <SectionIntro subText="Learning path" heading="Education." />
+            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+              {loading ? (
+                <Skeleton height={160} />
+              ) : education.length ? (
+                <Stack spacing={1.4}>
+                  {education.map((e, idx) => (
+                    <TimelineCard
+                      key={e?.id ?? idx}
+                      title={safeString(e?.degree) || "Degree"}
+                      subtitle={`${safeString(e?.institution) ? `${safeString(e?.institution)}${safeString(e?.year) ? " • " : ""}` : ""}${safeString(e?.year) || ""}`}
+                      description={safeString(e?.details)}
+                    />
+                  ))}
+                </Stack>
+              ) : (
+                <Typography variant="body2" sx={{ opacity: 0.85 }}>
+                  No education added yet.
+                </Typography>
+              )}
+            </GlassPanel>
+          </MotionBox>
+
+          <MotionBox
+            id="languages"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.12 }}
+            variants={revealUp}
+            transition={{ duration: 0.45 }}
+            sx={{ mt: { xs: 4, md: 6 } }}
+          >
+            <SectionIntro subText="Language proficiency" heading="Programming Languages Experience." />
+            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+              {loading ? (
+                <Skeleton height={140} />
+              ) : languages.length ? (
+                <TableContainer sx={{ overflowX: "hidden" }}>
+                  <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: 950, width: "34%" }}>Language</TableCell>
+                        <TableCell sx={{ fontWeight: 950, width: "33%" }}>Level</TableCell>
+                        <TableCell sx={{ fontWeight: 950, width: "33%" }}>Experience</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {languages.map((l, idx) => (
+                        <TableRow
+                          key={l?.id ?? idx}
+                          hover
+                          sx={{
+                            transition: "transform 140ms ease",
+                            "&:hover": { transform: "translateX(2px)" },
+                          }}
+                        >
+                          <TableCell sx={{ fontWeight: 900, opacity: 0.9 }}>
+                            {safeString(l?.language) || "—"}
+                          </TableCell>
+                          <TableCell sx={{ opacity: 0.88 }}>{safeString(l?.level) || "—"}</TableCell>
+                          <TableCell sx={{ opacity: 0.88 }}>
+                            {typeof l?.years === "number" ? `${l.years} yr` : safeString(l?.years) || "—"}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              ) : (
+                <Typography variant="body2" sx={{ opacity: 0.85 }}>
+                  No language experience added yet.
+                </Typography>
+              )}
+            </GlassPanel>
+          </MotionBox>
+
+          <MotionBox
+            id="contact"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.12 }}
+            variants={revealUp}
+            transition={{ duration: 0.45 }}
+            sx={{ mt: { xs: 4, md: 6 }, pb: 6 }}
+          >
+            <SectionIntro subText="Get in touch" heading="Contact." />
+            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+              {loading ? (
+                <Skeleton height={140} />
+              ) : (
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={7}>
+                    <Stack spacing={1.35}>
+                      {contactEmail ? (
+                        <Typography
+                          sx={{
+                            opacity: 0.92,
+                            cursor: "pointer",
+                            lineHeight: 1.8,
+                            "&:hover": { color: BRAND_PRIMARY },
+                          }}
+                          onClick={() => blobSafeWindowOpen(`mailto:${contactEmail}`)}
+                        >
+                          <MdEmail style={{ marginRight: 8, verticalAlign: "middle" }} />
+                          {contactEmail}
+                        </Typography>
+                      ) : null}
+
+                      {socials?.phone ? (
+                        <Typography
+                          sx={{
+                            opacity: 0.92,
+                            cursor: "pointer",
+                            lineHeight: 1.8,
+                            "&:hover": { color: BRAND_PRIMARY },
+                          }}
+                          onClick={() => blobSafeWindowOpen(`tel:${safeString(socials.phone)}`)}
+                        >
+                          <MdPhone style={{ marginRight: 8, verticalAlign: "middle" }} />
+                          {safeString(socials.phone)}
+                        </Typography>
+                      ) : null}
+
+                      {location ? (
+                        <Typography sx={{ opacity: 0.86, lineHeight: 1.8 }}>
+                          📍 {location}
+                        </Typography>
+                      ) : null}
+
+                      <Typography variant="body2" sx={{ opacity: 0.8, mt: 0.3, lineHeight: 1.8 }}>
+                        I’m open to software engineering, full-stack, backend, frontend, and product-focused development opportunities.
+                      </Typography>
+                    </Stack>
+                  </Grid>
+
+                  <Grid item xs={12} md={5}>
+                    <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" justifyContent={{ xs: "flex-start", md: "flex-end" }}>
                       {socials?.github ? (
                         <Button
-                          onClick={() => window.open(socials.github, "_blank")}
-                          variant="outlined"
-                          size="small"
+                          onClick={() => blobSafeWindowOpen(socials.github)}
+                          variant="contained"
                           startIcon={<FaGithub />}
                           sx={{
                             borderRadius: 999,
                             fontWeight: 950,
-                            borderColor: "rgba(198,128,242,0.55)",
-                            color: BRAND_PRIMARY,
-                            transition: "transform 160ms ease, box-shadow 160ms ease",
-                            "&:hover": {
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 14px 34px rgba(198,128,242,0.16)",
-                            },
+                            background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
+                            color: "#0b0b0e",
                           }}
                         >
                           GitHub
@@ -1434,42 +1698,52 @@ useEffect(() => {
 
                       {socials?.linkedin ? (
                         <Button
-                          onClick={() => window.open(socials.linkedin, "_blank")}
+                          onClick={() => blobSafeWindowOpen(socials.linkedin)}
                           variant="outlined"
-                          size="small"
                           startIcon={<FaLinkedin />}
                           sx={{
                             borderRadius: 999,
                             fontWeight: 950,
-                            borderColor: "rgba(198,128,242,0.55)",
-                            color: BRAND_PRIMARY,
-                            transition: "transform 160ms ease, box-shadow 160ms ease",
-                            "&:hover": {
-                              transform: "translateY(-2px)",
-                              boxShadow: "0 14px 34px rgba(198,128,242,0.16)",
-                            },
+                            color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
+                            borderColor: "rgba(145,94,255,0.30)",
                           }}
                         >
                           LinkedIn
                         </Button>
                       ) : null}
-                    </Stack>
-                  </Stack>
-                )}
-              </GlassCard>
-            </MotionBox>
-          </Box>
 
-          <ResumePreviewDialog
-            open={resumePreviewOpen}
-            title={resumePreviewTitle}
-            onClose={closeResumePreview}
-            url={resumeViewUrlBusted}
-            blobUrl={resumePreviewBlobUrl}
-            loading={resumePreviewLoading}
-          />
-        </Container>
-      </Box>
+                      {socials?.website ? (
+                        <Button
+                          onClick={() => blobSafeWindowOpen(socials.website)}
+                          variant="outlined"
+                          startIcon={<MdLink />}
+                          sx={{
+                            borderRadius: 999,
+                            fontWeight: 950,
+                            color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
+                            borderColor: "rgba(145,94,255,0.30)",
+                          }}
+                        >
+                          Website
+                        </Button>
+                      ) : null}
+                    </Stack>
+                  </Grid>
+                </Grid>
+              )}
+            </GlassPanel>
+          </MotionBox>
+        </Box>
+
+        <ResumePreviewDialog
+          open={resumePreviewOpen}
+          title={resumePreviewTitle}
+          onClose={closeResumePreview}
+          url={resumeViewUrlBusted}
+          blobUrl={resumePreviewBlobUrl}
+          loading={resumePreviewLoading}
+        />
+      </Container>
     </Box>
   );
 }

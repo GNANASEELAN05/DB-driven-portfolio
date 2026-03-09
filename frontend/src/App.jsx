@@ -26,6 +26,10 @@ const makeTheme = (mode, flavor = "viewer") => {
         default: mode === "dark" ? "#0B1220" : "#F6F7FB",
         paper: mode === "dark" ? "#0F1A2B" : "#FFFFFF",
       },
+      text: {
+        primary: mode === "dark" ? "#FFFFFF" : "#111827",
+        secondary: mode === "dark" ? "rgba(255,255,255,0.74)" : "rgba(17,24,39,0.70)",
+      },
     },
     shape: { borderRadius: 14 },
     typography: {
@@ -35,26 +39,20 @@ const makeTheme = (mode, flavor = "viewer") => {
 };
 
 export default function App() {
-  // viewer theme
   const [viewerDark, setViewerDark] = useState(
     localStorage.getItem("viewer_theme")
       ? localStorage.getItem("viewer_theme") === "dark"
       : true
   );
 
-  // admin theme
   const [adminDark, setAdminDark] = useState(
     localStorage.getItem("admin_theme")
       ? localStorage.getItem("admin_theme") === "dark"
       : true
   );
 
-  // 🔥 IMPORTANT: reactive login state
-  const [loggedIn, setLoggedIn] = useState(
-    !!localStorage.getItem("token")
-  );
+  const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token"));
 
-  // 🔥 watch token changes live
   useEffect(() => {
     const checkToken = () => {
       setLoggedIn(!!localStorage.getItem("token"));
@@ -68,7 +66,6 @@ export default function App() {
       window.removeEventListener("focus", checkToken);
     };
   }, []);
-  
 
   const viewerTheme = useMemo(
     () => makeTheme(viewerDark ? "dark" : "light", "viewer"),
@@ -99,8 +96,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-
-        {/* VIEWER */}
         <Route
           path="/"
           element={
@@ -111,7 +106,6 @@ export default function App() {
           }
         />
 
-        {/* ADMIN LOGIN */}
         <Route
           path="/admin/login"
           element={
@@ -122,7 +116,6 @@ export default function App() {
           }
         />
 
-        {/* ADMIN DASHBOARD */}
         <Route
           path="/admin"
           element={
@@ -137,9 +130,7 @@ export default function App() {
           }
         />
 
-        {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
-
       </Routes>
     </BrowserRouter>
   );
