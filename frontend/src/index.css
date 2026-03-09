@@ -131,7 +131,6 @@ button {
 .portfolio-mesh-lines {
   position: absolute;
   inset: 0;
-  /* FIX light mode: darker animation colors */
   opacity: 0.55;
   background:
     radial-gradient(circle at 18% 78%, rgba(241, 48, 36, 0.35) 0 2px, transparent 3px),
@@ -145,7 +144,6 @@ button {
   transition: transform 0.18s ease-out;
 }
 
-/* FIX: darker animation colors in light mode */
 .mode-light .portfolio-mesh-lines {
   background:
     radial-gradient(circle at 18% 78%, rgba(241, 48, 36, 0.5) 0 2px, transparent 3px),
@@ -176,7 +174,6 @@ button {
       60% 42% / 24% 1px no-repeat;
 }
 
-/* FIX: darker lines in light mode */
 .mode-light .portfolio-mesh-lines::before {
   background:
     linear-gradient(112deg, transparent 20%, rgba(17, 24, 39, 0.18) 20.4%, transparent 21%)
@@ -231,7 +228,6 @@ button {
   animation-delay: -8s;
 }
 
-/* FIX: light mode orbs are more visible/darker */
 .mode-light .orb-one {
   background: rgba(241, 48, 36, 0.32);
   opacity: 0.6;
@@ -255,7 +251,7 @@ button {
   }
 }
 
-/* FIX: portfolio-shell — removed excessive top padding, topbar will align flush at top */
+/* portfolio-shell — right padding ensures content never hides behind sidebar */
 .portfolio-shell {
   position: relative;
   z-index: 2;
@@ -264,8 +260,8 @@ button {
   padding-bottom: 20px;
   display: flex;
   flex-direction: column;
-  /* FIX: padding-right accounts for sidebar so content never goes behind it */
-  padding-right: calc(var(--side-nav-desktop-space) + 8px);
+  /* FIX: enough padding-right so sidebar NEVER overlaps content on any page */
+  padding-right: calc(var(--side-nav-desktop-space) + 16px);
 }
 
 .portfolio-topbar {
@@ -276,7 +272,6 @@ button {
   justify-content: flex-end;
   align-items: center;
   gap: 16px;
-  /* FIX: reduced margin-bottom so name starts same line as icons */
   margin-bottom: 10px;
   padding: 8px 12px;
   border-radius: 999px;
@@ -369,7 +364,6 @@ button {
   min-height: 100%;
 }
 
-/* FIX: hero section has minimal top padding so content is flush with topbar */
 .hero-section {
   padding-top: 4px;
 }
@@ -389,7 +383,7 @@ button {
   max-width: 920px;
 }
 
-/* FIX: hero-name-row — spinner covers the height of all 4 meta items */
+/* hero-name-row — spinner + name+meta side by side */
 .hero-name-row {
   display: flex;
   align-items: flex-start;
@@ -397,15 +391,17 @@ button {
   margin-bottom: 14px;
 }
 
-/* FIX: spinner sized to match the 4 info lines block height */
+/* =============================================
+   SPINNER — improved look matching reference image
+   Dashed outer ring + solid inner ring + spinning text
+   ============================================= */
 .hero-name-spinner-badge {
-  width: clamp(80px, 8vw, 110px);
-  height: clamp(80px, 8vw, 110px);
+  width: clamp(90px, 9vw, 120px);
+  height: clamp(90px, 9vw, 120px);
   flex: 0 0 auto;
-  animation: heroBadgeSpin 16s linear infinite;
+  animation: heroBadgeSpin 18s linear infinite;
   transform-origin: center;
-  filter: drop-shadow(0 0 18px rgba(241, 48, 36, 0.18));
-  /* align to center of the text block */
+  filter: drop-shadow(0 0 14px rgba(241, 48, 36, 0.28));
   align-self: center;
 }
 
@@ -413,32 +409,48 @@ button {
   width: 100%;
   height: 100%;
   display: block;
+  overflow: visible;
 }
 
+/* Outer dashed ring */
 .hero-name-spinner-ring {
   fill: transparent;
-  stroke: rgba(255, 255, 255, 0.18);
-  stroke-width: 1.4;
+  stroke: rgba(241, 48, 36, 0.55);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 5;
 }
 
 .mode-light .hero-name-spinner-ring {
-  stroke: rgba(17, 24, 39, 0.25);
+  stroke: rgba(241, 48, 36, 0.65);
 }
 
+/* Inner solid ring */
+.hero-name-spinner-ring-inner {
+  fill: transparent;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 0.8;
+}
+
+.mode-light .hero-name-spinner-ring-inner {
+  stroke: rgba(17, 24, 39, 0.18);
+}
+
+/* Text on the path */
 .hero-name-spinner-text {
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
-  fill: rgba(255, 255, 255, 0.78);
+  fill: rgba(255, 255, 255, 0.85);
 }
 
 .mode-light .hero-name-spinner-text {
-  fill: rgba(17, 24, 39, 0.68);
+  fill: rgba(17, 24, 39, 0.72);
 }
 
+/* Arrow in center */
 .hero-name-spinner-arrow {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   fill: var(--accent);
 }
@@ -452,14 +464,14 @@ button {
   }
 }
 
-/* FIX: name text block to sit beside the spinner */
+/* name + meta text block beside spinner */
 .hero-name-text-block {
   display: flex;
   flex-direction: column;
   gap: 2px;
 }
 
-/* FIX: hero-name — larger size, NO uppercase transform (respects admin input casing) */
+/* hero-name — larger size, NO uppercase transform */
 .hero-name {
   font-weight: 800 !important;
   letter-spacing: 0.04em;
@@ -467,7 +479,6 @@ button {
   line-height: 1.15 !important;
 }
 
-/* Use hero-name-display class to set the font-size without uppercase */
 .hero-name-display {
   font-size: clamp(1.45rem, 3vw, 1.9rem) !important;
   text-transform: none !important;
@@ -509,7 +520,7 @@ button {
   text-align-last: left;
 }
 
-/* FIX: social icon buttons — styled with bubble background (matching reference image) */
+/* social icon buttons */
 .hero-social-btn {
   border: 1px solid transparent !important;
   transition: all 0.24s ease !important;
@@ -569,9 +580,6 @@ button {
   border: 1px solid var(--light-border);
 }
 
-/* FIX: removed section-kicker class (was showing small colored duplicate title) */
-/* .section-kicker is no longer used in SectionHeading */
-
 .section-title {
   font-size: clamp(2rem, 4vw, 3.4rem) !important;
   font-weight: 900 !important;
@@ -604,8 +612,7 @@ button {
 }
 
 .project-grid,
-.achievement-grid,
-.contact-grid {
+.achievement-grid {
   display: grid;
   gap: 22px;
 }
@@ -614,9 +621,16 @@ button {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.achievement-grid,
-.contact-grid {
+.achievement-grid {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* FIX: lang-grid for Programming Languages — 2-col on desktop, 1-col on mobile */
+.lang-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 18px;
 }
 
 .project-card {
@@ -637,8 +651,6 @@ button {
   background: rgba(255, 255, 255, 0.82) !important;
   border-color: rgba(17, 24, 39, 0.08) !important;
 }
-
-/* FIX: .project-card-topline and .project-mini-label removed (Featured Project label gone) */
 
 .project-title {
   font-size: 1.45rem !important;
@@ -825,7 +837,10 @@ button {
 }
 
 /* =============================================
-   SIDEBAR NAV — FIX: bubble fills the whole icon button (not just the icon)
+   SIDEBAR NAV
+   Active: full bubble fills with gradient (like reference image)
+   Inactive: subtle background, white/light icon
+   Adapts for both dark and light themes
    ============================================= */
 .portfolio-side-nav {
   position: fixed;
@@ -866,7 +881,7 @@ button {
   padding: 0;
 }
 
-/* FIX: icon-bubble is the full circle background (what fills with gradient on active) */
+/* icon-bubble is the full circle background — fills with gradient on active */
 .portfolio-side-nav-item .icon-bubble {
   width: 100%;
   height: 100%;
@@ -877,38 +892,42 @@ button {
   font-size: 1.08rem;
 }
 
+/* Dark mode: inactive bubble */
 .mode-dark .portfolio-side-nav-item .icon-bubble {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Light mode: inactive bubble */
 .mode-light .portfolio-side-nav-item .icon-bubble {
   background: rgba(17, 24, 39, 0.04);
   border: 1px solid rgba(17, 24, 39, 0.1);
 }
 
-/* FIX: active state fills the full bubble with gradient */
+/* ACTIVE: gradient fills the full bubble — works for both dark and light themes */
 .portfolio-side-nav-item.active .icon-bubble {
   background: linear-gradient(135deg, #f13024, #f97316) !important;
   border-color: transparent !important;
   box-shadow: 0 8px 24px rgba(241, 48, 36, 0.35);
 }
 
+/* Active icon is always white (on gradient background) */
 .portfolio-side-nav-item.active .icon-inner {
-  color: white;
+  color: white !important;
+  opacity: 1;
 }
 
-/* FIX: hover state — subtle bubble highlight */
+/* Hover: subtle bubble highlight */
 .portfolio-side-nav-item:hover .icon-bubble {
   transform: scale(1.06);
 }
 
-.mode-dark .portfolio-side-nav-item:hover .icon-bubble {
+.mode-dark .portfolio-side-nav-item:hover:not(.active) .icon-bubble {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.18);
 }
 
-.mode-light .portfolio-side-nav-item:hover .icon-bubble {
+.mode-light .portfolio-side-nav-item:hover:not(.active) .icon-bubble {
   background: rgba(17, 24, 39, 0.08);
   border-color: rgba(17, 24, 39, 0.16);
 }
@@ -922,8 +941,14 @@ button {
   transition: color 0.22s ease, opacity 0.22s ease;
 }
 
-.portfolio-side-nav-item.active .icon-inner {
-  opacity: 1;
+/* Dark mode: inactive icon color */
+.mode-dark .portfolio-side-nav-item:not(.active) .icon-inner {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Light mode: inactive icon color */
+.mode-light .portfolio-side-nav-item:not(.active) .icon-inner {
+  color: rgba(17, 24, 39, 0.75);
 }
 
 .portfolio-side-nav-item .label {
@@ -962,11 +987,11 @@ table td {
 }
 
 /* =============================================
-   RESPONSIVE — FIX: center only home & about on mobile; rest stays justified
+   RESPONSIVE
    ============================================= */
 @media (max-width: 1199px) {
   .portfolio-shell {
-    padding-right: calc(var(--side-nav-desktop-space) - 6px);
+    padding-right: calc(var(--side-nav-desktop-space) + 10px);
   }
 
   .hero-layout {
@@ -976,7 +1001,7 @@ table td {
 
   .project-grid,
   .achievement-grid,
-  .contact-grid {
+  .lang-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -990,7 +1015,8 @@ table td {
 
   .portfolio-shell {
     padding-top: 10px;
-    padding-right: 24px;
+    /* FIX: on mobile sidebar moves to bottom, so no right padding needed for sidebar */
+    padding-right: 16px;
     padding-bottom: calc(var(--side-nav-mobile-space) + 10px);
   }
 
@@ -1022,7 +1048,7 @@ table td {
     padding: 26px 0;
   }
 
-  /* FIX: Only center home and about on mobile */
+  /* FIX: center home hero section on mobile */
   .hero-section .hero-name-row,
   .hero-section .hero-meta-stack,
   .hero-section .hero-title,
@@ -1036,6 +1062,7 @@ table td {
     margin-right: auto;
   }
 
+  /* FIX: hero-name-row centers on mobile */
   .hero-section .hero-name-row {
     justify-content: center;
     flex-wrap: wrap;
@@ -1049,7 +1076,17 @@ table td {
     align-items: center;
   }
 
-  /* All other sections (skills, projects, experience, education, achievements, contact) stay left/justify */
+  /* FIX: hero action buttons — center on mobile, shown as column */
+  .hero-action-buttons {
+    align-items: center !important;
+  }
+
+  /* FIX: social icons row — center on mobile, always visible */
+  .hero-social-row {
+    justify-content: center !important;
+  }
+
+  /* Other sections stay left/justify */
   .section-static:not(.about-section-plain) .body-copy,
   .section-static:not(.about-section-plain) .section-title,
   .section-static:not(.about-section-plain) .section-subtitle,
@@ -1062,6 +1099,12 @@ table td {
 
   .hero-left-expanded {
     max-width: 100%;
+  }
+
+  .project-grid,
+  .achievement-grid,
+  .lang-grid {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1095,8 +1138,8 @@ table td {
   }
 
   .hero-name-spinner-badge {
-    width: 70px;
-    height: 70px;
+    width: 72px;
+    height: 72px;
   }
 
   .segmented-meter {
