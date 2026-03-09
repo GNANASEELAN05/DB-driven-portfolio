@@ -48,8 +48,7 @@ export const updateExperience = (payload) =>
 /* =========================
    ADMIN (Projects)
 ========================= */
-export const getAllProjectsAdmin = () =>
-  http.get("/projects", authHeader());
+export const getAllProjectsAdmin = () => http.get("/projects", authHeader());
 
 export const createProject = (payload) =>
   http.post("/projects", payload, authHeader());
@@ -64,7 +63,6 @@ export const deleteProject = (id) =>
    RESUME SECTION
 ========================= */
 
-// upload resume
 export const uploadResume = (file) => {
   const form = new FormData();
   form.append("file", file);
@@ -77,26 +75,21 @@ export const uploadResume = (file) => {
   });
 };
 
-// viewer download
 export const downloadResumeUrl = () =>
   `${http.defaults.baseURL}/resume/download`;
 
 export const viewResumeUrl = () =>
   `${http.defaults.baseURL}/resume/download`;
 
-// admin list
 export const listResumesAdmin = () =>
   http.get("/resume/list", authHeader());
 
-// preview by id
 export const viewResumeByIdUrl = (id) =>
   `${http.defaults.baseURL}/resume/${id}/view`;
 
-// set primary resume
 export const setPrimaryResume = (id) =>
   http.put(`/resume/${id}/primary`, {}, authHeader());
 
-// delete resume
 export const deleteResumeById = (id) =>
   http.delete(`/resume/${id}`, authHeader());
 

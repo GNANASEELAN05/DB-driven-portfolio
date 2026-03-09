@@ -24,6 +24,11 @@
   --accent: #f13024;
   --accent-soft: rgba(241, 48, 36, 0.16);
   --white-soft: rgba(255, 255, 255, 0.06);
+
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --mouse-rx: 0deg;
+  --mouse-ry: 0deg;
 }
 
 * {
@@ -55,7 +60,8 @@ button {
 .portfolio-root {
   position: relative;
   min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .portfolio-root.mode-dark {
@@ -84,19 +90,75 @@ button {
 
 .portfolio-grid {
   position: absolute;
-  inset: 0;
+  inset: -6%;
   background-image:
-    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: radial-gradient(circle at center, black 30%, transparent 82%);
-  opacity: 0.35;
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 52px 52px;
+  mask-image: radial-gradient(circle at center, black 34%, transparent 86%);
+  opacity: 0.42;
+  transform:
+    perspective(1200px)
+    rotateX(var(--mouse-rx))
+    rotateY(var(--mouse-ry))
+    translate3d(calc((var(--mouse-x) - 50%) / 18), calc((var(--mouse-y) - 50%) / 18), 0);
+  transition: transform 0.22s ease-out;
 }
 
 .mode-light .portfolio-grid {
   background-image:
     linear-gradient(rgba(17,24,39,0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(17,24,39,0.035) 1px, transparent 1px);
+}
+
+.portfolio-grid-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at var(--mouse-x) var(--mouse-y),
+      rgba(241, 48, 36, 0.16),
+      rgba(241, 48, 36, 0.06) 14%,
+      transparent 34%);
+  opacity: 0.95;
+  transition: background-position 0.16s linear;
+}
+
+.portfolio-mesh-lines {
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 18% 78%, rgba(241,48,36,0.35) 0 2px, transparent 3px),
+    radial-gradient(circle at 32% 66%, rgba(255,255,255,0.16) 0 2px, transparent 3px),
+    radial-gradient(circle at 46% 58%, rgba(255,255,255,0.18) 0 2px, transparent 3px),
+    radial-gradient(circle at 64% 46%, rgba(255,255,255,0.16) 0 2px, transparent 3px),
+    radial-gradient(circle at 78% 34%, rgba(241,48,36,0.28) 0 2px, transparent 3px);
+  filter: blur(0.2px);
+  transform:
+    translate3d(calc((var(--mouse-x) - 50%) / 45), calc((var(--mouse-y) - 50%) / 45), 0);
+  transition: transform 0.18s ease-out;
+}
+
+.portfolio-mesh-lines::before,
+.portfolio-mesh-lines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.55;
+}
+
+.portfolio-mesh-lines::before {
+  background:
+    linear-gradient(112deg, transparent 20%, rgba(255,255,255,0.09) 20.4%, transparent 21%) 16% 70% / 22% 1px no-repeat,
+    linear-gradient(118deg, transparent 20%, rgba(255,255,255,0.09) 20.4%, transparent 21%) 30% 62% / 22% 1px no-repeat,
+    linear-gradient(125deg, transparent 20%, rgba(255,255,255,0.08) 20.4%, transparent 21%) 44% 53% / 24% 1px no-repeat,
+    linear-gradient(132deg, transparent 20%, rgba(255,255,255,0.08) 20.4%, transparent 21%) 60% 42% / 24% 1px no-repeat;
+}
+
+.portfolio-mesh-lines::after {
+  background:
+    linear-gradient(0deg, transparent 49%, rgba(241,48,36,0.14) 50%, transparent 51%) center center / 100% 100% no-repeat;
+  mask-image: radial-gradient(circle at var(--mouse-x) var(--mouse-y), black 0, transparent 42%);
 }
 
 .portfolio-orb {
@@ -146,23 +208,42 @@ button {
 .portfolio-shell {
   position: relative;
   z-index: 2;
+  height: 100vh;
   padding-top: 26px;
-  padding-bottom: 36px;
+  padding-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.portfolio-shell-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  padding-right: 4px;
+}
+
+.portfolio-shell-scroll::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .portfolio-topbar {
   position: sticky;
   top: 18px;
-  z-index: 20;
+  z-index: 25;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   gap: 16px;
-  margin-bottom: 22px;
-  padding: 14px 18px;
+  margin-bottom: 18px;
+  padding: 12px 14px;
   border-radius: 999px;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255,255,255,0.08);
+  width: fit-content;
+  margin-left: auto;
 }
 
 .mode-dark .portfolio-topbar {
@@ -173,24 +254,6 @@ button {
 .mode-light .portfolio-topbar {
   background: rgba(255,255,255,0.72);
   border-color: rgba(17,24,39,0.08);
-}
-
-.topbar-avatar {
-  width: 44px !important;
-  height: 44px !important;
-  font-weight: 800 !important;
-  background: linear-gradient(135deg, #f13024, #f97316) !important;
-  color: white !important;
-}
-
-.topbar-name {
-  font-size: 0.98rem !important;
-  font-weight: 800 !important;
-}
-
-.topbar-role {
-  font-size: 0.84rem !important;
-  opacity: 0.75;
 }
 
 .topbar-icon-btn {
@@ -221,15 +284,46 @@ button {
 }
 
 .portfolio-section {
-  min-height: 100vh;
+  min-height: calc(100vh - 110px);
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 44px 0;
+  padding: 34px 0;
+  position: relative;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .hero-section {
-  padding-top: 34px;
+  padding-top: 10px;
+}
+
+.section-nav-focus::after {
+  content: "";
+  position: absolute;
+  inset: 8% 0;
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 20% 50%, rgba(241,48,36,0.22), transparent 28%),
+    radial-gradient(circle at 75% 45%, rgba(168,85,247,0.18), transparent 32%);
+  filter: blur(14px);
+  pointer-events: none;
+  z-index: -1;
+  animation: sectionBurst 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes sectionBurst {
+  0% {
+    opacity: 0;
+    transform: scale(0.92) translateY(24px);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.04) translateY(0);
+  }
 }
 
 .hero-layout {
@@ -239,13 +333,46 @@ button {
   align-items: center;
 }
 
-.hero-kicker {
-  font-size: 0.95rem !important;
-  font-weight: 700 !important;
-  letter-spacing: 0.16em;
+.hero-name-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.hero-name-spinner {
+  width: 1.4rem;
+  height: 1.4rem;
+  display: inline-block;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.18);
+  border-top-color: var(--accent);
+  border-right-color: rgba(249,115,22,0.72);
+  box-shadow: 0 0 0 1px rgba(241,48,36,0.12), 0 0 18px rgba(241,48,36,0.24);
+  animation: heroMiniSpin 3.8s linear infinite;
+}
+
+.mode-light .hero-name-spinner {
+  border-color: rgba(17,24,39,0.12);
+  border-top-color: var(--accent);
+  border-right-color: rgba(249,115,22,0.72);
+}
+
+@keyframes heroMiniSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.hero-name {
+  font-size: clamp(1rem, 2.2vw, 1.2rem) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--accent);
-  margin-bottom: 12px !important;
 }
 
 .hero-title {
@@ -545,6 +672,130 @@ button {
   word-break: break-word;
 }
 
+.language-card {
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.mode-dark .language-card {
+  background: rgba(255,255,255,0.04);
+}
+
+.mode-light .language-card {
+  background: rgba(17,24,39,0.03);
+  border-color: rgba(17,24,39,0.08);
+}
+
+.language-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.language-name {
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+}
+
+.meter-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.meter-label {
+  font-size: 0.84rem !important;
+  opacity: 0.72;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.meter-value {
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+}
+
+.segmented-meter {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.segment {
+  height: 38px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 0.78rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  opacity: 0.64;
+  transition: all 0.28s ease;
+}
+
+.mode-dark .segment {
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.08);
+}
+
+.mode-light .segment {
+  background: rgba(17,24,39,0.05);
+  border-color: rgba(17,24,39,0.08);
+}
+
+.segment.active {
+  opacity: 1;
+  color: white;
+  background: linear-gradient(135deg, #f13024, #f97316);
+  box-shadow: 0 10px 28px rgba(241,48,36,0.22);
+  border-color: transparent;
+}
+
+.experience-track {
+  position: relative;
+  height: 18px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.mode-dark .experience-track {
+  background: rgba(255,255,255,0.08);
+}
+
+.mode-light .experience-track {
+  background: rgba(17,24,39,0.08);
+}
+
+.experience-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #f13024 0%, #f97316 100%);
+  box-shadow: 0 8px 24px rgba(241,48,36,0.28);
+}
+
+.experience-scale {
+  position: absolute;
+  inset: 24px 0 auto 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.tick {
+  font-size: 0.74rem;
+  opacity: 0.68;
+}
+
 .portfolio-footer {
   padding: 24px 0 10px;
   text-align: center;
@@ -577,8 +828,8 @@ button {
 
 .portfolio-side-nav-item {
   position: relative;
-  width: 44px;
-  height: 44px;
+  width: 46px;
+  height: 46px;
   border: none;
   background: transparent;
   border-radius: 999px;
@@ -586,22 +837,40 @@ button {
   display: grid;
   place-items: center;
   transition: all 0.22s ease;
+  color: inherit;
 }
 
-.portfolio-side-nav-item .dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: 0.5;
+.portfolio-side-nav-item .icon-wrap {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border-radius: inherit;
+  font-size: 1.08rem;
+  opacity: 0.78;
+  transition: all 0.22s ease;
 }
 
-.portfolio-side-nav-item.active {
+.mode-dark .portfolio-side-nav-item .icon-wrap {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.mode-light .portfolio-side-nav-item .icon-wrap {
+  background: rgba(17,24,39,0.03);
+  border: 1px solid rgba(17,24,39,0.08);
+}
+
+.portfolio-side-nav-item.active .icon-wrap {
+  opacity: 1;
   color: white;
   background: linear-gradient(135deg, #f13024, #f97316);
+  border-color: transparent;
+  box-shadow: 0 14px 32px rgba(241,48,36,0.24);
 }
 
-.portfolio-side-nav-item.active .dot {
+.portfolio-side-nav-item:hover .icon-wrap {
+  transform: translateX(-2px) scale(1.04);
   opacity: 1;
 }
 
@@ -645,6 +914,26 @@ table td {
 }
 
 @media (max-width: 1199px) {
+  .portfolio-root {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .portfolio-shell {
+    height: auto;
+  }
+
+  .portfolio-shell-scroll {
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .portfolio-section {
+    min-height: auto;
+    scroll-snap-align: none;
+  }
+
   .hero-layout {
     grid-template-columns: 1fr;
     gap: 30px;
@@ -672,7 +961,8 @@ table td {
 
   .portfolio-topbar {
     border-radius: 24px;
-    padding: 14px;
+    padding: 12px;
+    top: 14px;
   }
 
   .portfolio-side-nav {
@@ -692,6 +982,11 @@ table td {
 }
 
 @media (max-width: 767px) {
+  .portfolio-root {
+    height: auto;
+    overflow: visible;
+  }
+
   .portfolio-section {
     min-height: auto;
     padding: 48px 0;
@@ -702,16 +997,8 @@ table td {
   }
 
   .portfolio-topbar {
-    align-items: flex-start;
+    align-items: center;
     border-radius: 22px;
-  }
-
-  .topbar-name {
-    font-size: 0.92rem !important;
-  }
-
-  .topbar-role {
-    font-size: 0.78rem !important;
   }
 
   .portfolio-side-nav {
@@ -724,11 +1011,23 @@ table td {
   }
 
   .portfolio-side-nav-item {
-    width: 38px;
-    height: 38px;
+    width: 40px;
+    height: 40px;
   }
 
   .hero-stat-card {
     min-width: 96px;
+  }
+
+  .hero-name-row {
+    margin-bottom: 10px;
+  }
+
+  .segmented-meter {
+    grid-template-columns: 1fr;
+  }
+
+  .segment {
+    height: 34px;
   }
 }

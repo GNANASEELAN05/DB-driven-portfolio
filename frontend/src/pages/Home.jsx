@@ -33,17 +33,20 @@ import {
   MdEmail,
   MdLightMode,
   MdLink,
-  MdMenu,
   MdPhone,
   MdRefresh,
   MdSchool,
-  MdTimeline,
-  MdWork,
-  MdCode,
-  MdEmojiEvents,
   MdAdminPanelSettings,
   MdVisibility,
   MdClose,
+  MdHome,
+  MdPerson,
+  MdCode,
+  MdWork,
+  MdTimeline,
+  MdEmojiEvents,
+  MdContacts,
+  MdMenuBook,
 } from "react-icons/md";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
@@ -178,27 +181,32 @@ function VerticalNav({ items, activeId, onJump, mobileOpen, setMobileOpen }) {
   return (
     <>
       <Box className={`portfolio-side-nav ${mobileOpen ? "open" : ""}`}>
-        {items.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={`portfolio-side-nav-item ${activeId === item.id ? "active" : ""}`}
-            onClick={() => {
-              onJump(item.id);
-              setMobileOpen(false);
-            }}
-            aria-label={item.label}
-            title={item.label}
-          >
-            <span className="dot" />
-            <span className="label">{item.label}</span>
-          </button>
-        ))}
+        {items.map((item) => {
+          const Icon = item.icon;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              className={`portfolio-side-nav-item ${activeId === item.id ? "active" : ""}`}
+              onClick={() => {
+                onJump(item.id);
+                setMobileOpen(false);
+              }}
+              aria-label={item.label}
+              title={item.label}
+            >
+              <span className="icon-wrap">
+                <Icon />
+              </span>
+              <span className="label">{item.label}</span>
+            </button>
+          );
+        })}
       </Box>
 
       <Box className="portfolio-mobile-nav-toggle">
         <IconButton onClick={() => setMobileOpen((v) => !v)} size="small">
-          <MdMenu />
+          <MdMenuBook />
         </IconButton>
       </Box>
     </>
@@ -233,21 +241,19 @@ function StatCard({ value, label }) {
   );
 }
 
-function SectionHeading({ index, title, subtitle }) {
+function SectionHeading({ title, subtitle }) {
   return (
     <Stack spacing={1.1} sx={{ mb: 3 }}>
-      <Typography className="section-kicker">
-        {index}. {title}
-      </Typography>
+      <Typography className="section-kicker">{title}</Typography>
       <Typography className="section-title">{title}</Typography>
       {subtitle ? <Typography className="section-subtitle">{subtitle}</Typography> : null}
     </Stack>
   );
 }
 
-function GlassPanel({ children, sx }) {
+function GlassPanel({ children, sx, className = "" }) {
   return (
-    <Paper className="glass-panel" sx={sx}>
+    <Paper className={`glass-panel ${className}`.trim()} sx={sx}>
       {children}
     </Paper>
   );
@@ -261,11 +267,7 @@ function ProjectCard({ project }) {
   const liveUrl = safeString(project?.liveUrl);
 
   return (
-    <MotionPaper
-      variants={fadeUp}
-      className="project-card"
-      whileHover={{ y: -8 }}
-    >
+    <MotionPaper variants={fadeUp} className="project-card" whileHover={{ y: -8 }}>
       <Box className="project-card-topline">
         <Typography className="project-mini-label">Featured Project</Typography>
       </Box>
@@ -311,6 +313,64 @@ function ProjectCard({ project }) {
   );
 }
 
+function LanguageLevelBar({ level }) {
+  const normalized = safeString(level).trim().toLowerCase();
+  const levelMap = {
+    beginner: 33.33,
+    intermediate: 66.66,
+    advanced: 100,
+  };
+
+  const pct = levelMap[normalized] ?? 0;
+
+  return (
+    <Box className="meter-block">
+      <Box className="meter-head">
+        <Typography className="meter-label">Level</Typography>
+        <Typography className="meter-value">
+          {safeString(level) || "—"}
+        </Typography>
+      </Box>
+
+      <Box className="segmented-meter" aria-label={`Language level ${safeString(level) || "unknown"}`}>
+        <span className={`segment ${pct >= 33.33 ? "active" : ""}`}>Beginner</span>
+        <span className={`segment ${pct >= 66.66 ? "active" : ""}`}>Intermediate</span>
+        <span className={`segment ${pct >= 100 ? "active" : ""}`}>Advanced</span>
+      </Box>
+    </Box>
+  );
+}
+
+function LanguageYearsBar({ years }) {
+  const raw =
+    typeof years === "number"
+      ? years
+      : Number.parseFloat(String(years).replace(/[^\d.]/g, "") || "0");
+
+  const clamped = Number.isFinite(raw) ? Math.max(0, Math.min(5, raw)) : 0;
+  const pct = (clamped / 5) * 100;
+
+  return (
+    <Box className="meter-block">
+      <Box className="meter-head">
+        <Typography className="meter-label">Experience</Typography>
+        <Typography className="meter-value">{clamped} / 5 yrs</Typography>
+      </Box>
+
+      <Box className="experience-track" aria-label={`Experience ${clamped} out of 5 years`}>
+        <Box className="experience-fill" sx={{ width: `${pct}%` }} />
+        <Box className="experience-scale">
+          {[0, 1, 2, 3, 4, 5].map((tick) => (
+            <span key={tick} className="tick">
+              {tick}
+            </span>
+          ))}
+        </Box>
+      </Box>
+    </Box>
+  );
+}
+
 export default function Home({ toggleTheme }) {
   useEffect(() => {
     document.title = "Gnanaseelan V Portfolio";
@@ -342,25 +402,27 @@ export default function Home({ toggleTheme }) {
 
   const [activeSection, setActiveSection] = useState("home");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [navFlashId, setNavFlashId] = useState("");
+  const flashTimerRef = useRef(null);
+  const rootRef = useRef(null);
 
   const sectionIds = useMemo(
     () => [
-      { id: "home", label: "Home" },
-      { id: "about", label: "About" },
-      { id: "skills", label: "Skills" },
-      { id: "projects", label: "Work" },
-      { id: "experience", label: "Experience" },
-      { id: "education", label: "Education" },
-      { id: "achievements", label: "Achievements" },
-      { id: "contact", label: "Contact" },
+      { id: "home", label: "Home", icon: MdHome },
+      { id: "about", label: "About", icon: MdPerson },
+      { id: "skills", label: "Skills", icon: MdCode },
+      { id: "projects", label: "Work", icon: MdWork },
+      { id: "experience", label: "Experience", icon: MdTimeline },
+      { id: "education", label: "Education", icon: MdSchool },
+      { id: "achievements", label: "Achievements", icon: MdEmojiEvents },
+      { id: "contact", label: "Contact", icon: MdContacts },
     ],
     []
   );
 
   const name = safeString(profile?.name) || "Your Name";
   const title = safeString(profile?.title) || "Full Stack Developer";
-  const tagline =
-    safeString(profile?.tagline) || "Transforming Ideas Into Digital Reality";
+  const tagline = safeString(profile?.tagline) || "Transforming Ideas Into Digital Reality";
   const about = safeString(profile?.about) || "Add your about content from admin.";
   const location = safeString(profile?.location) || "";
   const emailPublic = safeString(profile?.emailPublic) || "";
@@ -375,7 +437,11 @@ export default function Home({ toggleTheme }) {
 
   const reload = () => setReloadTick((x) => x + 1);
 
-  const contentVersion = useMemo(() => localStorage.getItem("content_version") || "0", [reloadTick]);
+  const contentVersion = useMemo(
+    () => localStorage.getItem("content_version") || "0",
+    [reloadTick]
+  );
+
   const resumeDownloadBase = useMemo(() => downloadResumeUrl(), []);
   const resumeViewBase = useMemo(() => viewResumeUrl(), []);
 
@@ -406,20 +472,22 @@ export default function Home({ toggleTheme }) {
       try {
         setLoading(true);
 
-        const [profRes, skillsRes, projRes, expRes, eduRes, socRes, achRes, langRes] = await Promise.all([
-          getProfile(),
-          getSkills(),
-          getFeaturedProjects(),
-          getExperience(),
-          getEducation(),
-          getSocials(),
-          getAchievements(),
-          getLanguageExperience(),
-        ]);
+        const [profRes, skillsRes, projRes, expRes, eduRes, socRes, achRes, langRes] =
+          await Promise.all([
+            getProfile(),
+            getSkills(),
+            getFeaturedProjects(),
+            getExperience(),
+            getEducation(),
+            getSocials(),
+            getAchievements(),
+            getLanguageExperience(),
+          ]);
 
         if (!alive) return;
 
-        setProfile(profRes?.data || {});
+        const nextProfile = profRes?.data || {};
+        setProfile(nextProfile);
         setSkills(skillsRes?.data || {});
         setProjects(Array.isArray(projRes?.data) ? projRes.data : []);
         setExperience(Array.isArray(expRes?.data) ? expRes.data : []);
@@ -432,8 +500,13 @@ export default function Home({ toggleTheme }) {
           localStorage.getItem("active_resume_file_name") ||
           localStorage.getItem("resume_file_name") ||
           "";
-        if (localName) setResumeName(localName);
-        else setResumeName(`${name.replace(/\s+/g, "_")}_Resume.pdf`);
+
+        if (localName) {
+          setResumeName(localName);
+        } else {
+          const profileName = safeString(nextProfile?.name) || "Resume";
+          setResumeName(`${profileName.replace(/\s+/g, "_")}_Resume.pdf`);
+        }
       } catch {
       } finally {
         if (alive) setLoading(false);
@@ -441,17 +514,22 @@ export default function Home({ toggleTheme }) {
     };
 
     load();
+
     return () => {
       alive = false;
     };
-  }, [reloadTick, name]);
+  }, [reloadTick]);
 
   useEffect(() => {
     const sync = () => reload();
 
     const onStorage = (e) => {
       if (!e) return;
-      if (e.key === "content_version" || e.key === "active_resume_file_name" || e.key === "resume_file_name") {
+      if (
+        e.key === "content_version" ||
+        e.key === "active_resume_file_name" ||
+        e.key === "resume_file_name"
+      ) {
         sync();
       }
     };
@@ -482,7 +560,10 @@ export default function Home({ toggleTheme }) {
           setActiveSection(visible[0].target.id);
         }
       },
-      { threshold: [0.3, 0.55, 0.75] }
+      {
+        root: document.querySelector(".portfolio-shell-scroll"),
+        threshold: [0.35, 0.55, 0.75],
+      }
     );
 
     sectionIds.forEach(({ id }) => {
@@ -493,10 +574,57 @@ export default function Home({ toggleTheme }) {
     return () => observer.disconnect();
   }, [loading, sectionIds]);
 
+  useEffect(() => {
+    const target = rootRef.current;
+    if (!target) return;
+
+    const updateMouseVars = (event) => {
+      const rect = target.getBoundingClientRect();
+      const x = ((event.clientX - rect.left) / rect.width) * 100;
+      const y = ((event.clientY - rect.top) / rect.height) * 100;
+      const rx = ((event.clientY - rect.top) / rect.height - 0.5) * 12;
+      const ry = ((event.clientX - rect.left) / rect.width - 0.5) * 12;
+
+      target.style.setProperty("--mouse-x", `${x}%`);
+      target.style.setProperty("--mouse-y", `${y}%`);
+      target.style.setProperty("--mouse-rx", `${rx.toFixed(2)}deg`);
+      target.style.setProperty("--mouse-ry", `${ry.toFixed(2)}deg`);
+    };
+
+    const resetMouseVars = () => {
+      target.style.setProperty("--mouse-x", "50%");
+      target.style.setProperty("--mouse-y", "50%");
+      target.style.setProperty("--mouse-rx", "0deg");
+      target.style.setProperty("--mouse-ry", "0deg");
+    };
+
+    resetMouseVars();
+    window.addEventListener("mousemove", updateMouseVars, { passive: true });
+    window.addEventListener("mouseleave", resetMouseVars);
+
+    return () => {
+      window.removeEventListener("mousemove", updateMouseVars);
+      window.removeEventListener("mouseleave", resetMouseVars);
+    };
+  }, []);
+
   const jumpTo = (id) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    if (flashTimerRef.current) {
+      window.clearTimeout(flashTimerRef.current);
+    }
+
+    setNavFlashId(id);
+
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    flashTimerRef.current = window.setTimeout(() => {
+      setNavFlashId("");
+    }, 900);
   };
 
   const closeResumePreview = () => {
@@ -552,12 +680,17 @@ export default function Home({ toggleTheme }) {
   ];
 
   return (
-    <Box className={`portfolio-root ${mode === "dark" ? "mode-dark" : "mode-light"}`}>
+    <Box
+      ref={rootRef}
+      className={`portfolio-root ${mode === "dark" ? "mode-dark" : "mode-light"}`}
+    >
       <Box className="portfolio-bg">
         <span className="portfolio-orb orb-one" />
         <span className="portfolio-orb orb-two" />
         <span className="portfolio-orb orb-three" />
         <span className="portfolio-grid" />
+        <span className="portfolio-grid-glow" />
+        <span className="portfolio-mesh-lines" />
       </Box>
 
       <VerticalNav
@@ -570,17 +703,7 @@ export default function Home({ toggleTheme }) {
 
       <Container maxWidth="xl" className="portfolio-shell">
         <Box className="portfolio-topbar">
-          <Stack direction="row" spacing={1.5} alignItems="center">
-            <Avatar className="topbar-avatar">
-              {(safeString(profile?.initials) || name || "Y").slice(0, 2).toUpperCase()}
-            </Avatar>
-            <Box>
-              <Typography className="topbar-name">{name}</Typography>
-              <Typography className="topbar-role">{title}</Typography>
-            </Box>
-          </Stack>
-
-          <Stack direction="row" spacing={1} alignItems="center">
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: "auto" }}>
             <Tooltip title="Reload">
               <IconButton onClick={reload} className="topbar-icon-btn">
                 <MdRefresh />
@@ -601,466 +724,455 @@ export default function Home({ toggleTheme }) {
           </Stack>
         </Box>
 
-        <MotionBox
-          id="home"
-          className="portfolio-section hero-section"
-          initial="hidden"
-          animate="show"
-          variants={fadeUp}
-        >
-          <Box className="hero-layout">
-            <Box className="hero-left">
-              <MotionBox variants={fadeUp}>
-                <Typography className="hero-kicker">Full Stack Developer</Typography>
-                <Typography className="hero-title">
-                  {tagline}
-                </Typography>
-                <Typography className="hero-description">
-                  {about}
-                </Typography>
-
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
-                  <HeroActionButton
-                    variant="contained"
-                    startIcon={<MdArrowOutward />}
-                    onClick={() => jumpTo("projects")}
-                  >
-                    View Work
-                  </HeroActionButton>
-
-                  <HeroActionButton
-                    variant="outlined"
-                    startIcon={<MdDownload />}
-                    onClick={onDownloadResume}
-                    disabled={downloading}
-                  >
-                    {downloading ? "Downloading..." : `Download Resume`}
-                  </HeroActionButton>
-
-                  <HeroActionButton
-                    variant="outlined"
-                    startIcon={<MdVisibility />}
-                    onClick={onPreviewResume}
-                  >
-                    Preview Resume
-                  </HeroActionButton>
-                </Stack>
-
-                <Stack direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
-                  {socials?.github ? (
-                    <IconButton
-                      className="hero-social-btn"
-                      onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}
-                    >
-                      <FaGithub />
-                    </IconButton>
-                  ) : null}
-
-                  {socials?.linkedin ? (
-                    <IconButton
-                      className="hero-social-btn"
-                      onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}
-                    >
-                      <FaLinkedin />
-                    </IconButton>
-                  ) : null}
-
-                  {contactEmail ? (
-                    <IconButton
-                      className="hero-social-btn"
-                      onClick={() => window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")}
-                    >
-                      <MdEmail />
-                    </IconButton>
-                  ) : null}
-
-                  {socials?.phone ? (
-                    <IconButton
-                      className="hero-social-btn"
-                      onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")}
-                    >
-                      <MdPhone />
-                    </IconButton>
-                  ) : null}
-                </Stack>
-
-                <Stack direction="row" spacing={2} sx={{ mt: 5, flexWrap: "wrap", rowGap: 1.5 }}>
-                  <StatCard value={completedSections[0]} label="Projects" />
-                  <StatCard value={completedSections[1]} label="Experience" />
-                  <StatCard value={completedSections[2]} label="Education" />
-                </Stack>
-              </MotionBox>
-            </Box>
-
-            <Box className="hero-right">
-              <MotionBox variants={floatIn} className="hero-visual-wrap">
-                <Box className="hero-avatar-ring">
-                  <Box className="hero-avatar-core">
-                    <Avatar className="hero-main-avatar">
-                      {(safeString(profile?.initials) || name || "Y").slice(0, 2).toUpperCase()}
-                    </Avatar>
+        <Box className="portfolio-shell-scroll">
+          <MotionBox
+            id="home"
+            className={`portfolio-section hero-section ${
+              navFlashId === "home" ? "section-nav-focus" : ""
+            }`}
+            initial="hidden"
+            animate="show"
+            variants={fadeUp}
+          >
+            <Box className="hero-layout">
+              <Box className="hero-left">
+                <MotionBox variants={fadeUp}>
+                  <Box className="hero-name-row">
+                    <span className="hero-name-spinner" />
+                    <Typography className="hero-name">{name}</Typography>
                   </Box>
-                </Box>
 
-                <GlassPanel sx={{ p: 2, mt: 3 }}>
-                  <Typography className="mini-card-title">{name}</Typography>
-                  <Typography className="mini-card-subtitle">{title}</Typography>
-                  {location ? (
-                    <Typography className="mini-card-line">📍 {location}</Typography>
-                  ) : null}
-                  {contactEmail ? (
-                    <Typography className="mini-card-line">✉️ {contactEmail}</Typography>
-                  ) : null}
-                </GlassPanel>
-              </MotionBox>
-            </Box>
-          </Box>
-        </MotionBox>
+                  <Typography className="hero-title">{tagline}</Typography>
 
-        <MotionBox
-          id="about"
-          className="portfolio-section"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
-        >
-          <SectionHeading
-            index="01"
-            title="About"
-            subtitle="A short introduction and profile summary."
-          />
-          <GlassPanel sx={{ p: { xs: 2.5, md: 4 } }}>
-            {loading ? (
-              <Skeleton height={180} />
-            ) : (
-              <Typography className="body-copy">{about}</Typography>
-            )}
-          </GlassPanel>
-        </MotionBox>
+                  <Typography className="hero-description">{about}</Typography>
 
-        <MotionBox
-          id="skills"
-          className="portfolio-section"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.25 }}
-        >
-          <SectionHeading
-            index="02"
-            title="Skills"
-            subtitle="Tech stack grouped the same way your backend already returns it."
-          />
-          <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
-            {loading ? (
-              <Skeleton height={220} />
-            ) : (
-              <TableContainer>
-                <Table size="small">
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>Skills</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {skillRows.map((row, idx) => (
-                      <TableRow key={idx}>
-                        <TableCell sx={{ fontWeight: 700 }}>{row.category}</TableCell>
-                        <TableCell>{row.value}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </GlassPanel>
-        </MotionBox>
-
-        <MotionBox
-          id="projects"
-          className="portfolio-section"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <SectionHeading
-            index="03"
-            title="Work"
-            subtitle="Featured projects in a modern portfolio card layout."
-          />
-          {loading ? (
-            <Stack spacing={2}>
-              <Skeleton height={220} />
-              <Skeleton height={220} />
-            </Stack>
-          ) : projects.length ? (
-            <Box className="project-grid">
-              {projects.map((project, idx) => (
-                <ProjectCard key={project?.id ?? idx} project={project} />
-              ))}
-            </Box>
-          ) : (
-            <GlassPanel sx={{ p: 3 }}>
-              <Typography>No projects yet. Add them in Admin → Projects.</Typography>
-            </GlassPanel>
-          )}
-        </MotionBox>
-
-        <MotionBox
-          id="experience"
-          className="portfolio-section"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <SectionHeading
-            index="04"
-            title="Experience"
-            subtitle="Career and internship timeline."
-          />
-          <Stack spacing={2}>
-            {loading ? (
-              <Skeleton height={220} />
-            ) : experience.length ? (
-              experience.map((item, idx) => (
-                <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
-                  <Typography className="timeline-title">
-                    {safeString(item?.role) || "Role"}
-                  </Typography>
-                  <Typography className="timeline-subtitle">
-                    {safeString(item?.company) || "Company"}
-                  </Typography>
-                  <Typography className="timeline-meta">
-                    {safeString(item?.start)}
-                    {safeString(item?.end) ? ` - ${safeString(item?.end)}` : ""}
-                  </Typography>
-                  {safeString(item?.description) ? (
-                    <Typography className="body-copy" sx={{ mt: 1.5 }}>
-                      {safeString(item?.description)}
-                    </Typography>
-                  ) : null}
-                </GlassPanel>
-              ))
-            ) : (
-              <GlassPanel sx={{ p: 3 }}>
-                <Typography>No experience added yet.</Typography>
-              </GlassPanel>
-            )}
-          </Stack>
-        </MotionBox>
-
-        <MotionBox
-          id="education"
-          className="portfolio-section"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <SectionHeading
-            index="05"
-            title="Education"
-            subtitle="Academic background and qualifications."
-          />
-          <Stack spacing={2}>
-            {loading ? (
-              <Skeleton height={220} />
-            ) : education.length ? (
-              education.map((item, idx) => (
-                <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
-                  <Typography className="timeline-title">
-                    {safeString(item?.degree) || "Degree"}
-                  </Typography>
-                  <Typography className="timeline-subtitle">
-                    {safeString(item?.institution) || "Institution"}
-                  </Typography>
-                  <Typography className="timeline-meta">{safeString(item?.year) || ""}</Typography>
-                  {safeString(item?.details) ? (
-                    <Typography className="body-copy" sx={{ mt: 1.5 }}>
-                      {safeString(item?.details)}
-                    </Typography>
-                  ) : null}
-                </GlassPanel>
-              ))
-            ) : (
-              <GlassPanel sx={{ p: 3 }}>
-                <Typography>No education added yet.</Typography>
-              </GlassPanel>
-            )}
-          </Stack>
-        </MotionBox>
-
-        <MotionBox
-          id="achievements"
-          className="portfolio-section"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <SectionHeading
-            index="06"
-            title="Achievements"
-            subtitle="Certifications, awards, and recognitions."
-          />
-          <Box className="achievement-grid">
-            {loading ? (
-              <Skeleton height={220} />
-            ) : achievements.length ? (
-              achievements.map((item, idx) => (
-                <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
-                  <Typography className="timeline-title">
-                    {safeString(item?.title) || "Achievement"}
-                  </Typography>
-                  <Typography className="timeline-subtitle">
-                    {safeString(item?.issuer) || ""}
-                  </Typography>
-                  <Typography className="timeline-meta">
-                    {safeString(item?.year) || ""}
-                  </Typography>
-
-                  {safeString(item?.link) ? (
-                    <Button
-                      variant="outlined"
-                      startIcon={<MdLink />}
-                      sx={{ mt: 2, borderRadius: 999, fontWeight: 700 }}
-                      onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}
+                  <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
+                    <HeroActionButton
+                      variant="contained"
+                      startIcon={<MdArrowOutward />}
+                      onClick={() => jumpTo("projects")}
                     >
-                      View
-                    </Button>
-                  ) : null}
-                </GlassPanel>
-              ))
-            ) : (
-              <GlassPanel sx={{ p: 3 }}>
-                <Typography>No achievements yet.</Typography>
-              </GlassPanel>
-            )}
-          </Box>
-        </MotionBox>
+                      View Work
+                    </HeroActionButton>
 
-        <MotionBox
-          id="contact"
-          className="portfolio-section"
-          variants={fadeUp}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true, amount: 0.2 }}
-        >
-          <SectionHeading
-            index="07"
-            title="Contact"
-            subtitle="Let’s build something great together."
-          />
+                    <HeroActionButton
+                      variant="outlined"
+                      startIcon={<MdDownload />}
+                      onClick={onDownloadResume}
+                      disabled={downloading}
+                    >
+                      {downloading ? "Downloading..." : "Download Resume"}
+                    </HeroActionButton>
 
-          <Box className="contact-grid">
-            <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
-              <Typography className="timeline-title">Get in touch</Typography>
+                    <HeroActionButton
+                      variant="outlined"
+                      startIcon={<MdVisibility />}
+                      onClick={onPreviewResume}
+                    >
+                      Preview Resume
+                    </HeroActionButton>
+                  </Stack>
 
-              <Stack spacing={1.6} sx={{ mt: 2 }}>
-                {contactEmail ? (
-                  <Typography className="contact-line">
-                    <MdEmail style={{ marginRight: 10 }} />
-                    {contactEmail}
-                  </Typography>
-                ) : null}
+                  <Stack direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
+                    {socials?.github ? (
+                      <IconButton
+                        className="hero-social-btn"
+                        onClick={() =>
+                          window.open(socials.github, "_blank", "noopener,noreferrer")
+                        }
+                      >
+                        <FaGithub />
+                      </IconButton>
+                    ) : null}
 
-                {socials?.phone ? (
-                  <Typography className="contact-line">
-                    <MdPhone style={{ marginRight: 10 }} />
-                    {safeString(socials.phone)}
-                  </Typography>
-                ) : null}
+                    {socials?.linkedin ? (
+                      <IconButton
+                        className="hero-social-btn"
+                        onClick={() =>
+                          window.open(socials.linkedin, "_blank", "noopener,noreferrer")
+                        }
+                      >
+                        <FaLinkedin />
+                      </IconButton>
+                    ) : null}
 
-                {location ? (
-                  <Typography className="contact-line">
-                    <MdSchool style={{ marginRight: 10 }} />
-                    {location}
-                  </Typography>
-                ) : null}
-              </Stack>
+                    {contactEmail ? (
+                      <IconButton
+                        className="hero-social-btn"
+                        onClick={() =>
+                          window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")
+                        }
+                      >
+                        <MdEmail />
+                      </IconButton>
+                    ) : null}
 
-              <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
-                {socials?.github ? (
-                  <Button
-                    variant="outlined"
-                    startIcon={<FaGithub />}
-                    sx={{ borderRadius: 999, fontWeight: 700 }}
-                    onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}
-                  >
-                    GitHub
-                  </Button>
-                ) : null}
+                    {socials?.phone ? (
+                      <IconButton
+                        className="hero-social-btn"
+                        onClick={() =>
+                          window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")
+                        }
+                      >
+                        <MdPhone />
+                      </IconButton>
+                    ) : null}
+                  </Stack>
 
-                {socials?.linkedin ? (
-                  <Button
-                    variant="outlined"
-                    startIcon={<FaLinkedin />}
-                    sx={{ borderRadius: 999, fontWeight: 700 }}
-                    onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}
-                  >
-                    LinkedIn
-                  </Button>
-                ) : null}
+                  <Stack direction="row" spacing={2} sx={{ mt: 5, flexWrap: "wrap", rowGap: 1.5 }}>
+                    <StatCard value={completedSections[0]} label="Projects" />
+                    <StatCard value={completedSections[1]} label="Experience" />
+                    <StatCard value={completedSections[2]} label="Education" />
+                  </Stack>
+                </MotionBox>
+              </Box>
 
-                {socials?.website ? (
-                  <Button
-                    variant="outlined"
-                    startIcon={<MdLink />}
-                    sx={{ borderRadius: 999, fontWeight: 700 }}
-                    onClick={() => window.open(socials.website, "_blank", "noopener,noreferrer")}
-                  >
-                    Website
-                  </Button>
-                ) : null}
-              </Stack>
-            </GlassPanel>
+              <Box className="hero-right">
+                <MotionBox variants={floatIn} className="hero-visual-wrap">
+                  <Box className="hero-avatar-ring">
+                    <Box className="hero-avatar-core">
+                      <Avatar className="hero-main-avatar">
+                        {(safeString(profile?.initials) || name || "Y").slice(0, 2).toUpperCase()}
+                      </Avatar>
+                    </Box>
+                  </Box>
 
-            <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
-              <Typography className="timeline-title">Programming Languages</Typography>
+                  <GlassPanel sx={{ p: 2, mt: 3 }}>
+                    <Typography className="mini-card-title">{title}</Typography>
+                    {location ? <Typography className="mini-card-line">📍 {location}</Typography> : null}
+                    {contactEmail ? (
+                      <Typography className="mini-card-line">✉️ {contactEmail}</Typography>
+                    ) : null}
+                  </GlassPanel>
+                </MotionBox>
+              </Box>
+            </Box>
+          </MotionBox>
 
+          <MotionBox
+            id="about"
+            className={`portfolio-section ${navFlashId === "about" ? "section-nav-focus" : ""}`}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.25 }}
+          >
+            <SectionHeading title="About" subtitle="A short introduction and profile summary." />
+            <GlassPanel sx={{ p: { xs: 2.5, md: 4 } }}>
               {loading ? (
-                <Skeleton height={180} sx={{ mt: 2 }} />
-              ) : languages.length ? (
-                <TableContainer sx={{ mt: 2 }}>
+                <Skeleton height={180} />
+              ) : (
+                <Typography className="body-copy">{about}</Typography>
+              )}
+            </GlassPanel>
+          </MotionBox>
+
+          <MotionBox
+            id="skills"
+            className={`portfolio-section ${navFlashId === "skills" ? "section-nav-focus" : ""}`}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.25 }}
+          >
+            <SectionHeading
+              title="Skills"
+              subtitle="Tech stack grouped the same way your backend already returns it."
+            />
+            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+              {loading ? (
+                <Skeleton height={220} />
+              ) : (
+                <TableContainer>
                   <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ fontWeight: 800 }}>Language</TableCell>
-                        <TableCell sx={{ fontWeight: 800 }}>Level</TableCell>
-                        <TableCell sx={{ fontWeight: 800 }}>Experience</TableCell>
+                        <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
+                        <TableCell sx={{ fontWeight: 800 }}>Skills</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {languages.map((lang, idx) => (
-                        <TableRow key={lang?.id ?? idx}>
-                          <TableCell>{safeString(lang?.language) || "—"}</TableCell>
-                          <TableCell>{safeString(lang?.level) || "—"}</TableCell>
-                          <TableCell>
-                            {typeof lang?.years === "number"
-                              ? `${lang.years} yr`
-                              : safeString(lang?.years) || "—"}
-                          </TableCell>
+                      {skillRows.map((row, idx) => (
+                        <TableRow key={idx}>
+                          <TableCell sx={{ fontWeight: 700 }}>{row.category}</TableCell>
+                          <TableCell>{row.value}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>
                   </Table>
                 </TableContainer>
-              ) : (
-                <Typography sx={{ mt: 2 }}>No language experience added yet.</Typography>
               )}
             </GlassPanel>
-          </Box>
-        </MotionBox>
+          </MotionBox>
 
-        <Box className="portfolio-footer">
-          <Typography>
-            © {new Date().getFullYear()} {name}. All rights reserved.
-          </Typography>
+          <MotionBox
+            id="projects"
+            className={`portfolio-section ${navFlashId === "projects" ? "section-nav-focus" : ""}`}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <SectionHeading title="Work" subtitle="Featured projects in a modern portfolio card layout." />
+            {loading ? (
+              <Stack spacing={2}>
+                <Skeleton height={220} />
+                <Skeleton height={220} />
+              </Stack>
+            ) : projects.length ? (
+              <Box className="project-grid">
+                {projects.map((project, idx) => (
+                  <ProjectCard key={project?.id ?? idx} project={project} />
+                ))}
+              </Box>
+            ) : (
+              <GlassPanel sx={{ p: 3 }}>
+                <Typography>No projects yet. Add them in Admin → Projects.</Typography>
+              </GlassPanel>
+            )}
+          </MotionBox>
+
+          <MotionBox
+            id="experience"
+            className={`portfolio-section ${
+              navFlashId === "experience" ? "section-nav-focus" : ""
+            }`}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <SectionHeading title="Experience" subtitle="Career and internship timeline." />
+            <Stack spacing={2}>
+              {loading ? (
+                <Skeleton height={220} />
+              ) : experience.length ? (
+                experience.map((item, idx) => (
+                  <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
+                    <Typography className="timeline-title">
+                      {safeString(item?.role) || "Role"}
+                    </Typography>
+                    <Typography className="timeline-subtitle">
+                      {safeString(item?.company) || "Company"}
+                    </Typography>
+                    <Typography className="timeline-meta">
+                      {safeString(item?.start)}
+                      {safeString(item?.end) ? ` - ${safeString(item?.end)}` : ""}
+                    </Typography>
+                    {safeString(item?.description) ? (
+                      <Typography className="body-copy" sx={{ mt: 1.5 }}>
+                        {safeString(item?.description)}
+                      </Typography>
+                    ) : null}
+                  </GlassPanel>
+                ))
+              ) : (
+                <GlassPanel sx={{ p: 3 }}>
+                  <Typography>No experience added yet.</Typography>
+                </GlassPanel>
+              )}
+            </Stack>
+          </MotionBox>
+
+          <MotionBox
+            id="education"
+            className={`portfolio-section ${navFlashId === "education" ? "section-nav-focus" : ""}`}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <SectionHeading title="Education" subtitle="Academic background and qualifications." />
+            <Stack spacing={2}>
+              {loading ? (
+                <Skeleton height={220} />
+              ) : education.length ? (
+                education.map((item, idx) => (
+                  <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
+                    <Typography className="timeline-title">
+                      {safeString(item?.degree) || "Degree"}
+                    </Typography>
+                    <Typography className="timeline-subtitle">
+                      {safeString(item?.institution) || "Institution"}
+                    </Typography>
+                    <Typography className="timeline-meta">{safeString(item?.year) || ""}</Typography>
+                    {safeString(item?.details) ? (
+                      <Typography className="body-copy" sx={{ mt: 1.5 }}>
+                        {safeString(item?.details)}
+                      </Typography>
+                    ) : null}
+                  </GlassPanel>
+                ))
+              ) : (
+                <GlassPanel sx={{ p: 3 }}>
+                  <Typography>No education added yet.</Typography>
+                </GlassPanel>
+              )}
+            </Stack>
+          </MotionBox>
+
+          <MotionBox
+            id="achievements"
+            className={`portfolio-section ${
+              navFlashId === "achievements" ? "section-nav-focus" : ""
+            }`}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <SectionHeading title="Achievements" subtitle="Certifications, awards, and recognitions." />
+            <Box className="achievement-grid">
+              {loading ? (
+                <Skeleton height={220} />
+              ) : achievements.length ? (
+                achievements.map((item, idx) => (
+                  <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
+                    <Typography className="timeline-title">
+                      {safeString(item?.title) || "Achievement"}
+                    </Typography>
+                    <Typography className="timeline-subtitle">
+                      {safeString(item?.issuer) || ""}
+                    </Typography>
+                    <Typography className="timeline-meta">
+                      {safeString(item?.year) || ""}
+                    </Typography>
+
+                    {safeString(item?.link) ? (
+                      <Button
+                        variant="outlined"
+                        startIcon={<MdLink />}
+                        sx={{ mt: 2, borderRadius: 999, fontWeight: 700 }}
+                        onClick={() =>
+                          window.open(safeString(item?.link), "_blank", "noopener,noreferrer")
+                        }
+                      >
+                        View
+                      </Button>
+                    ) : null}
+                  </GlassPanel>
+                ))
+              ) : (
+                <GlassPanel sx={{ p: 3 }}>
+                  <Typography>No achievements yet.</Typography>
+                </GlassPanel>
+              )}
+            </Box>
+          </MotionBox>
+
+          <MotionBox
+            id="contact"
+            className={`portfolio-section ${navFlashId === "contact" ? "section-nav-focus" : ""}`}
+            variants={fadeUp}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, amount: 0.2 }}
+          >
+            <SectionHeading title="Contact" subtitle="Let’s build something great together." />
+
+            <Box className="contact-grid">
+              <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
+                <Typography className="timeline-title">Get in touch</Typography>
+
+                <Stack spacing={1.6} sx={{ mt: 2 }}>
+                  {contactEmail ? (
+                    <Typography className="contact-line">
+                      <MdEmail style={{ marginRight: 10 }} />
+                      {contactEmail}
+                    </Typography>
+                  ) : null}
+
+                  {socials?.phone ? (
+                    <Typography className="contact-line">
+                      <MdPhone style={{ marginRight: 10 }} />
+                      {safeString(socials.phone)}
+                    </Typography>
+                  ) : null}
+
+                  {location ? (
+                    <Typography className="contact-line">
+                      <MdSchool style={{ marginRight: 10 }} />
+                      {location}
+                    </Typography>
+                  ) : null}
+                </Stack>
+
+                <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
+                  {socials?.github ? (
+                    <Button
+                      variant="outlined"
+                      startIcon={<FaGithub />}
+                      sx={{ borderRadius: 999, fontWeight: 700 }}
+                      onClick={() =>
+                        window.open(socials.github, "_blank", "noopener,noreferrer")
+                      }
+                    >
+                      GitHub
+                    </Button>
+                  ) : null}
+
+                  {socials?.linkedin ? (
+                    <Button
+                      variant="outlined"
+                      startIcon={<FaLinkedin />}
+                      sx={{ borderRadius: 999, fontWeight: 700 }}
+                      onClick={() =>
+                        window.open(socials.linkedin, "_blank", "noopener,noreferrer")
+                      }
+                    >
+                      LinkedIn
+                    </Button>
+                  ) : null}
+
+                  {socials?.website ? (
+                    <Button
+                      variant="outlined"
+                      startIcon={<MdLink />}
+                      sx={{ borderRadius: 999, fontWeight: 700 }}
+                      onClick={() =>
+                        window.open(safeString(socials.website), "_blank", "noopener,noreferrer")
+                      }
+                    >
+                      Website
+                    </Button>
+                  ) : null}
+                </Stack>
+              </GlassPanel>
+
+              <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
+                <Typography className="timeline-title">Programming Languages</Typography>
+
+                {loading ? (
+                  <Skeleton height={220} sx={{ mt: 2 }} />
+                ) : languages.length ? (
+                  <Stack spacing={2} sx={{ mt: 2 }}>
+                    {languages.map((lang, idx) => (
+                      <Box key={lang?.id ?? idx} className="language-card">
+                        <Box className="language-card-head">
+                          <Typography className="language-name">
+                            {safeString(lang?.language) || "—"}
+                          </Typography>
+                        </Box>
+
+                        <Stack spacing={1.4} sx={{ mt: 1.25 }}>
+                          <LanguageLevelBar level={lang?.level} />
+                          <LanguageYearsBar years={lang?.years} />
+                        </Stack>
+                      </Box>
+                    ))}
+                  </Stack>
+                ) : (
+                  <Typography sx={{ mt: 2 }}>No language experience added yet.</Typography>
+                )}
+              </GlassPanel>
+            </Box>
+          </MotionBox>
+
+          <Box className="portfolio-footer">
+            <Typography>
+              © {new Date().getFullYear()} {name}. All rights reserved.
+            </Typography>
+          </Box>
         </Box>
       </Container>
 
