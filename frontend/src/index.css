@@ -30,8 +30,9 @@
   --mouse-rx: 0deg;
   --mouse-ry: 0deg;
 
-  --side-nav-desktop-space: 108px;
-  --side-nav-mobile-space: 104px;
+  /* FIXED: increased side-nav-desktop-space to prevent sidebar from hiding content */
+  --side-nav-desktop-space: 72px;
+  --side-nav-mobile-space: 80px;
 }
 
 * {
@@ -251,7 +252,7 @@ button {
   }
 }
 
-/* portfolio-shell — right padding ensures content never hides behind sidebar */
+/* FIXED: portfolio-shell — right padding accounts for sidebar width so content is NEVER hidden */
 .portfolio-shell {
   position: relative;
   z-index: 2;
@@ -260,8 +261,8 @@ button {
   padding-bottom: 20px;
   display: flex;
   flex-direction: column;
-  /* FIX: enough padding-right so sidebar NEVER overlaps content on any page */
-  padding-right: calc(var(--side-nav-desktop-space) + 16px);
+  /* FIXED: sidebar is 46px wide + 22px from right edge + extra buffer */
+  padding-right: calc(46px + 22px + 24px);
 }
 
 .portfolio-topbar {
@@ -346,8 +347,9 @@ button {
   height: 0;
 }
 
+/* FIXED: home-scroll-area now scrollable so all buttons/social icons visible on mobile */
 .home-scroll-area {
-  overflow-y: hidden;
+  overflow-y: auto;
 }
 
 .portfolio-section {
@@ -392,16 +394,16 @@ button {
 }
 
 /* =============================================
-   SPINNER — improved look matching reference image
-   Dashed outer ring + solid inner ring + spinning text
+   SPINNER — Luxury unique design with dual rings,
+   diamond markers, gold gradient accents
    ============================================= */
 .hero-name-spinner-badge {
   width: clamp(90px, 9vw, 120px);
   height: clamp(90px, 9vw, 120px);
   flex: 0 0 auto;
-  animation: heroBadgeSpin 18s linear infinite;
+  animation: heroBadgeSpin 22s linear infinite;
   transform-origin: center;
-  filter: drop-shadow(0 0 14px rgba(241, 48, 36, 0.28));
+  filter: drop-shadow(0 0 18px rgba(241, 48, 36, 0.38)) drop-shadow(0 0 6px rgba(251, 191, 36, 0.22));
   align-self: center;
 }
 
@@ -412,47 +414,48 @@ button {
   overflow: visible;
 }
 
-/* Outer dashed ring */
+/* Outer dashed ring with luxury dash pattern */
 .hero-name-spinner-ring {
   fill: transparent;
-  stroke: rgba(241, 48, 36, 0.55);
-  stroke-width: 1.2;
-  stroke-dasharray: 4 5;
+  stroke: url(#spinnerGradient);
+  stroke-width: 1.4;
+  stroke-dasharray: 3 4 1 4;
 }
 
 .mode-light .hero-name-spinner-ring {
-  stroke: rgba(241, 48, 36, 0.65);
+  stroke: url(#spinnerGradient);
+  opacity: 0.85;
 }
 
 /* Inner solid ring */
 .hero-name-spinner-ring-inner {
   fill: transparent;
-  stroke: rgba(255, 255, 255, 0.15);
+  stroke: rgba(255, 255, 255, 0.12);
   stroke-width: 0.8;
 }
 
 .mode-light .hero-name-spinner-ring-inner {
-  stroke: rgba(17, 24, 39, 0.18);
+  stroke: rgba(17, 24, 39, 0.15);
 }
 
 /* Text on the path */
 .hero-name-spinner-text {
-  font-size: 8px;
+  font-size: 7.5px;
   font-weight: 700;
-  letter-spacing: 2.5px;
+  letter-spacing: 2.8px;
   text-transform: uppercase;
-  fill: rgba(255, 255, 255, 0.85);
+  fill: rgba(255, 255, 255, 0.82);
 }
 
 .mode-light .hero-name-spinner-text {
-  fill: rgba(17, 24, 39, 0.72);
+  fill: rgba(17, 24, 39, 0.7);
 }
 
-/* Arrow in center */
-.hero-name-spinner-arrow {
+/* Center initials — large, gradient filled */
+.hero-name-spinner-center-initials {
   font-size: 20px;
-  font-weight: 700;
-  fill: var(--accent);
+  font-weight: 900;
+  letter-spacing: 0.04em;
 }
 
 @keyframes heroBadgeSpin {
@@ -625,7 +628,7 @@ button {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-/* FIX: lang-grid for Programming Languages — 2-col on desktop, 1-col on mobile */
+/* lang-grid for Programming Languages — 2-col on desktop, 1-col on mobile */
 .lang-grid {
   display: grid;
   gap: 18px;
@@ -837,39 +840,42 @@ button {
 }
 
 /* =============================================
-   SIDEBAR NAV
-   Active: full bubble fills with gradient (like reference image)
-   Inactive: subtle background, white/light icon
-   Adapts for both dark and light themes
+   SIDEBAR NAV — FIXED:
+   - No bubble wrapper — bare icon only
+   - Active: icon itself fills with gradient color
+   - Hover: icon fills with accent color, shows name tooltip
+   - After hover: active stays gradient, inactive stays original
+   - Adapts for light and dark theme
    ============================================= */
 .portfolio-side-nav {
   position: fixed;
-  right: 22px;
+  right: 16px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 30;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px 10px;
+  gap: 6px;
+  padding: 10px 6px;
   border-radius: 999px;
   backdrop-filter: blur(20px);
 }
 
 .mode-dark .portfolio-side-nav {
-  background: rgba(17, 19, 38, 0.62);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(17, 19, 38, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .mode-light .portfolio-side-nav {
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(17, 24, 39, 0.08);
+  background: rgba(255, 255, 255, 0.62);
+  border: 1px solid rgba(17, 24, 39, 0.07);
 }
 
+/* FIXED: bare button — no bubble, just clean icon button */
 .portfolio-side-nav-item {
   position: relative;
-  width: 46px;
-  height: 46px;
+  width: 38px;
+  height: 38px;
   border: none;
   background: transparent;
   border-radius: 999px;
@@ -881,104 +887,52 @@ button {
   padding: 0;
 }
 
-/* icon-bubble is the full circle background — fills with gradient on active */
-.portfolio-side-nav-item .icon-bubble {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  transition: all 0.22s ease;
-  font-size: 1.08rem;
-}
-
-/* Dark mode: inactive bubble */
-.mode-dark .portfolio-side-nav-item .icon-bubble {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-/* Light mode: inactive bubble */
-.mode-light .portfolio-side-nav-item .icon-bubble {
-  background: rgba(17, 24, 39, 0.04);
-  border: 1px solid rgba(17, 24, 39, 0.1);
-}
-
-/* ACTIVE: gradient fills the full bubble — works for both dark and light themes */
-.portfolio-side-nav-item.active .icon-bubble {
-  background: linear-gradient(135deg, #f13024, #f97316) !important;
-  border-color: transparent !important;
-  box-shadow: 0 8px 24px rgba(241, 48, 36, 0.35);
-}
-
-/* Active icon is always white (on gradient background) */
-.portfolio-side-nav-item.active .icon-inner {
-  color: white !important;
-  opacity: 1;
-}
-
-/* Hover: subtle bubble highlight */
-.portfolio-side-nav-item:hover .icon-bubble {
-  transform: scale(1.06);
-}
-
-.mode-dark .portfolio-side-nav-item:hover:not(.active) .icon-bubble {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.18);
-}
-
-.mode-light .portfolio-side-nav-item:hover:not(.active) .icon-bubble {
-  background: rgba(17, 24, 39, 0.08);
-  border-color: rgba(17, 24, 39, 0.16);
-}
-
+/* FIXED: icon-inner is what gets colored — no bubble around it */
 .portfolio-side-nav-item .icon-inner {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.08rem;
-  opacity: 0.78;
-  transition: color 0.22s ease, opacity 0.22s ease;
+  font-size: 1.15rem;
+  transition: color 0.22s ease, filter 0.22s ease, transform 0.22s ease;
 }
 
-/* Dark mode: inactive icon color */
+/* Dark mode: inactive icon — white at lower opacity */
 .mode-dark .portfolio-side-nav-item:not(.active) .icon-inner {
-  color: rgba(255, 255, 255, 0.85);
+  color: rgba(255, 255, 255, 0.5);
 }
 
-/* Light mode: inactive icon color */
+/* Light mode: inactive icon — dark at lower opacity */
 .mode-light .portfolio-side-nav-item:not(.active) .icon-inner {
-  color: rgba(17, 24, 39, 0.75);
+  color: rgba(17, 24, 39, 0.5);
 }
 
-.portfolio-side-nav-item .label {
-  position: absolute;
-  right: 58px;
-  white-space: nowrap;
-  padding: 8px 12px;
-  border-radius: 999px;
-  font-size: 0.84rem;
-  opacity: 0;
-  transform: translateX(10px);
-  pointer-events: none;
-  transition: all 0.2s ease;
-}
-
-.mode-dark .portfolio-side-nav-item .label {
-  background: rgba(17, 19, 38, 0.88);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.mode-light .portfolio-side-nav-item .label {
-  background: rgba(255, 255, 255, 0.92);
-  color: #111827;
-  border: 1px solid rgba(17, 24, 39, 0.08);
-}
-
-.portfolio-side-nav-item:hover .label {
+/* ACTIVE: icon itself fills with gradient via filter trick + explicit color */
+.portfolio-side-nav-item.active .icon-inner {
+  color: #f13024 !important;
+  filter: drop-shadow(0 0 6px rgba(241, 48, 36, 0.55));
+  transform: scale(1.15);
   opacity: 1;
-  transform: translateX(0);
+}
+
+/* Hover: icon fills with accent color (stays after hover if active) */
+.portfolio-side-nav-item:hover:not(.active) .icon-inner {
+  color: #f97316 !important;
+  filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.45));
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+/* After hover (no active): returns to muted original */
+.mode-dark .portfolio-side-nav-item:not(.active):not(:hover) .icon-inner {
+  color: rgba(255, 255, 255, 0.5);
+  filter: none;
+  transform: scale(1);
+}
+
+.mode-light .portfolio-side-nav-item:not(.active):not(:hover) .icon-inner {
+  color: rgba(17, 24, 39, 0.5);
+  filter: none;
+  transform: scale(1);
 }
 
 table th,
@@ -991,7 +945,7 @@ table td {
    ============================================= */
 @media (max-width: 1199px) {
   .portfolio-shell {
-    padding-right: calc(var(--side-nav-desktop-space) + 10px);
+    padding-right: calc(46px + 22px + 16px);
   }
 
   .hero-layout {
@@ -1015,7 +969,7 @@ table td {
 
   .portfolio-shell {
     padding-top: 10px;
-    /* FIX: on mobile sidebar moves to bottom, so no right padding needed for sidebar */
+    /* FIXED: on mobile sidebar moves to bottom — no right padding for sidebar */
     padding-right: 16px;
     padding-bottom: calc(var(--side-nav-mobile-space) + 10px);
   }
@@ -1026,6 +980,7 @@ table td {
     top: 10px;
   }
 
+  /* FIXED: mobile sidebar at bottom — horizontal layout */
   .portfolio-side-nav {
     top: auto;
     left: 14px;
@@ -1033,22 +988,18 @@ table td {
     bottom: 14px;
     transform: none;
     flex-direction: row;
-    justify-content: space-between;
-    gap: 6px;
+    justify-content: space-around;
+    gap: 4px;
     overflow-x: auto;
     max-width: calc(100vw - 28px);
-    padding: 10px;
-  }
-
-  .portfolio-side-nav-item .label {
-    display: none;
+    padding: 8px 10px;
   }
 
   .portfolio-section {
     padding: 26px 0;
   }
 
-  /* FIX: center home hero section on mobile */
+  /* FIXED: center home hero section on mobile */
   .hero-section .hero-name-row,
   .hero-section .hero-meta-stack,
   .hero-section .hero-title,
@@ -1062,7 +1013,7 @@ table td {
     margin-right: auto;
   }
 
-  /* FIX: hero-name-row centers on mobile */
+  /* FIXED: hero-name-row centers on mobile */
   .hero-section .hero-name-row {
     justify-content: center;
     flex-wrap: wrap;
@@ -1076,12 +1027,13 @@ table td {
     align-items: center;
   }
 
-  /* FIX: hero action buttons — center on mobile, shown as column */
+  /* FIXED: hero action buttons — center on mobile */
   .hero-action-buttons {
     align-items: center !important;
+    justify-content: center !important;
   }
 
-  /* FIX: social icons row — center on mobile, always visible */
+  /* FIXED: social icons row — center on mobile, always visible */
   .hero-social-row {
     justify-content: center !important;
   }
@@ -1124,8 +1076,8 @@ table td {
   }
 
   .portfolio-side-nav-item {
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     flex: 0 0 auto;
   }
 

@@ -44,6 +44,7 @@ import {
   MdTimeline,
   MdEmojiEvents,
   MdContacts,
+  MdTerminal,
 } from "react-icons/md";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
@@ -203,28 +204,37 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   );
 }
 
+// FIXED: VerticalNav — bare icon only (no bubble wrapper), active fills icon color with gradient,
+// hover shows name tooltip and fills icon with accent color, stays filled after hover when active
 function VerticalNav({ items, activeId, onJump }) {
+  const [hoveredId, setHoveredId] = useState(null);
+
   return (
     <Box className="portfolio-side-nav">
       {items.map((item) => {
         const Icon = item.icon;
         const isActive = activeId === item.id;
+        const isHovered = hoveredId === item.id;
         return (
-          <button
+          <Tooltip
             key={item.id}
-            type="button"
-            className={`portfolio-side-nav-item ${isActive ? "active" : ""}`}
-            onClick={() => onJump(item.id)}
-            aria-label={item.label}
             title={item.label}
+            placement="left"
+            arrow
           >
-            <span className="icon-bubble">
+            <button
+              type="button"
+              className={`portfolio-side-nav-item ${isActive ? "active" : ""} ${isHovered && !isActive ? "hovered" : ""}`}
+              onClick={() => onJump(item.id)}
+              onMouseEnter={() => setHoveredId(item.id)}
+              onMouseLeave={() => setHoveredId(null)}
+              aria-label={item.label}
+            >
               <span className="icon-inner">
                 <Icon />
               </span>
-            </span>
-            <span className="label">{item.label}</span>
-          </button>
+            </button>
+          </Tooltip>
         );
       })}
     </Box>
@@ -250,7 +260,6 @@ function HeroActionButton({ children, ...props }) {
   );
 }
 
-// Removed duplicate small colored kicker title — only big section title shown
 function SectionHeading({ title, subtitle }) {
   return (
     <Stack spacing={1.1} sx={{ mb: 3 }}>
@@ -268,8 +277,7 @@ function GlassPanel({ children, sx, className = "" }) {
   );
 }
 
-// FIX: MiniOrbitBadge — reads profile.initials from admin dashboard About Me section
-// Falls back to first letters of name words if initials field is empty
+// FIXED: Luxury unique spinner with dual rings, diamond markers, and gold/gradient accents
 function MiniOrbitBadge({ initials, name }) {
   const resolvedInitials =
     safeString(initials).trim() ||
@@ -295,23 +303,86 @@ function MiniOrbitBadge({ initials, name }) {
                a43,43 0 1,1 86,0
                a43,43 0 1,1 -86,0"
           />
+          <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#f13024" />
+            <stop offset="50%" stopColor="#f97316" />
+            <stop offset="100%" stopColor="#fbbf24" />
+          </linearGradient>
+          <linearGradient id="spinnerGoldRing" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(251,191,36,0.7)" />
+            <stop offset="100%" stopColor="rgba(241,48,36,0.5)" />
+          </linearGradient>
+          <filter id="spinnerGlow">
+            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(241,48,36,0.18)" />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
         </defs>
-        <circle className="hero-name-spinner-ring" cx="60" cy="60" r="42" />
+
+        {/* Outermost subtle ring */}
+        <circle cx="60" cy="60" r="56" fill="none" stroke="url(#spinnerGoldRing)" strokeWidth="0.5" strokeDasharray="2 6" />
+
+        {/* Outer dashed ring */}
+        <circle className="hero-name-spinner-ring" cx="60" cy="60" r="49" />
+
+        {/* Spinning text path */}
         <text className="hero-name-spinner-text">
           <textPath href="#miniOrbitPath" startOffset="0%">
             {spinText}
           </textPath>
         </text>
-        {/* Center: shows initials large and static */}
-        <text x="60" y="64" textAnchor="middle" className="hero-name-spinner-center-initials">
+
+        {/* Inner glow circle */}
+        <circle cx="60" cy="60" r="34" fill="url(#centerGlow)" />
+
+        {/* Inner solid ring */}
+        <circle className="hero-name-spinner-ring-inner" cx="60" cy="60" r="30" />
+
+        {/* Diamond markers at 4 corners */}
+        {[0, 90, 180, 270].map((angle, i) => {
+          const rad = (angle * Math.PI) / 180;
+          const mx = 60 + 43 * Math.cos(rad);
+          const my = 60 + 43 * Math.sin(rad);
+          return (
+            <rect
+              key={i}
+              x={mx - 3}
+              y={my - 3}
+              width="6"
+              height="6"
+              fill="url(#spinnerGradient)"
+              transform={`rotate(45 ${mx} ${my})`}
+              filter="url(#spinnerGlow)"
+              opacity="0.9"
+            />
+          );
+        })}
+
+        {/* Center initials with gradient */}
+        <text x="60" y="65" textAnchor="middle" className="hero-name-spinner-center-initials" fill="url(#spinnerGradient)">
           {resolvedInitials || "?"}
         </text>
+
+        {/* Tiny accent dots on inner ring */}
+        {[45, 135, 225, 315].map((angle, i) => {
+          const rad = (angle * Math.PI) / 180;
+          const dx = 60 + 30 * Math.cos(rad);
+          const dy = 60 + 30 * Math.sin(rad);
+          return (
+            <circle key={i} cx={dx} cy={dy} r="1.5" fill="rgba(251,191,36,0.8)" />
+          );
+        })}
       </svg>
     </Box>
   );
 }
 
-// FIX: "Featured Project" label removed
 function ProjectCard({ project }) {
   const title = safeString(project?.title) || "Untitled Project";
   const description = safeString(project?.description);
@@ -451,6 +522,7 @@ export default function Home({ toggleTheme }) {
 
   const rootRef = useRef(null);
 
+  // FIXED: Added "languages" as a separate section with MdTerminal icon
   const sectionIds = useMemo(
     () => [
       { id: "home", label: "Home", icon: MdHome },
@@ -460,6 +532,7 @@ export default function Home({ toggleTheme }) {
       { id: "experience", label: "Experience", icon: MdTimeline },
       { id: "education", label: "Education", icon: MdSchool },
       { id: "achievements", label: "Achievements", icon: MdEmojiEvents },
+      { id: "languages", label: "Programming Languages", icon: MdTerminal },
       { id: "contact", label: "Contact", icon: MdContacts },
     ],
     []
@@ -473,9 +546,7 @@ export default function Home({ toggleTheme }) {
     return map;
   }, [sectionIds]);
 
-  // Name preserves original casing from admin
   const name = safeString(profile?.name) || "Your Name";
-  // FIX: read initials field from admin dashboard profile (About Me section)
   const profileInitials = safeString(profile?.initials) || "";
   const title = safeString(profile?.title) || "Full Stack Developer";
   const tagline = safeString(profile?.tagline) || "Transforming Ideas Into Digital Reality";
@@ -706,18 +777,15 @@ export default function Home({ toggleTheme }) {
             exit="exit"
             className="portfolio-page-frame"
           >
-            {/* FIX: home uses scrollable area on mobile so all buttons are reachable */}
+            {/* FIXED: home-scroll-area now allows overflow-y scroll on mobile so all buttons are reachable */}
             <Box className="section-scroll-area home-scroll-area">
               <MotionBox className="portfolio-section hero-section" initial="hidden" animate="show" variants={fadeUp}>
                 <Box className="hero-layout hero-layout-single">
                   <Box className="hero-left hero-left-expanded">
                     <MotionBox variants={fadeUp}>
-                      {/* Spinner beside the 4 info lines */}
                       <Box className="hero-name-row">
-                        {/* FIX: passes profileInitials from admin dashboard About Me */}
                         <MiniOrbitBadge initials={profileInitials} name={name} />
                         <Box className="hero-name-text-block">
-                          {/* Name respects admin casing — no uppercase */}
                           <Typography className="hero-name hero-name-display">{name}</Typography>
                           <Stack spacing={0.8} className="hero-meta-stack">
                             <Typography className="hero-role-line">{title}</Typography>
@@ -733,8 +801,8 @@ export default function Home({ toggleTheme }) {
 
                       <Typography className="hero-description">{about}</Typography>
 
-                      {/* FIX: action buttons always shown on mobile via scroll */}
-                      <Stack className="hero-action-stack" direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
+                      {/* FIXED: hero action buttons — always visible, scrollable on mobile */}
+                      <Stack className="hero-action-buttons" direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
                         <HeroActionButton
                           variant="contained"
                           startIcon={<MdArrowOutward />}
@@ -761,8 +829,8 @@ export default function Home({ toggleTheme }) {
                         </HeroActionButton>
                       </Stack>
 
-                      {/* FIX: social icons always present, reachable via mobile scroll */}
-                      <Stack className="hero-social-stack" direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
+                      {/* FIXED: social icons — always visible on mobile via scroll */}
+                      <Stack className="hero-social-row" direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
                         {socials?.github ? (
                           <IconButton
                             className="hero-social-btn"
@@ -1084,6 +1152,50 @@ export default function Home({ toggleTheme }) {
           </MotionBox>
         );
 
+      // FIXED: Programming Languages is now its own separate page/section
+      case "languages":
+        return (
+          <MotionBox
+            key="languages"
+            custom={navDirection}
+            variants={pageVariants}
+            initial="enter"
+            animate="center"
+            exit="exit"
+            className="portfolio-page-frame"
+          >
+            <Box className="section-scroll-area">
+              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+                <SectionHeading title="Programming Languages" subtitle="Language proficiency and years of experience." />
+                <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
+                  {loading ? (
+                    <Skeleton height={220} sx={{ mt: 2 }} />
+                  ) : languages.length ? (
+                    <Box className="lang-grid">
+                      {languages.map((lang, idx) => (
+                        <Box key={lang?.id ?? idx} className="language-card">
+                          <Box className="language-card-head">
+                            <Typography className="language-name">
+                              {safeString(lang?.language) || "—"}
+                            </Typography>
+                          </Box>
+
+                          <Stack spacing={1.4} sx={{ mt: 1.25 }}>
+                            <LanguageLevelBar level={lang?.level} />
+                            <LanguageYearsBar years={lang?.years} />
+                          </Stack>
+                        </Box>
+                      ))}
+                    </Box>
+                  ) : (
+                    <Typography sx={{ mt: 2 }}>No language experience added yet.</Typography>
+                  )}
+                </GlassPanel>
+              </MotionBox>
+            </Box>
+          </MotionBox>
+        );
+
       case "contact":
         return (
           <MotionBox
@@ -1099,7 +1211,7 @@ export default function Home({ toggleTheme }) {
               <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
                 <SectionHeading title="Contact" subtitle="Let's build something great together." />
 
-                {/* FIX: Contact details — separate full-width card, not in a side-by-side grid */}
+                {/* Contact details — separate full-width card */}
                 <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 }, mb: 3 }}>
                   <Typography className="timeline-title">Get in touch</Typography>
 
@@ -1168,34 +1280,6 @@ export default function Home({ toggleTheme }) {
                   </Stack>
                 </GlassPanel>
 
-                {/* FIX: Programming Languages — completely separate full-width section */}
-                <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 }, mb: 3 }}>
-                  <Typography className="timeline-title">Programming Languages</Typography>
-
-                  {loading ? (
-                    <Skeleton height={220} sx={{ mt: 2 }} />
-                  ) : languages.length ? (
-                    <Stack spacing={2} sx={{ mt: 2 }}>
-                      {languages.map((lang, idx) => (
-                        <Box key={lang?.id ?? idx} className="language-card">
-                          <Box className="language-card-head">
-                            <Typography className="language-name">
-                              {safeString(lang?.language) || "—"}
-                            </Typography>
-                          </Box>
-
-                          <Stack spacing={1.4} sx={{ mt: 1.25 }}>
-                            <LanguageLevelBar level={lang?.level} />
-                            <LanguageYearsBar years={lang?.years} />
-                          </Stack>
-                        </Box>
-                      ))}
-                    </Stack>
-                  ) : (
-                    <Typography sx={{ mt: 2 }}>No language experience added yet.</Typography>
-                  )}
-                </GlassPanel>
-
                 <Box className="portfolio-footer">
                   <Typography>
                     © {new Date().getFullYear()} {name}. All rights reserved.
@@ -1223,7 +1307,6 @@ export default function Home({ toggleTheme }) {
         <span className="portfolio-grid" />
         <span className="portfolio-grid-glow" />
         <span className="portfolio-mesh-lines" />
-        {/* Canvas-based animated web/network structure */}
         <NetworkCanvas mode={mode} />
       </Box>
 
