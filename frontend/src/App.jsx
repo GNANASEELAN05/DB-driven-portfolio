@@ -8,8 +8,8 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 
 const makeTheme = (mode, flavor = "viewer") => {
-  const viewerPrimary = "#7C3AED";
-  const viewerSecondary = "#06B6D4";
+  const viewerPrimary = mode === "dark" ? "#f13024" : "#e11d48";
+  const viewerSecondary = mode === "dark" ? "#131424" : "#f8fafc";
 
   const adminPrimary = "#F59E0B";
   const adminSecondary = "#3B82F6";
@@ -23,17 +23,46 @@ const makeTheme = (mode, flavor = "viewer") => {
       primary: { main: primary },
       secondary: { main: secondary },
       background: {
-        default: mode === "dark" ? "#0B1220" : "#F6F7FB",
-        paper: mode === "dark" ? "#0F1A2B" : "#FFFFFF",
+        default: mode === "dark" ? "#0f1020" : "#f6f8fc",
+        paper: mode === "dark" ? "rgba(19,20,36,0.72)" : "rgba(255,255,255,0.78)",
       },
       text: {
-        primary: mode === "dark" ? "#FFFFFF" : "#111827",
-        secondary: mode === "dark" ? "rgba(255,255,255,0.74)" : "rgba(17,24,39,0.70)",
+        primary: mode === "dark" ? "#ffffff" : "#111827",
+        secondary: mode === "dark" ? "rgba(255,255,255,0.7)" : "rgba(17,24,39,0.72)",
       },
     },
-    shape: { borderRadius: 14 },
+    shape: { borderRadius: 18 },
     typography: {
-      fontFamily: `"Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial`,
+      fontFamily: `"Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif`,
+    },
+    components: {
+      MuiCssBaseline: {
+        styleOverrides: {
+          html: {
+            scrollBehavior: "smooth",
+          },
+          body: {
+            overflowX: "hidden",
+          },
+          "*": {
+            boxSizing: "border-box",
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundImage: "none",
+          },
+        },
+      },
+      MuiButton: {
+        styleOverrides: {
+          root: {
+            textTransform: "none",
+          },
+        },
+      },
     },
   });
 };

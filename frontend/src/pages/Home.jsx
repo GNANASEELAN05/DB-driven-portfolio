@@ -9,7 +9,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
   IconButton,
   Paper,
   Skeleton,
@@ -25,25 +24,26 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-
 import {
-  MdArrowDownward,
-  MdAdminPanelSettings,
-  MdRefresh,
-  MdEmail,
-  MdLightMode,
+  MdArrowOutward,
   MdDarkMode,
   MdDownload,
+  MdEmail,
+  MdLightMode,
   MdLink,
-  MdWork,
+  MdMenu,
+  MdPhone,
+  MdRefresh,
   MdSchool,
   MdTimeline,
-  MdEmojiEvents,
+  MdWork,
   MdCode,
+  MdEmojiEvents,
+  MdAdminPanelSettings,
   MdVisibility,
-  MdPhone,
+  MdClose,
 } from "react-icons/md";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
@@ -63,37 +63,23 @@ import {
 const MotionBox = motion(Box);
 const MotionPaper = motion(Paper);
 
-const BRAND_PRIMARY = "#915EFF";
-const BRAND_SECONDARY = "#00CEA8";
-const BRAND_TEXT = "#DFD9FF";
-const BRAND_CARD = "#151030";
-const BRAND_CARD_2 = "#100D25";
-
-const revealUp = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0 },
-};
-
-const staggerWrap = {
-  hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.08,
-    },
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: [0.25, 0.25, 0.25, 0.75] },
   },
 };
 
-function scrollToId(id) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.scrollIntoView({ behavior: "smooth", block: "start" });
-}
-
-function clampArray(x) {
-  if (!x) return [];
-  if (Array.isArray(x)) return x;
-  return [];
-}
+const floatIn = {
+  hidden: { opacity: 0, scale: 0.92 },
+  show: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.9, ease: [0.25, 0.25, 0.25, 0.75] },
+  },
+};
 
 function safeString(v) {
   return typeof v === "string" ? v : v == null ? "" : String(v);
@@ -108,345 +94,6 @@ function splitCSV(s) {
     .filter(Boolean);
 }
 
-function blobSafeWindowOpen(url) {
-  try {
-    window.open(url, "_blank", "noopener,noreferrer");
-  } catch {
-    window.open(url, "_blank");
-  }
-}
-
-function SectionIntro({ subText, heading }) {
-  const theme = useTheme();
-
-  return (
-    <Box sx={{ mb: 2.25 }}>
-      <Typography
-        sx={{
-          textTransform: "uppercase",
-          letterSpacing: "0.18em",
-          fontSize: { xs: 11, md: 12 },
-          fontWeight: 800,
-          color: theme.palette.mode === "dark" ? "rgba(223,217,255,0.72)" : "rgba(77,51,130,0.70)",
-        }}
-      >
-        {subText}
-      </Typography>
-
-      <Typography
-        sx={{
-          mt: 0.5,
-          fontSize: { xs: 26, md: 38 },
-          lineHeight: 1.08,
-          fontWeight: 900,
-          color: "text.primary",
-        }}
-      >
-        {heading}
-      </Typography>
-    </Box>
-  );
-}
-
-function GlassPanel({ children, sx }) {
-  const theme = useTheme();
-
-  return (
-    <Paper
-      variant="outlined"
-      sx={{
-        position: "relative",
-        borderRadius: 4,
-        overflow: "hidden",
-        borderColor:
-          theme.palette.mode === "dark"
-            ? "rgba(255,255,255,0.08)"
-            : "rgba(73,56,126,0.12)",
-        background:
-          theme.palette.mode === "dark"
-            ? "linear-gradient(180deg, rgba(21,16,48,0.92), rgba(16,13,37,0.94))"
-            : "linear-gradient(180deg, rgba(255,255,255,0.92), rgba(245,242,255,0.88))",
-        backdropFilter: "blur(12px)",
-        boxShadow:
-          theme.palette.mode === "dark"
-            ? "0 20px 60px rgba(0,0,0,0.28)"
-            : "0 20px 60px rgba(73,56,126,0.10)",
-        transition: "transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease",
-        "&:hover": {
-          transform: "translateY(-3px)",
-          boxShadow:
-            theme.palette.mode === "dark"
-              ? "0 24px 70px rgba(0,0,0,0.34)"
-              : "0 24px 70px rgba(73,56,126,0.14)",
-          borderColor:
-            theme.palette.mode === "dark"
-              ? "rgba(145,94,255,0.22)"
-              : "rgba(145,94,255,0.20)",
-        },
-        ...sx,
-      }}
-    >
-      {children}
-    </Paper>
-  );
-}
-
-function TechBadge({ label }) {
-  const theme = useTheme();
-
-  return (
-    <Chip
-      label={label}
-      size="small"
-      sx={{
-        fontWeight: 800,
-        borderRadius: 999,
-        color: theme.palette.mode === "dark" ? BRAND_TEXT : "#4f3a87",
-        background:
-          theme.palette.mode === "dark"
-            ? "rgba(145,94,255,0.14)"
-            : "rgba(145,94,255,0.10)",
-        border: "1px solid",
-        borderColor:
-          theme.palette.mode === "dark"
-            ? "rgba(145,94,255,0.22)"
-            : "rgba(145,94,255,0.18)",
-        "& .MuiChip-label": {
-          px: 1.25,
-        },
-      }}
-    />
-  );
-}
-
-function FloatingStars() {
-  const dots = useMemo(
-    () =>
-      Array.from({ length: 42 }, (_, i) => ({
-        id: i,
-        size: (i % 3) + 2,
-        left: `${(i * 17) % 100}%`,
-        top: `${(i * 29) % 100}%`,
-        delay: `${(i % 8) * 0.4}s`,
-        duration: `${4 + (i % 5)}s`,
-        opacity: 0.25 + (i % 4) * 0.12,
-      })),
-    []
-  );
-
-  return (
-    <Box sx={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none" }}>
-      {dots.map((d) => (
-        <Box
-          key={d.id}
-          sx={{
-            position: "absolute",
-            left: d.left,
-            top: d.top,
-            width: d.size,
-            height: d.size,
-            borderRadius: "50%",
-            background: "rgba(255,255,255,0.95)",
-            opacity: d.opacity,
-            boxShadow: "0 0 16px rgba(255,255,255,0.55)",
-            animation: `twinkle ${d.duration} ease-in-out ${d.delay} infinite`,
-          }}
-        />
-      ))}
-    </Box>
-  );
-}
-
-function VerticalAccent() {
-  const theme = useTheme();
-
-  return (
-    <Stack alignItems="center" spacing={1.25} sx={{ pt: 1, mr: { xs: 0.8, md: 1.6 } }}>
-      <Box
-        sx={{
-          width: 14,
-          height: 14,
-          borderRadius: "50%",
-          background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
-          boxShadow: "0 0 24px rgba(145,94,255,0.45)",
-        }}
-      />
-      <Box
-        sx={{
-          width: 4,
-          height: { xs: 110, md: 180 },
-          borderRadius: 999,
-          background:
-            theme.palette.mode === "dark"
-              ? "linear-gradient(180deg, #915EFF, rgba(145,94,255,0.08))"
-              : "linear-gradient(180deg, #915EFF, rgba(145,94,255,0.10))",
-        }}
-      />
-    </Stack>
-  );
-}
-
-function InfoStat({ label, value }) {
-  const theme = useTheme();
-
-  return (
-    <GlassPanel
-      sx={{
-        p: 1.6,
-        minHeight: 92,
-        display: "flex",
-        justifyContent: "center",
-        flexDirection: "column",
-        background:
-          theme.palette.mode === "dark"
-            ? "linear-gradient(180deg, rgba(145,94,255,0.10), rgba(16,13,37,0.92))"
-            : "linear-gradient(180deg, rgba(145,94,255,0.08), rgba(255,255,255,0.94))",
-      }}
-    >
-      <Typography sx={{ fontSize: 22, fontWeight: 950, lineHeight: 1.1 }}>{value}</Typography>
-      <Typography variant="body2" sx={{ opacity: 0.78, mt: 0.45 }}>
-        {label}
-      </Typography>
-    </GlassPanel>
-  );
-}
-
-function ProjectCardOneByOne({ index, p }) {
-  const theme = useTheme();
-  const title = safeString(p?.title) || "Untitled Project";
-  const description = safeString(p?.description) || "";
-  const techList = splitCSV(p?.tech);
-  const repoUrl = safeString(p?.repoUrl || "");
-  const liveUrl = safeString(p?.liveUrl || "");
-
-  return (
-    <MotionPaper
-      variants={revealUp}
-      whileHover={{ y: -8, rotateX: 2, rotateY: -2 }}
-      transition={{ type: "spring", stiffness: 260, damping: 20 }}
-      variant="outlined"
-      sx={{
-        p: { xs: 2, md: 2.6 },
-        borderRadius: 4,
-        borderColor:
-          theme.palette.mode === "dark"
-            ? "rgba(255,255,255,0.09)"
-            : "rgba(73,56,126,0.12)",
-        background:
-          theme.palette.mode === "dark"
-            ? "linear-gradient(180deg, rgba(21,16,48,0.95), rgba(16,13,37,0.98))"
-            : "linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,242,255,0.92))",
-        boxShadow:
-          theme.palette.mode === "dark"
-            ? "0 18px 50px rgba(0,0,0,0.24)"
-            : "0 18px 50px rgba(73,56,126,0.12)",
-      }}
-    >
-      <Stack spacing={1.4}>
-        <Stack direction="row" alignItems="center" spacing={1.2}>
-          <Box
-            sx={{
-              width: 42,
-              height: 42,
-              borderRadius: 3,
-              display: "grid",
-              placeItems: "center",
-              fontWeight: 950,
-              fontSize: 14,
-              background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
-              color: "#0b0b0e",
-              boxShadow: "0 10px 25px rgba(145,94,255,0.25)",
-            }}
-          >
-            {String(index).padStart(2, "0")}
-          </Box>
-
-          <Typography sx={{ fontWeight: 950, fontSize: { xs: 18, md: 20 } }}>
-            {title}
-          </Typography>
-        </Stack>
-
-        {description ? (
-          <Typography
-            variant="body2"
-            sx={{
-              opacity: 0.9,
-              lineHeight: 1.75,
-              textAlign: "justify",
-              whiteSpace: "pre-wrap",
-            }}
-          >
-            {description}
-          </Typography>
-        ) : null}
-
-        {techList.length ? (
-          <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-            {techList.map((item, idx) => (
-              <TechBadge key={`${item}-${idx}`} label={`#${item}`} />
-            ))}
-          </Stack>
-        ) : null}
-
-        {(repoUrl || liveUrl) && (
-          <Stack direction="row" spacing={1.1} sx={{ pt: 0.5, flexWrap: "wrap" }}>
-            {repoUrl ? (
-              <Button
-                variant="outlined"
-                size="small"
-                startIcon={<MdLink />}
-                onClick={() => blobSafeWindowOpen(repoUrl)}
-                sx={{
-                  borderRadius: 999,
-                  fontWeight: 900,
-                  px: 1.8,
-                  color: theme.palette.mode === "dark" ? BRAND_TEXT : "#4f3a87",
-                  borderColor:
-                    theme.palette.mode === "dark"
-                      ? "rgba(145,94,255,0.32)"
-                      : "rgba(145,94,255,0.24)",
-                  "&:hover": {
-                    borderColor: BRAND_PRIMARY,
-                    background:
-                      theme.palette.mode === "dark"
-                        ? "rgba(145,94,255,0.10)"
-                        : "rgba(145,94,255,0.07)",
-                  },
-                }}
-              >
-                Source Code
-              </Button>
-            ) : null}
-
-            {liveUrl ? (
-              <Button
-                variant="contained"
-                size="small"
-                startIcon={<MdLink />}
-                onClick={() => blobSafeWindowOpen(liveUrl)}
-                sx={{
-                  borderRadius: 999,
-                  fontWeight: 900,
-                  px: 1.8,
-                  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
-                  color: "#0b0b0e",
-                  boxShadow: "0 12px 30px rgba(145,94,255,0.24)",
-                  "&:hover": {
-                    background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
-                    boxShadow: "0 16px 40px rgba(145,94,255,0.30)",
-                  },
-                }}
-              >
-                Live Demo
-              </Button>
-            ) : null}
-          </Stack>
-        )}
-      </Stack>
-    </MotionPaper>
-  );
-}
-
 async function blobDownload(url) {
   const res = await fetch(url, { method: "GET" });
   if (!res.ok) throw new Error("Download failed");
@@ -456,7 +103,9 @@ async function blobDownload(url) {
   let filename = "Resume.pdf";
   const cd = res.headers.get("content-disposition") || "";
   const match =
-    cd.match(/filename\*=UTF-8''([^;]+)/i) || cd.match(/filename="([^"]+)"/i) || cd.match(/filename=([^;]+)/i);
+    cd.match(/filename\*=UTF-8''([^;]+)/i) ||
+    cd.match(/filename="([^"]+)"/i) ||
+    cd.match(/filename=([^;]+)/i);
 
   if (match?.[1]) {
     try {
@@ -481,83 +130,43 @@ async function blobDownload(url) {
 
 function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   const src = blobUrl || url;
-  const theme = useTheme();
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-      <DialogTitle sx={{ fontWeight: 950 }}>{title}</DialogTitle>
-
+    <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
+      <DialogTitle sx={{ fontWeight: 900 }}>{title}</DialogTitle>
       <DialogContent
         sx={{
-          height: 650,
+          height: 700,
           p: 0,
           overflow: "hidden",
-          background: "#000",
+          bgcolor: "black",
         }}
       >
         {loading ? (
-          <Box sx={{ p: 2 }}>
-            <Typography sx={{ opacity: 0.7 }}>Loading preview…</Typography>
+          <Box sx={{ p: 3 }}>
+            <Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography>
           </Box>
         ) : src ? (
-          <Box
-            sx={{
-              width: "100%",
-              height: "100%",
-              overflowY: "scroll",
-              overflowX: "hidden",
-              position: "relative",
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-              "&::-webkit-scrollbar": {
-                width: "0px",
-                background: "transparent",
-              },
-            }}
-          >
-            <Box
-              sx={{
-                position: "absolute",
-                right: 0,
-                top: 0,
-                width: "14px",
-                height: "100%",
-                background: theme.palette.mode === "dark" ? "#000" : "#fff",
-                zIndex: 10,
-                pointerEvents: "none",
-              }}
-            />
+          <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
             <iframe
               title="Resume Preview"
               src={src}
               style={{
                 width: "100%",
-                height: "200%",
+                height: "100%",
                 border: "none",
                 display: "block",
-                overflow: "hidden",
               }}
             />
           </Box>
         ) : (
-          <Box sx={{ p: 2 }}>
-            <Typography sx={{ opacity: 0.7 }}>Preview not available.</Typography>
+          <Box sx={{ p: 3 }}>
+            <Typography sx={{ opacity: 0.75 }}>Preview not available.</Typography>
           </Box>
         )}
       </DialogContent>
-
       <DialogActions sx={{ p: 2 }}>
-        <Button
-          onClick={onClose}
-          variant="outlined"
-          size="small"
-          sx={{
-            borderRadius: 999,
-            fontWeight: 950,
-            borderColor: "rgba(145,94,255,0.45)",
-            color: BRAND_PRIMARY,
-          }}
-        >
+        <Button onClick={onClose} variant="outlined" startIcon={<MdClose />}>
           Close
         </Button>
       </DialogActions>
@@ -565,54 +174,152 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   );
 }
 
-function TimelineCard({ title, subtitle, description }) {
-  const theme = useTheme();
+function VerticalNav({ items, activeId, onJump, mobileOpen, setMobileOpen }) {
+  return (
+    <>
+      <Box className={`portfolio-side-nav ${mobileOpen ? "open" : ""}`}>
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            className={`portfolio-side-nav-item ${activeId === item.id ? "active" : ""}`}
+            onClick={() => {
+              onJump(item.id);
+              setMobileOpen(false);
+            }}
+            aria-label={item.label}
+            title={item.label}
+          >
+            <span className="dot" />
+            <span className="label">{item.label}</span>
+          </button>
+        ))}
+      </Box>
+
+      <Box className="portfolio-mobile-nav-toggle">
+        <IconButton onClick={() => setMobileOpen((v) => !v)} size="small">
+          <MdMenu />
+        </IconButton>
+      </Box>
+    </>
+  );
+}
+
+function HeroActionButton({ children, ...props }) {
+  return (
+    <Button
+      {...props}
+      sx={{
+        borderRadius: 999,
+        px: 2.3,
+        py: 1.2,
+        fontWeight: 800,
+        textTransform: "none",
+        letterSpacing: 0.2,
+        ...(props.sx || {}),
+      }}
+    >
+      {children}
+    </Button>
+  );
+}
+
+function StatCard({ value, label }) {
+  return (
+    <Box className="hero-stat-card">
+      <Typography className="hero-stat-value">{value}</Typography>
+      <Typography className="hero-stat-label">{label}</Typography>
+    </Box>
+  );
+}
+
+function SectionHeading({ index, title, subtitle }) {
+  return (
+    <Stack spacing={1.1} sx={{ mb: 3 }}>
+      <Typography className="section-kicker">
+        {index}. {title}
+      </Typography>
+      <Typography className="section-title">{title}</Typography>
+      {subtitle ? <Typography className="section-subtitle">{subtitle}</Typography> : null}
+    </Stack>
+  );
+}
+
+function GlassPanel({ children, sx }) {
+  return (
+    <Paper className="glass-panel" sx={sx}>
+      {children}
+    </Paper>
+  );
+}
+
+function ProjectCard({ project }) {
+  const title = safeString(project?.title) || "Untitled Project";
+  const description = safeString(project?.description);
+  const techList = splitCSV(project?.tech);
+  const repoUrl = safeString(project?.repoUrl);
+  const liveUrl = safeString(project?.liveUrl);
 
   return (
     <MotionPaper
-      variants={revealUp}
-      whileHover={{ y: -6 }}
-      transition={{ type: "spring", stiffness: 280, damping: 22 }}
-      variant="outlined"
-      sx={{
-        p: 2,
-        borderRadius: 4,
-        borderColor:
-          theme.palette.mode === "dark"
-            ? "rgba(255,255,255,0.08)"
-            : "rgba(73,56,126,0.12)",
-        background:
-          theme.palette.mode === "dark"
-            ? "linear-gradient(180deg, rgba(21,16,48,0.95), rgba(16,13,37,0.98))"
-            : "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(245,242,255,0.91))",
-      }}
+      variants={fadeUp}
+      className="project-card"
+      whileHover={{ y: -8 }}
     >
-      <Typography sx={{ fontWeight: 900, fontSize: { xs: 16, md: 18 } }}>{title}</Typography>
-      {subtitle ? (
-        <Typography variant="body2" sx={{ opacity: 0.8, mt: 0.35 }}>
-          {subtitle}
-        </Typography>
+      <Box className="project-card-topline">
+        <Typography className="project-mini-label">Featured Project</Typography>
+      </Box>
+
+      <Typography className="project-title">{title}</Typography>
+
+      <Typography className="project-description">
+        {description || "No description added yet."}
+      </Typography>
+
+      {techList.length ? (
+        <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mt: 2 }}>
+          {techList.map((tech, i) => (
+            <Chip key={`${tech}-${i}`} label={tech} size="small" className="project-chip" />
+          ))}
+        </Stack>
       ) : null}
-      {description ? (
-        <Typography
-          variant="body2"
-          sx={{ mt: 1.1, opacity: 0.92, lineHeight: 1.7, whiteSpace: "pre-wrap", textAlign: "justify" }}
-        >
-          {description}
-        </Typography>
-      ) : null}
+
+      <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
+        {repoUrl ? (
+          <Button
+            variant="outlined"
+            startIcon={<MdLink />}
+            onClick={() => window.open(repoUrl, "_blank", "noopener,noreferrer")}
+            sx={{ borderRadius: 999, fontWeight: 700 }}
+          >
+            Repository
+          </Button>
+        ) : null}
+
+        {liveUrl ? (
+          <Button
+            variant="contained"
+            startIcon={<MdArrowOutward />}
+            onClick={() => window.open(liveUrl, "_blank", "noopener,noreferrer")}
+            sx={{ borderRadius: 999, fontWeight: 700 }}
+          >
+            Live Preview
+          </Button>
+        ) : null}
+      </Stack>
     </MotionPaper>
   );
 }
 
 export default function Home({ toggleTheme }) {
   useEffect(() => {
-    document.title = "Gnanaseelan Portfolio";
+    document.title = "Portfolio";
   }, []);
 
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const mode = theme.palette.mode;
 
   const [loading, setLoading] = useState(true);
   const [reloadTick, setReloadTick] = useState(0);
@@ -633,19 +340,30 @@ export default function Home({ toggleTheme }) {
   const [resumePreviewBlobUrl, setResumePreviewBlobUrl] = useState("");
   const [resumePreviewLoading, setResumePreviewLoading] = useState(false);
 
-  const mode = theme.palette.mode;
+  const [activeSection, setActiveSection] = useState("home");
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  const sectionIds = useMemo(
+    () => [
+      { id: "home", label: "Home" },
+      { id: "about", label: "About" },
+      { id: "skills", label: "Skills" },
+      { id: "projects", label: "Work" },
+      { id: "experience", label: "Experience" },
+      { id: "education", label: "Education" },
+      { id: "achievements", label: "Achievements" },
+      { id: "contact", label: "Contact" },
+    ],
+    []
+  );
 
   const name = safeString(profile?.name) || "Your Name";
   const title = safeString(profile?.title) || "Full Stack Developer";
-  const tagline = safeString(profile?.tagline) || "I build modern, scalable, and user-focused digital experiences.";
-  const about = safeString(profile?.about) || "";
+  const tagline =
+    safeString(profile?.tagline) || "Transforming Ideas Into Digital Reality";
+  const about = safeString(profile?.about) || "Add your about content from admin.";
   const location = safeString(profile?.location) || "";
   const emailPublic = safeString(profile?.emailPublic) || "";
-
-  const frontendList = splitCSV(skills?.frontend);
-  const backendList = splitCSV(skills?.backend);
-  const databaseList = splitCSV(skills?.database);
-  const toolsList = splitCSV(skills?.tools);
 
   const contactEmail = useMemo(() => {
     const ep = safeString(emailPublic).trim();
@@ -659,16 +377,27 @@ export default function Home({ toggleTheme }) {
 
   const contentVersion = useMemo(() => localStorage.getItem("content_version") || "0", [reloadTick]);
   const resumeDownloadBase = useMemo(() => downloadResumeUrl(), []);
+  const resumeViewBase = useMemo(() => viewResumeUrl(), []);
+
   const resumeDownloadUrlBusted = useMemo(() => {
     const joiner = resumeDownloadBase.includes("?") ? "&" : "?";
     return `${resumeDownloadBase}${joiner}v=${encodeURIComponent(contentVersion)}&t=${Date.now()}`;
   }, [resumeDownloadBase, contentVersion]);
 
-  const resumeViewBase = useMemo(() => viewResumeUrl(), []);
   const resumeViewUrlBusted = useMemo(() => {
     const joiner = resumeViewBase.includes("?") ? "&" : "?";
     return `${resumeViewBase}${joiner}v=${encodeURIComponent(contentVersion)}&t=${Date.now()}`;
   }, [resumeViewBase, contentVersion]);
+
+  const skillRows = useMemo(() => {
+    const s = skills || {};
+    return [
+      { category: "Frontend", value: splitCSV(s.frontend).join(", ") || "—" },
+      { category: "Backend", value: splitCSV(s.backend).join(", ") || "—" },
+      { category: "Database", value: splitCSV(s.database).join(", ") || "—" },
+      { category: "Tools", value: splitCSV(s.tools).join(", ") || "—" },
+    ];
+  }, [skills]);
 
   useEffect(() => {
     let alive = true;
@@ -700,11 +429,12 @@ export default function Home({ toggleTheme }) {
         setLanguages(Array.isArray(langRes?.data) ? langRes.data : []);
 
         const localName =
-          localStorage.getItem("active_resume_file_name") || localStorage.getItem("resume_file_name") || "";
+          localStorage.getItem("active_resume_file_name") ||
+          localStorage.getItem("resume_file_name") ||
+          "";
         if (localName) setResumeName(localName);
         else setResumeName(`${name.replace(/\s+/g, "_")}_Resume.pdf`);
       } catch {
-        // keep UI clean
       } finally {
         if (alive) setLoading(false);
       }
@@ -717,9 +447,7 @@ export default function Home({ toggleTheme }) {
   }, [reloadTick, name]);
 
   useEffect(() => {
-    const sync = () => {
-      reload();
-    };
+    const sync = () => reload();
 
     const onStorage = (e) => {
       if (!e) return;
@@ -743,36 +471,32 @@ export default function Home({ toggleTheme }) {
     };
   }, []);
 
-  const skillCategoryRows = useMemo(() => {
-    const s = skills || {};
-    const frontend = splitCSV(s.frontend).join(", ");
-    const backend = splitCSV(s.backend).join(", ");
-    const database = splitCSV(s.database).join(", ");
-    const tools = splitCSV(s.tools).join(", ");
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
 
-    return [
-      { category: "Frontend", value: frontend || "—" },
-      { category: "Backend", value: backend || "—" },
-      { category: "Database", value: database || "—" },
-      { category: "Tools", value: tools || "—" },
-    ];
-  }, [skills]);
+        if (visible[0]?.target?.id) {
+          setActiveSection(visible[0].target.id);
+        }
+      },
+      { threshold: [0.3, 0.55, 0.75] }
+    );
 
-  const onDownloadResume = async () => {
-    try {
-      setDownloading(true);
-      const fname = await blobDownload(resumeDownloadUrlBusted);
-      localStorage.setItem("active_resume_file_name", fname);
-      setResumeName(fname);
-    } catch {
-      try {
-        blobSafeWindowOpen(resumeDownloadUrlBusted);
-      } catch {
-        // ignore
-      }
-    } finally {
-      setDownloading(false);
-    }
+    sectionIds.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [loading, sectionIds]);
+
+  const jumpTo = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const closeResumePreview = () => {
@@ -781,7 +505,6 @@ export default function Home({ toggleTheme }) {
       try {
         URL.revokeObjectURL(resumePreviewBlobUrl);
       } catch {
-        // ignore
       }
     }
     setResumePreviewBlobUrl("");
@@ -806,805 +529,521 @@ export default function Home({ toggleTheme }) {
     }
   };
 
-  const pageBg = useMemo(() => {
-    return mode === "dark"
-      ? `
-        radial-gradient(circle at 12% 12%, rgba(145,94,255,0.18), transparent 28%),
-        radial-gradient(circle at 88% 18%, rgba(0,206,168,0.12), transparent 24%),
-        radial-gradient(circle at 50% 80%, rgba(145,94,255,0.10), transparent 26%),
-        linear-gradient(180deg, #050816 0%, #0b1026 45%, #050816 100%)
-      `
-      : `
-        radial-gradient(circle at 12% 12%, rgba(145,94,255,0.12), transparent 28%),
-        radial-gradient(circle at 88% 18%, rgba(0,206,168,0.10), transparent 24%),
-        radial-gradient(circle at 50% 82%, rgba(145,94,255,0.08), transparent 26%),
-        linear-gradient(180deg, #f6f4ff 0%, #f3f7ff 48%, #f8f6ff 100%)
-      `;
-  }, [mode]);
-
-  const heroRef = useRef(null);
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const mxSpring = useSpring(mx, { stiffness: 180, damping: 20, mass: 0.4 });
-  const mySpring = useSpring(my, { stiffness: 180, damping: 20, mass: 0.4 });
-  const rotateY = useTransform(mxSpring, [-0.5, 0.5], [-5, 5]);
-  const rotateX = useTransform(mySpring, [-0.5, 0.5], [5, -5]);
-
-  const onHeroMove = (e) => {
-    const el = heroRef.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / rect.width;
-    const dy = (e.clientY - cy) / rect.height;
-    mx.set(Math.max(-0.5, Math.min(0.5, dx)));
-    my.set(Math.max(-0.5, Math.min(0.5, dy)));
+  const onDownloadResume = async () => {
+    try {
+      setDownloading(true);
+      const fname = await blobDownload(resumeDownloadUrlBusted);
+      localStorage.setItem("active_resume_file_name", fname);
+      setResumeName(fname);
+    } catch {
+      try {
+        window.open(resumeDownloadUrlBusted, "_blank", "noopener,noreferrer");
+      } catch {
+      }
+    } finally {
+      setDownloading(false);
+    }
   };
 
-  const onHeroLeave = () => {
-    mx.set(0);
-    my.set(0);
-  };
-
-  const socialsButtons = [
-    {
-      show: !!socials?.github,
-      label: "GitHub",
-      icon: <FaGithub />,
-      action: () => blobSafeWindowOpen(socials.github),
-    },
-    {
-      show: !!socials?.linkedin,
-      label: "LinkedIn",
-      icon: <FaLinkedin />,
-      action: () => blobSafeWindowOpen(socials.linkedin),
-    },
-    {
-      show: !!contactEmail,
-      label: "Email",
-      icon: <MdEmail />,
-      action: () => blobSafeWindowOpen(`mailto:${contactEmail}`),
-    },
-    {
-      show: !!socials?.website,
-      label: "Website",
-      icon: <MdLink />,
-      action: () => blobSafeWindowOpen(socials.website),
-    },
-    {
-      show: !!socials?.phone,
-      label: "Phone",
-      icon: <MdPhone />,
-      action: () => blobSafeWindowOpen(`tel:${safeString(socials.phone)}`),
-    },
-  ];
-
-  const summaryStats = [
-    { label: "Projects", value: projects.length || "00" },
-    { label: "Skills Groups", value: skillCategoryRows.filter((x) => x.value !== "—").length || "00" },
-    { label: "Achievements", value: achievements.length || "00" },
-    { label: "Experience Entries", value: experience.length || "00" },
+  const completedSections = [
+    projects.length ? projects.length : "0",
+    experience.length ? experience.length : "0",
+    education.length ? education.length : "0",
   ];
 
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        width: "100%",
-        overflowX: "hidden",
-        background: pageBg,
-        position: "relative",
-      }}
-    >
-      <FloatingStars />
+    <Box className={`portfolio-root ${mode === "dark" ? "mode-dark" : "mode-light"}`}>
+      <Box className="portfolio-bg">
+        <span className="portfolio-orb orb-one" />
+        <span className="portfolio-orb orb-two" />
+        <span className="portfolio-orb orb-three" />
+        <span className="portfolio-grid" />
+      </Box>
 
-      <Box
-        sx={{
-          position: "absolute",
-          top: -120,
-          left: -120,
-          width: 280,
-          height: 280,
-          borderRadius: "50%",
-          background: "rgba(145,94,255,0.18)",
-          filter: "blur(90px)",
-          pointerEvents: "none",
-        }}
-      />
-      <Box
-        sx={{
-          position: "absolute",
-          right: -120,
-          top: 80,
-          width: 260,
-          height: 260,
-          borderRadius: "50%",
-          background: "rgba(0,206,168,0.12)",
-          filter: "blur(90px)",
-          pointerEvents: "none",
-        }}
+      <VerticalNav
+        items={sectionIds}
+        activeId={activeSection}
+        onJump={jumpTo}
+        mobileOpen={mobileNavOpen}
+        setMobileOpen={setMobileNavOpen}
       />
 
-      <Container maxWidth="lg" sx={{ position: "relative", py: { xs: 3, md: 4.5 } }}>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="space-between"
-          spacing={1}
-          sx={{ mb: { xs: 2.5, md: 3.5 } }}
-        >
-          <Stack direction="row" spacing={1.25} alignItems="center">
-            <Avatar
-              sx={{
-                width: 48,
-                height: 48,
-                fontWeight: 950,
-                background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
-                color: "#0b0b0e",
-                boxShadow: "0 10px 30px rgba(145,94,255,0.26)",
-              }}
-            >
+      <Container maxWidth="xl" className="portfolio-shell">
+        <Box className="portfolio-topbar">
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Avatar className="topbar-avatar">
               {(safeString(profile?.initials) || name || "Y").slice(0, 2).toUpperCase()}
             </Avatar>
-
             <Box>
-              <Typography sx={{ fontWeight: 950, fontSize: 16 }}>{name}</Typography>
-              <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                {title}
-              </Typography>
+              <Typography className="topbar-name">{name}</Typography>
+              <Typography className="topbar-role">{title}</Typography>
             </Box>
           </Stack>
 
           <Stack direction="row" spacing={1} alignItems="center">
-            <Tooltip title="Reload Data">
-              <IconButton
-                onClick={reload}
-                size="small"
-                sx={{
-                  borderRadius: 3,
-                  border: "1px solid",
-                  borderColor:
-                    mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(73,56,126,0.12)",
-                  background:
-                    mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.80)",
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                  },
-                }}
-              >
+            <Tooltip title="Reload">
+              <IconButton onClick={reload} className="topbar-icon-btn">
                 <MdRefresh />
               </IconButton>
             </Tooltip>
 
-            <Tooltip title={mode === "dark" ? "Light Theme" : "Dark Theme"}>
-              <IconButton
-                onClick={toggleTheme}
-                size="small"
-                sx={{
-                  borderRadius: 3,
-                  border: "1px solid",
-                  borderColor:
-                    mode === "dark" ? "rgba(255,255,255,0.10)" : "rgba(73,56,126,0.12)",
-                  background:
-                    mode === "dark" ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.80)",
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                  },
-                }}
-              >
+            <Tooltip title={mode === "dark" ? "Light Mode" : "Dark Mode"}>
+              <IconButton onClick={toggleTheme} className="topbar-icon-btn">
                 {mode === "dark" ? <MdLightMode /> : <MdDarkMode />}
               </IconButton>
             </Tooltip>
 
-            <Tooltip title="Go to Admin">
-              <IconButton
-                onClick={() => navigate("/admin")}
-                size="small"
-                sx={{
-                  borderRadius: 3,
-                  color: BRAND_PRIMARY,
-                  border: "1px solid rgba(145,94,255,0.24)",
-                  background: "rgba(145,94,255,0.08)",
-                  "&:hover": {
-                    transform: "translateY(-2px)",
-                  },
-                }}
-              >
+            <Tooltip title="Admin">
+              <IconButton onClick={() => navigate("/admin")} className="topbar-icon-btn accent">
                 <MdAdminPanelSettings />
               </IconButton>
             </Tooltip>
           </Stack>
-        </Stack>
+        </Box>
 
-        <Grid container spacing={{ xs: 2.5, md: 3.5 }} alignItems="stretch">
-          <Grid item xs={12}>
-            <MotionPaper
-              ref={heroRef}
-              onMouseMove={onHeroMove}
-              onMouseLeave={onHeroLeave}
-              initial="hidden"
-              animate="visible"
-              variants={staggerWrap}
-              style={{
-                transformStyle: "preserve-3d",
-                rotateX,
-                rotateY,
-              }}
-              sx={{
-                borderRadius: 5,
-                position: "relative",
-                overflow: "hidden",
-                border: "1px solid",
-                borderColor:
-                  mode === "dark" ? "rgba(255,255,255,0.08)" : "rgba(73,56,126,0.12)",
-                background:
-                  mode === "dark"
-                    ? "linear-gradient(180deg, rgba(21,16,48,0.96), rgba(10,12,32,0.96))"
-                    : "linear-gradient(180deg, rgba(255,255,255,0.95), rgba(243,239,255,0.90))",
-                boxShadow:
-                  mode === "dark"
-                    ? "0 28px 80px rgba(0,0,0,0.30)"
-                    : "0 28px 80px rgba(73,56,126,0.12)",
-                p: { xs: 2.2, md: 3.4 },
-              }}
-            >
-              <Box
-                sx={{
-                  position: "absolute",
-                  inset: 0,
-                  pointerEvents: "none",
-                  background:
-                    mode === "dark"
-                      ? "radial-gradient(circle at 80% 20%, rgba(145,94,255,0.20), transparent 30%), radial-gradient(circle at 15% 18%, rgba(0,206,168,0.12), transparent 24%)"
-                      : "radial-gradient(circle at 80% 20%, rgba(145,94,255,0.14), transparent 30%), radial-gradient(circle at 15% 18%, rgba(0,206,168,0.10), transparent 24%)",
-                }}
-              />
+        <MotionBox
+          id="home"
+          className="portfolio-section hero-section"
+          initial="hidden"
+          animate="show"
+          variants={fadeUp}
+        >
+          <Box className="hero-layout">
+            <Box className="hero-left">
+              <MotionBox variants={fadeUp}>
+                <Typography className="hero-kicker">Full Stack Developer</Typography>
+                <Typography className="hero-title">
+                  {tagline}
+                </Typography>
+                <Typography className="hero-description">
+                  {about}
+                </Typography>
 
-              <Grid container spacing={{ xs: 2.2, md: 3.2 }} alignItems="center">
-                <Grid item xs={12} md={7}>
-                  <Stack direction="row" alignItems="flex-start">
-                    <VerticalAccent />
-                    <Box sx={{ pt: 0.15 }}>
-                      <MotionBox variants={revealUp}>
-                        <Typography
-                          sx={{
-                            textTransform: "uppercase",
-                            letterSpacing: "0.18em",
-                            fontSize: { xs: 11, md: 12 },
-                            fontWeight: 800,
-                            color:
-                              mode === "dark"
-                                ? "rgba(223,217,255,0.74)"
-                                : "rgba(79,58,135,0.74)",
-                          }}
-                        >
-                          Introduction
-                        </Typography>
-                      </MotionBox>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
+                  <HeroActionButton
+                    variant="contained"
+                    startIcon={<MdArrowOutward />}
+                    onClick={() => jumpTo("projects")}
+                  >
+                    View Work
+                  </HeroActionButton>
 
-                      <MotionBox variants={revealUp}>
-                        <Typography
-                          sx={{
-                            mt: 0.5,
-                            fontWeight: 950,
-                            lineHeight: 1.08,
-                            fontSize: { xs: 30, sm: 40, md: 58 },
-                          }}
-                        >
-                          Hi, I’m{" "}
-                          <Box component="span" sx={{ color: BRAND_PRIMARY }}>
-                            {name}
-                          </Box>
-                        </Typography>
-                      </MotionBox>
+                  <HeroActionButton
+                    variant="outlined"
+                    startIcon={<MdDownload />}
+                    onClick={onDownloadResume}
+                    disabled={downloading}
+                  >
+                    {downloading ? "Downloading..." : `Download Resume`}
+                  </HeroActionButton>
 
-                      <MotionBox variants={revealUp}>
-                        <Typography
-                          sx={{
-                            mt: 1.2,
-                            fontSize: { xs: 15, md: 18 },
-                            lineHeight: 1.8,
-                            maxWidth: 760,
-                            opacity: 0.92,
-                          }}
-                        >
-                          {tagline}
-                        </Typography>
-                      </MotionBox>
+                  <HeroActionButton
+                    variant="outlined"
+                    startIcon={<MdVisibility />}
+                    onClick={onPreviewResume}
+                  >
+                    Preview Resume
+                  </HeroActionButton>
+                </Stack>
 
-                      <MotionBox variants={revealUp}>
-                        <Stack
-                          direction={{ xs: "column", sm: "row" }}
-                          spacing={1}
-                          sx={{ mt: 2.1, opacity: 0.88 }}
-                        >
-                          {location ? (
-                            <Chip
-                              label={`📍 ${location}`}
-                              sx={{ borderRadius: 999, fontWeight: 800, width: "fit-content" }}
-                            />
-                          ) : null}
-                          {contactEmail ? (
-                            <Chip
-                              label={`✉️ ${contactEmail}`}
-                              sx={{ borderRadius: 999, fontWeight: 800, width: "fit-content" }}
-                            />
-                          ) : null}
-                        </Stack>
-                      </MotionBox>
-
-                      <MotionBox variants={revealUp}>
-                        <Stack
-                          direction={{ xs: "column", sm: "row" }}
-                          spacing={1.2}
-                          sx={{ mt: 2.4 }}
-                        >
-                          <Button
-                            onClick={() => scrollToId("about")}
-                            variant="contained"
-                            startIcon={<MdArrowDownward />}
-                            fullWidth={isMobile}
-                            sx={{
-                              borderRadius: 999,
-                              fontWeight: 950,
-                              px: 2.4,
-                              py: 1.2,
-                              background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
-                              color: "#0b0b0e",
-                              boxShadow: "0 14px 34px rgba(145,94,255,0.24)",
-                              "&:hover": {
-                                background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
-                                boxShadow: "0 18px 40px rgba(145,94,255,0.30)",
-                              },
-                            }}
-                          >
-                            Explore Portfolio
-                          </Button>
-
-                          <Button
-                            onClick={onPreviewResume}
-                            variant="outlined"
-                            startIcon={<MdVisibility />}
-                            fullWidth={isMobile}
-                            sx={{
-                              borderRadius: 999,
-                              fontWeight: 950,
-                              px: 2.4,
-                              py: 1.2,
-                              color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
-                              borderColor:
-                                mode === "dark"
-                                  ? "rgba(145,94,255,0.30)"
-                                  : "rgba(145,94,255,0.24)",
-                              "&:hover": {
-                                borderColor: BRAND_PRIMARY,
-                                background:
-                                  mode === "dark"
-                                    ? "rgba(145,94,255,0.10)"
-                                    : "rgba(145,94,255,0.06)",
-                              },
-                            }}
-                          >
-                            Preview Resume
-                          </Button>
-
-                          <Button
-                            onClick={onDownloadResume}
-                            variant="outlined"
-                            startIcon={<MdDownload />}
-                            disabled={downloading}
-                            fullWidth={isMobile}
-                            sx={{
-                              borderRadius: 999,
-                              fontWeight: 950,
-                              px: 2.4,
-                              py: 1.2,
-                              color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
-                              borderColor:
-                                mode === "dark"
-                                  ? "rgba(145,94,255,0.30)"
-                                  : "rgba(145,94,255,0.24)",
-                              "&:hover": {
-                                borderColor: BRAND_PRIMARY,
-                                background:
-                                  mode === "dark"
-                                    ? "rgba(145,94,255,0.10)"
-                                    : "rgba(145,94,255,0.06)",
-                              },
-                            }}
-                          >
-                            {downloading ? "Downloading…" : `Download Resume`}
-                          </Button>
-                        </Stack>
-                      </MotionBox>
-                    </Box>
-                  </Stack>
-                </Grid>
-
-                <Grid item xs={12} md={5}>
-                  <MotionBox variants={revealUp}>
-                    <GlassPanel
-                      sx={{
-                        p: { xs: 2, md: 2.25 },
-                        minHeight: { xs: "auto", md: 320 },
-                      }}
+                <Stack direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
+                  {socials?.github ? (
+                    <IconButton
+                      className="hero-social-btn"
+                      onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}
                     >
-                      <Typography
-                        sx={{
-                          fontSize: 13,
-                          textTransform: "uppercase",
-                          letterSpacing: "0.16em",
-                          fontWeight: 800,
-                          opacity: 0.74,
-                        }}
-                      >
-                        Connect
-                      </Typography>
+                      <FaGithub />
+                    </IconButton>
+                  ) : null}
 
-                      <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" sx={{ mt: 1.4 }}>
-                        {socialsButtons
-                          .filter((item) => item.show)
-                          .map((item, idx) => (
-                            <Tooltip key={`${item.label}-${idx}`} title={item.label}>
-                              <IconButton
-                                onClick={item.action}
-                                sx={{
-                                  width: 48,
-                                  height: 48,
-                                  borderRadius: 3,
-                                  background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
-                                  color: "#0b0b0e",
-                                  boxShadow: "0 10px 25px rgba(145,94,255,0.22)",
-                                  "&:hover": {
-                                    transform: "translateY(-2px)",
-                                    boxShadow: "0 16px 34px rgba(145,94,255,0.28)",
-                                  },
-                                }}
-                              >
-                                {item.icon}
-                              </IconButton>
-                            </Tooltip>
-                          ))}
-                      </Stack>
+                  {socials?.linkedin ? (
+                    <IconButton
+                      className="hero-social-btn"
+                      onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}
+                    >
+                      <FaLinkedin />
+                    </IconButton>
+                  ) : null}
 
-                      <Grid container spacing={1.2} sx={{ mt: 1.2 }}>
-                        {summaryStats.map((item, idx) => (
-                          <Grid item xs={6} key={`${item.label}-${idx}`}>
-                            <InfoStat label={item.label} value={item.value} />
-                          </Grid>
-                        ))}
-                      </Grid>
+                  {contactEmail ? (
+                    <IconButton
+                      className="hero-social-btn"
+                      onClick={() => window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")}
+                    >
+                      <MdEmail />
+                    </IconButton>
+                  ) : null}
 
-                      <Box
-                        sx={{
-                          mt: 1.8,
-                          borderRadius: 4,
-                          p: 1.6,
-                          border: "1px solid",
-                          borderColor:
-                            mode === "dark"
-                              ? "rgba(255,255,255,0.08)"
-                              : "rgba(73,56,126,0.12)",
-                          background:
-                            mode === "dark"
-                              ? "rgba(255,255,255,0.02)"
-                              : "rgba(255,255,255,0.60)",
-                        }}
-                      >
-                        <Typography sx={{ fontWeight: 900, fontSize: 14 }}>
-                          Current Role Focus
-                        </Typography>
-                        <Typography variant="body2" sx={{ mt: 0.65, opacity: 0.86, lineHeight: 1.7 }}>
-                          {title}
-                        </Typography>
-                        <Typography variant="body2" sx={{ mt: 0.55, opacity: 0.8, lineHeight: 1.7 }}>
-                          {safeString(profile?.tagline) || "Building polished user experiences with scalable logic and clean engineering."}
-                        </Typography>
-                      </Box>
-                    </GlassPanel>
-                  </MotionBox>
-                </Grid>
-              </Grid>
-            </MotionPaper>
-          </Grid>
-        </Grid>
+                  {socials?.phone ? (
+                    <IconButton
+                      className="hero-social-btn"
+                      onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")}
+                    >
+                      <MdPhone />
+                    </IconButton>
+                  ) : null}
+                </Stack>
 
-        <Box sx={{ mt: { xs: 4, md: 6 } }}>
-          <MotionBox
-            id="about"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.18 }}
-            variants={revealUp}
-            transition={{ duration: 0.45 }}
-          >
-            <SectionIntro subText="Introduction" heading="Overview." />
-            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
-              {loading ? (
-                <Skeleton height={160} />
-              ) : (
-                <Typography
-                  sx={{
-                    lineHeight: 1.9,
-                    textAlign: "justify",
-                    opacity: 0.92,
-                    whiteSpace: "pre-wrap",
-                    fontSize: { xs: 14.5, md: 16 },
-                  }}
-                >
-                  {about || "—"}
-                </Typography>
-              )}
-            </GlassPanel>
-          </MotionBox>
+                <Stack direction="row" spacing={2} sx={{ mt: 5, flexWrap: "wrap", rowGap: 1.5 }}>
+                  <StatCard value={completedSections[0]} label="Projects" />
+                  <StatCard value={completedSections[1]} label="Experience" />
+                  <StatCard value={completedSections[2]} label="Education" />
+                </Stack>
+              </MotionBox>
+            </Box>
 
-          <MotionBox
-            id="skills"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.16 }}
-            variants={revealUp}
-            transition={{ duration: 0.45 }}
-            sx={{ mt: { xs: 4, md: 6 } }}
-          >
-            <SectionIntro subText="What I work with" heading="Tech Stack." />
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={7}>
-                <GlassPanel sx={{ p: { xs: 2, md: 3 }, height: "100%" }}>
-                  {loading ? (
-                    <Skeleton height={200} />
-                  ) : (
-                    <>
-                      <TableContainer sx={{ overflowX: "hidden" }}>
-                        <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
-                          <TableHead>
-                            <TableRow>
-                              <TableCell sx={{ fontWeight: 950, width: "30%" }}>Category</TableCell>
-                              <TableCell sx={{ fontWeight: 950, width: "70%" }}>Skills</TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {skillCategoryRows.map((r, idx) => (
-                              <TableRow
-                                key={idx}
-                                hover
-                                sx={{
-                                  transition: "transform 140ms ease",
-                                  "&:hover": { transform: "translateX(2px)" },
-                                }}
-                              >
-                                <TableCell sx={{ fontWeight: 900, opacity: 0.9 }}>{r.category}</TableCell>
-                                <TableCell sx={{ opacity: 0.9 }}>{r.value}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </TableContainer>
-                    </>
-                  )}
+            <Box className="hero-right">
+              <MotionBox variants={floatIn} className="hero-visual-wrap">
+                <Box className="hero-avatar-ring">
+                  <Box className="hero-avatar-core">
+                    <Avatar className="hero-main-avatar">
+                      {(safeString(profile?.initials) || name || "Y").slice(0, 2).toUpperCase()}
+                    </Avatar>
+                  </Box>
+                </Box>
+
+                <GlassPanel sx={{ p: 2, mt: 3 }}>
+                  <Typography className="mini-card-title">{name}</Typography>
+                  <Typography className="mini-card-subtitle">{title}</Typography>
+                  {location ? (
+                    <Typography className="mini-card-line">📍 {location}</Typography>
+                  ) : null}
+                  {contactEmail ? (
+                    <Typography className="mini-card-line">✉️ {contactEmail}</Typography>
+                  ) : null}
                 </GlassPanel>
-              </Grid>
+              </MotionBox>
+            </Box>
+          </Box>
+        </MotionBox>
 
-              <Grid item xs={12} md={5}>
-                <GlassPanel sx={{ p: { xs: 2, md: 3 }, height: "100%" }}>
-                  {loading ? (
-                    <Skeleton height={200} />
-                  ) : (
-                    <Stack spacing={2}>
-                      <Box>
-                        <Typography sx={{ fontWeight: 900, mb: 1 }}>Frontend</Typography>
-                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                          {frontendList.length ? frontendList.map((x, i) => <TechBadge key={`${x}-${i}`} label={x} />) : <Typography variant="body2">—</Typography>}
-                        </Stack>
-                      </Box>
+        <MotionBox
+          id="about"
+          className="portfolio-section"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.25 }}
+        >
+          <SectionHeading
+            index="01"
+            title="About"
+            subtitle="A short introduction and profile summary."
+          />
+          <GlassPanel sx={{ p: { xs: 2.5, md: 4 } }}>
+            {loading ? (
+              <Skeleton height={180} />
+            ) : (
+              <Typography className="body-copy">{about}</Typography>
+            )}
+          </GlassPanel>
+        </MotionBox>
 
-                      <Box>
-                        <Typography sx={{ fontWeight: 900, mb: 1 }}>Backend</Typography>
-                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                          {backendList.length ? backendList.map((x, i) => <TechBadge key={`${x}-${i}`} label={x} />) : <Typography variant="body2">—</Typography>}
-                        </Stack>
-                      </Box>
+        <MotionBox
+          id="skills"
+          className="portfolio-section"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.25 }}
+        >
+          <SectionHeading
+            index="02"
+            title="Skills"
+            subtitle="Tech stack grouped the same way your backend already returns it."
+          />
+          <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
+            {loading ? (
+              <Skeleton height={220} />
+            ) : (
+              <TableContainer>
+                <Table size="small">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>Skills</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {skillRows.map((row, idx) => (
+                      <TableRow key={idx}>
+                        <TableCell sx={{ fontWeight: 700 }}>{row.category}</TableCell>
+                        <TableCell>{row.value}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </GlassPanel>
+        </MotionBox>
 
-                      <Box>
-                        <Typography sx={{ fontWeight: 900, mb: 1 }}>Database & Tools</Typography>
-                        <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                          {[...databaseList, ...toolsList].length ? [...databaseList, ...toolsList].map((x, i) => <TechBadge key={`${x}-${i}`} label={x} />) : <Typography variant="body2">—</Typography>}
-                        </Stack>
-                      </Box>
-                    </Stack>
-                  )}
+        <MotionBox
+          id="projects"
+          className="portfolio-section"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <SectionHeading
+            index="03"
+            title="Work"
+            subtitle="Featured projects in a modern portfolio card layout."
+          />
+          {loading ? (
+            <Stack spacing={2}>
+              <Skeleton height={220} />
+              <Skeleton height={220} />
+            </Stack>
+          ) : projects.length ? (
+            <Box className="project-grid">
+              {projects.map((project, idx) => (
+                <ProjectCard key={project?.id ?? idx} project={project} />
+              ))}
+            </Box>
+          ) : (
+            <GlassPanel sx={{ p: 3 }}>
+              <Typography>No projects yet. Add them in Admin → Projects.</Typography>
+            </GlassPanel>
+          )}
+        </MotionBox>
+
+        <MotionBox
+          id="experience"
+          className="portfolio-section"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <SectionHeading
+            index="04"
+            title="Experience"
+            subtitle="Career and internship timeline."
+          />
+          <Stack spacing={2}>
+            {loading ? (
+              <Skeleton height={220} />
+            ) : experience.length ? (
+              experience.map((item, idx) => (
+                <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
+                  <Typography className="timeline-title">
+                    {safeString(item?.role) || "Role"}
+                  </Typography>
+                  <Typography className="timeline-subtitle">
+                    {safeString(item?.company) || "Company"}
+                  </Typography>
+                  <Typography className="timeline-meta">
+                    {safeString(item?.start)}
+                    {safeString(item?.end) ? ` - ${safeString(item?.end)}` : ""}
+                  </Typography>
+                  {safeString(item?.description) ? (
+                    <Typography className="body-copy" sx={{ mt: 1.5 }}>
+                      {safeString(item?.description)}
+                    </Typography>
+                  ) : null}
                 </GlassPanel>
-              </Grid>
-            </Grid>
-          </MotionBox>
+              ))
+            ) : (
+              <GlassPanel sx={{ p: 3 }}>
+                <Typography>No experience added yet.</Typography>
+              </GlassPanel>
+            )}
+          </Stack>
+        </MotionBox>
 
-          <MotionBox
-            id="projects"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.12 }}
-            variants={staggerWrap}
-            sx={{ mt: { xs: 4, md: 6 } }}
-          >
-            <SectionIntro subText="My work" heading="Projects." />
-            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
-              {loading ? (
-                <Stack spacing={2}>
-                  <Skeleton height={140} />
-                  <Skeleton height={140} />
-                </Stack>
-              ) : projects.length ? (
-                <Stack spacing={2}>
-                  {projects.map((p, idx) => (
-                    <ProjectCardOneByOne key={p?.id ?? idx} index={idx + 1} p={p} />
-                  ))}
-                </Stack>
-              ) : (
-                <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                  No projects yet. Add them in Admin → Projects.
-                </Typography>
-              )}
+        <MotionBox
+          id="education"
+          className="portfolio-section"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <SectionHeading
+            index="05"
+            title="Education"
+            subtitle="Academic background and qualifications."
+          />
+          <Stack spacing={2}>
+            {loading ? (
+              <Skeleton height={220} />
+            ) : education.length ? (
+              education.map((item, idx) => (
+                <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
+                  <Typography className="timeline-title">
+                    {safeString(item?.degree) || "Degree"}
+                  </Typography>
+                  <Typography className="timeline-subtitle">
+                    {safeString(item?.institution) || "Institution"}
+                  </Typography>
+                  <Typography className="timeline-meta">{safeString(item?.year) || ""}</Typography>
+                  {safeString(item?.details) ? (
+                    <Typography className="body-copy" sx={{ mt: 1.5 }}>
+                      {safeString(item?.details)}
+                    </Typography>
+                  ) : null}
+                </GlassPanel>
+              ))
+            ) : (
+              <GlassPanel sx={{ p: 3 }}>
+                <Typography>No education added yet.</Typography>
+              </GlassPanel>
+            )}
+          </Stack>
+        </MotionBox>
+
+        <MotionBox
+          id="achievements"
+          className="portfolio-section"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <SectionHeading
+            index="06"
+            title="Achievements"
+            subtitle="Certifications, awards, and recognitions."
+          />
+          <Box className="achievement-grid">
+            {loading ? (
+              <Skeleton height={220} />
+            ) : achievements.length ? (
+              achievements.map((item, idx) => (
+                <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
+                  <Typography className="timeline-title">
+                    {safeString(item?.title) || "Achievement"}
+                  </Typography>
+                  <Typography className="timeline-subtitle">
+                    {safeString(item?.issuer) || ""}
+                  </Typography>
+                  <Typography className="timeline-meta">
+                    {safeString(item?.year) || ""}
+                  </Typography>
+
+                  {safeString(item?.link) ? (
+                    <Button
+                      variant="outlined"
+                      startIcon={<MdLink />}
+                      sx={{ mt: 2, borderRadius: 999, fontWeight: 700 }}
+                      onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}
+                    >
+                      View
+                    </Button>
+                  ) : null}
+                </GlassPanel>
+              ))
+            ) : (
+              <GlassPanel sx={{ p: 3 }}>
+                <Typography>No achievements yet.</Typography>
+              </GlassPanel>
+            )}
+          </Box>
+        </MotionBox>
+
+        <MotionBox
+          id="contact"
+          className="portfolio-section"
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <SectionHeading
+            index="07"
+            title="Contact"
+            subtitle="Let’s build something great together."
+          />
+
+          <Box className="contact-grid">
+            <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
+              <Typography className="timeline-title">Get in touch</Typography>
+
+              <Stack spacing={1.6} sx={{ mt: 2 }}>
+                {contactEmail ? (
+                  <Typography className="contact-line">
+                    <MdEmail style={{ marginRight: 10 }} />
+                    {contactEmail}
+                  </Typography>
+                ) : null}
+
+                {socials?.phone ? (
+                  <Typography className="contact-line">
+                    <MdPhone style={{ marginRight: 10 }} />
+                    {safeString(socials.phone)}
+                  </Typography>
+                ) : null}
+
+                {location ? (
+                  <Typography className="contact-line">
+                    <MdSchool style={{ marginRight: 10 }} />
+                    {location}
+                  </Typography>
+                ) : null}
+              </Stack>
+
+              <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
+                {socials?.github ? (
+                  <Button
+                    variant="outlined"
+                    startIcon={<FaGithub />}
+                    sx={{ borderRadius: 999, fontWeight: 700 }}
+                    onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}
+                  >
+                    GitHub
+                  </Button>
+                ) : null}
+
+                {socials?.linkedin ? (
+                  <Button
+                    variant="outlined"
+                    startIcon={<FaLinkedin />}
+                    sx={{ borderRadius: 999, fontWeight: 700 }}
+                    onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}
+                  >
+                    LinkedIn
+                  </Button>
+                ) : null}
+
+                {socials?.website ? (
+                  <Button
+                    variant="outlined"
+                    startIcon={<MdLink />}
+                    sx={{ borderRadius: 999, fontWeight: 700 }}
+                    onClick={() => window.open(socials.website, "_blank", "noopener,noreferrer")}
+                  >
+                    Website
+                  </Button>
+                ) : null}
+              </Stack>
             </GlassPanel>
-          </MotionBox>
 
-          <MotionBox
-            id="achievements"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.12 }}
-            variants={staggerWrap}
-            sx={{ mt: { xs: 4, md: 6 } }}
-          >
-            <SectionIntro subText="Recognition" heading="Achievements." />
-            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
-              {loading ? (
-                <Skeleton height={160} />
-              ) : achievements.length ? (
-                <Stack spacing={1.4}>
-                  {achievements.map((a, idx) => (
-                    <TimelineCard
-                      key={a?.id ?? idx}
-                      title={safeString(a?.title) || "Achievement"}
-                      subtitle={`${safeString(a?.issuer) ? `${safeString(a?.issuer)}${safeString(a?.year) ? " • " : ""}` : ""}${safeString(a?.year) || ""}`}
-                      description={
-                        safeString(a?.link)
-                          ? `Verification / reference link available below.`
-                          : ""
-                      }
-                    />
-                  ))}
-                  <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap">
-                    {achievements.map((a, idx) =>
-                      safeString(a?.link) ? (
-                        <Button
-                          key={`ach-link-${idx}`}
-                          onClick={() => blobSafeWindowOpen(safeString(a?.link))}
-                          size="small"
-                          variant="outlined"
-                          startIcon={<MdLink />}
-                          sx={{
-                            borderRadius: 999,
-                            fontWeight: 900,
-                            borderColor: "rgba(145,94,255,0.30)",
-                            color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
-                          }}
-                        >
-                          {safeString(a?.title) || `Achievement ${idx + 1}`}
-                        </Button>
-                      ) : null
-                    )}
-                  </Stack>
-                </Stack>
-              ) : (
-                <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                  No achievements yet.
-                </Typography>
-              )}
-            </GlassPanel>
-          </MotionBox>
+            <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
+              <Typography className="timeline-title">Programming Languages</Typography>
 
-          <MotionBox
-            id="experience"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.12 }}
-            variants={staggerWrap}
-            sx={{ mt: { xs: 4, md: 6 } }}
-          >
-            <SectionIntro subText="Where I’ve worked" heading="Experience." />
-            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
               {loading ? (
-                <Skeleton height={180} />
-              ) : experience.length ? (
-                <Stack spacing={1.4}>
-                  {experience.map((e, idx) => (
-                    <TimelineCard
-                      key={e?.id ?? idx}
-                      title={`${safeString(e?.role) || "Role"}${safeString(e?.company) ? ` • ${safeString(e?.company)}` : ""}`}
-                      subtitle={`${safeString(e?.start)}${safeString(e?.end) ? ` – ${safeString(e?.end)}` : ""}`}
-                      description={safeString(e?.description)}
-                    />
-                  ))}
-                </Stack>
-              ) : (
-                <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                  No experience added yet.
-                </Typography>
-              )}
-            </GlassPanel>
-          </MotionBox>
-
-          <MotionBox
-            id="education"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.12 }}
-            variants={staggerWrap}
-            sx={{ mt: { xs: 4, md: 6 } }}
-          >
-            <SectionIntro subText="Learning path" heading="Education." />
-            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
-              {loading ? (
-                <Skeleton height={160} />
-              ) : education.length ? (
-                <Stack spacing={1.4}>
-                  {education.map((e, idx) => (
-                    <TimelineCard
-                      key={e?.id ?? idx}
-                      title={safeString(e?.degree) || "Degree"}
-                      subtitle={`${safeString(e?.institution) ? `${safeString(e?.institution)}${safeString(e?.year) ? " • " : ""}` : ""}${safeString(e?.year) || ""}`}
-                      description={safeString(e?.details)}
-                    />
-                  ))}
-                </Stack>
-              ) : (
-                <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                  No education added yet.
-                </Typography>
-              )}
-            </GlassPanel>
-          </MotionBox>
-
-          <MotionBox
-            id="languages"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.12 }}
-            variants={revealUp}
-            transition={{ duration: 0.45 }}
-            sx={{ mt: { xs: 4, md: 6 } }}
-          >
-            <SectionIntro subText="Language proficiency" heading="Programming Languages Experience." />
-            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
-              {loading ? (
-                <Skeleton height={140} />
+                <Skeleton height={180} sx={{ mt: 2 }} />
               ) : languages.length ? (
-                <TableContainer sx={{ overflowX: "hidden" }}>
-                  <Table size="small" sx={{ tableLayout: "fixed", width: "100%" }}>
+                <TableContainer sx={{ mt: 2 }}>
+                  <Table size="small">
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ fontWeight: 950, width: "34%" }}>Language</TableCell>
-                        <TableCell sx={{ fontWeight: 950, width: "33%" }}>Level</TableCell>
-                        <TableCell sx={{ fontWeight: 950, width: "33%" }}>Experience</TableCell>
+                        <TableCell sx={{ fontWeight: 800 }}>Language</TableCell>
+                        <TableCell sx={{ fontWeight: 800 }}>Level</TableCell>
+                        <TableCell sx={{ fontWeight: 800 }}>Experience</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {languages.map((l, idx) => (
-                        <TableRow
-                          key={l?.id ?? idx}
-                          hover
-                          sx={{
-                            transition: "transform 140ms ease",
-                            "&:hover": { transform: "translateX(2px)" },
-                          }}
-                        >
-                          <TableCell sx={{ fontWeight: 900, opacity: 0.9 }}>
-                            {safeString(l?.language) || "—"}
-                          </TableCell>
-                          <TableCell sx={{ opacity: 0.88 }}>{safeString(l?.level) || "—"}</TableCell>
-                          <TableCell sx={{ opacity: 0.88 }}>
-                            {typeof l?.years === "number" ? `${l.years} yr` : safeString(l?.years) || "—"}
+                      {languages.map((lang, idx) => (
+                        <TableRow key={lang?.id ?? idx}>
+                          <TableCell>{safeString(lang?.language) || "—"}</TableCell>
+                          <TableCell>{safeString(lang?.level) || "—"}</TableCell>
+                          <TableCell>
+                            {typeof lang?.years === "number"
+                              ? `${lang.years} yr`
+                              : safeString(lang?.years) || "—"}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -1612,138 +1051,27 @@ export default function Home({ toggleTheme }) {
                   </Table>
                 </TableContainer>
               ) : (
-                <Typography variant="body2" sx={{ opacity: 0.85 }}>
-                  No language experience added yet.
-                </Typography>
+                <Typography sx={{ mt: 2 }}>No language experience added yet.</Typography>
               )}
             </GlassPanel>
-          </MotionBox>
+          </Box>
+        </MotionBox>
 
-          <MotionBox
-            id="contact"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.12 }}
-            variants={revealUp}
-            transition={{ duration: 0.45 }}
-            sx={{ mt: { xs: 4, md: 6 }, pb: 6 }}
-          >
-            <SectionIntro subText="Get in touch" heading="Contact." />
-            <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
-              {loading ? (
-                <Skeleton height={140} />
-              ) : (
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={7}>
-                    <Stack spacing={1.35}>
-                      {contactEmail ? (
-                        <Typography
-                          sx={{
-                            opacity: 0.92,
-                            cursor: "pointer",
-                            lineHeight: 1.8,
-                            "&:hover": { color: BRAND_PRIMARY },
-                          }}
-                          onClick={() => blobSafeWindowOpen(`mailto:${contactEmail}`)}
-                        >
-                          <MdEmail style={{ marginRight: 8, verticalAlign: "middle" }} />
-                          {contactEmail}
-                        </Typography>
-                      ) : null}
-
-                      {socials?.phone ? (
-                        <Typography
-                          sx={{
-                            opacity: 0.92,
-                            cursor: "pointer",
-                            lineHeight: 1.8,
-                            "&:hover": { color: BRAND_PRIMARY },
-                          }}
-                          onClick={() => blobSafeWindowOpen(`tel:${safeString(socials.phone)}`)}
-                        >
-                          <MdPhone style={{ marginRight: 8, verticalAlign: "middle" }} />
-                          {safeString(socials.phone)}
-                        </Typography>
-                      ) : null}
-
-                      {location ? (
-                        <Typography sx={{ opacity: 0.86, lineHeight: 1.8 }}>
-                          📍 {location}
-                        </Typography>
-                      ) : null}
-
-                      <Typography variant="body2" sx={{ opacity: 0.8, mt: 0.3, lineHeight: 1.8 }}>
-                        I’m open to software engineering, full-stack, backend, frontend, and product-focused development opportunities.
-                      </Typography>
-                    </Stack>
-                  </Grid>
-
-                  <Grid item xs={12} md={5}>
-                    <Stack direction="row" spacing={1} useFlexGap flexWrap="wrap" justifyContent={{ xs: "flex-start", md: "flex-end" }}>
-                      {socials?.github ? (
-                        <Button
-                          onClick={() => blobSafeWindowOpen(socials.github)}
-                          variant="contained"
-                          startIcon={<FaGithub />}
-                          sx={{
-                            borderRadius: 999,
-                            fontWeight: 950,
-                            background: `linear-gradient(135deg, ${BRAND_PRIMARY}, ${BRAND_SECONDARY})`,
-                            color: "#0b0b0e",
-                          }}
-                        >
-                          GitHub
-                        </Button>
-                      ) : null}
-
-                      {socials?.linkedin ? (
-                        <Button
-                          onClick={() => blobSafeWindowOpen(socials.linkedin)}
-                          variant="outlined"
-                          startIcon={<FaLinkedin />}
-                          sx={{
-                            borderRadius: 999,
-                            fontWeight: 950,
-                            color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
-                            borderColor: "rgba(145,94,255,0.30)",
-                          }}
-                        >
-                          LinkedIn
-                        </Button>
-                      ) : null}
-
-                      {socials?.website ? (
-                        <Button
-                          onClick={() => blobSafeWindowOpen(socials.website)}
-                          variant="outlined"
-                          startIcon={<MdLink />}
-                          sx={{
-                            borderRadius: 999,
-                            fontWeight: 950,
-                            color: mode === "dark" ? BRAND_TEXT : "#4f3a87",
-                            borderColor: "rgba(145,94,255,0.30)",
-                          }}
-                        >
-                          Website
-                        </Button>
-                      ) : null}
-                    </Stack>
-                  </Grid>
-                </Grid>
-              )}
-            </GlassPanel>
-          </MotionBox>
+        <Box className="portfolio-footer">
+          <Typography>
+            © {new Date().getFullYear()} {name}. All rights reserved.
+          </Typography>
         </Box>
-
-        <ResumePreviewDialog
-          open={resumePreviewOpen}
-          title={resumePreviewTitle}
-          onClose={closeResumePreview}
-          url={resumeViewUrlBusted}
-          blobUrl={resumePreviewBlobUrl}
-          loading={resumePreviewLoading}
-        />
       </Container>
+
+      <ResumePreviewDialog
+        open={resumePreviewOpen}
+        title={resumePreviewTitle}
+        onClose={closeResumePreview}
+        url={resumeViewUrlBusted}
+        blobUrl={resumePreviewBlobUrl}
+        loading={resumePreviewLoading}
+      />
     </Box>
   );
 }
