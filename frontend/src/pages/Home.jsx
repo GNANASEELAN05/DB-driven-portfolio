@@ -1312,9 +1312,9 @@ export default function Home({ toggleTheme }) {
 
       <VerticalNav items={sectionIds} activeId={activeSection} onJump={jumpTo} />
 
-<Box className="portfolio-shell">
-  <Box className="portfolio-topbar">
-    <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: "auto" }}>
+      <Container maxWidth="xl" className="portfolio-shell">
+        <Box className="portfolio-shell" sx={{ px: { xs: 2, md: 3 }, maxWidth: "100%", width: "100%" }}>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: "auto" }}>
             <Tooltip title="Reload">
               <IconButton onClick={reload} className="topbar-icon-btn">
                 <MdRefresh />
@@ -1340,7 +1340,7 @@ export default function Home({ toggleTheme }) {
             {renderSection()}
           </AnimatePresence>
         </Box>
-</Box>
+      </Container>
 
       <ResumePreviewDialog
         open={resumePreviewOpen}

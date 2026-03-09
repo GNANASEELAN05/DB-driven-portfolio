@@ -963,10 +963,11 @@ table td {
 @media (max-width: 899px) {
   .portfolio-shell {
     padding-top: 10px;
-    padding-right: 16px;
+    padding-right: 16px;  /* sidebar moves to bottom on mobile, no right padding needed */
     padding-left: 16px;
     padding-bottom: calc(var(--side-nav-mobile-space) + 10px);
   }
+
 
   .portfolio-topbar {
     border-radius: 24px;
