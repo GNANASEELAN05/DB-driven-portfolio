@@ -208,17 +208,20 @@ function VerticalNav({ items, activeId, onJump }) {
     <Box className="portfolio-side-nav">
       {items.map((item) => {
         const Icon = item.icon;
+        const isActive = activeId === item.id;
         return (
           <button
             key={item.id}
             type="button"
-            className={`portfolio-side-nav-item ${activeId === item.id ? "active" : ""}`}
+            className={`portfolio-side-nav-item ${isActive ? "active" : ""}`}
             onClick={() => onJump(item.id)}
             aria-label={item.label}
             title={item.label}
           >
-            <span className="icon-wrap">
-              <Icon />
+            <span className="icon-bubble">
+              <span className="icon-inner">
+                <Icon />
+              </span>
             </span>
             <span className="label">{item.label}</span>
           </button>
@@ -247,10 +250,10 @@ function HeroActionButton({ children, ...props }) {
   );
 }
 
+// FIX: SectionHeading — removed the duplicate small colored kicker title
 function SectionHeading({ title, subtitle }) {
   return (
     <Stack spacing={1.1} sx={{ mb: 3 }}>
-      <Typography className="section-kicker">{title}</Typography>
       <Typography className="section-title">{title}</Typography>
       {subtitle ? <Typography className="section-subtitle">{subtitle}</Typography> : null}
     </Stack>
@@ -265,7 +268,20 @@ function GlassPanel({ children, sx, className = "" }) {
   );
 }
 
-function MiniOrbitBadge() {
+// FIX: MiniOrbitBadge — show initials instead of "MY PROJECTS"
+function MiniOrbitBadge({ name }) {
+  // Get initials from name
+  const initials = safeString(name)
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join("");
+
+  const spinText = initials
+    ? `${initials} • ${initials} • ${initials} • ${initials} •`
+    : "• • • • • • • • • •";
+
   return (
     <Box className="hero-name-spinner-badge" aria-hidden="true">
       <svg viewBox="0 0 120 120" className="hero-name-spinner-svg">
@@ -282,7 +298,7 @@ function MiniOrbitBadge() {
         <circle className="hero-name-spinner-ring" cx="60" cy="60" r="42" />
         <text className="hero-name-spinner-text">
           <textPath href="#miniOrbitPath" startOffset="0%">
-            MY PROJECTS • MY PROJECTS •
+            {spinText}
           </textPath>
         </text>
         <text x="60" y="68" textAnchor="middle" className="hero-name-spinner-arrow">
@@ -293,6 +309,7 @@ function MiniOrbitBadge() {
   );
 }
 
+// FIX: ProjectCard — removed "Featured Project" label
 function ProjectCard({ project }) {
   const title = safeString(project?.title) || "Untitled Project";
   const description = safeString(project?.description);
@@ -302,10 +319,6 @@ function ProjectCard({ project }) {
 
   return (
     <MotionPaper variants={fadeUp} className="project-card" whileHover={{ y: -8 }}>
-      <Box className="project-card-topline">
-        <Typography className="project-mini-label">Featured Project</Typography>
-      </Box>
-
       <Typography className="project-title">{title}</Typography>
 
       <Typography className="project-description">
@@ -458,6 +471,7 @@ export default function Home({ toggleTheme }) {
     return map;
   }, [sectionIds]);
 
+  // FIX: name preserves original casing from admin (no text-transform: uppercase applied to the value)
   const name = safeString(profile?.name) || "Your Name";
   const title = safeString(profile?.title) || "Full Stack Developer";
   const tagline = safeString(profile?.tagline) || "Transforming Ideas Into Digital Reality";
@@ -693,18 +707,21 @@ export default function Home({ toggleTheme }) {
                 <Box className="hero-layout hero-layout-single">
                   <Box className="hero-left hero-left-expanded">
                     <MotionBox variants={fadeUp}>
+                      {/* FIX: hero-name-row with spinner sized to cover the 4 meta lines */}
                       <Box className="hero-name-row">
-                        <MiniOrbitBadge />
-                        <Typography className="hero-name">{name}</Typography>
+                        <MiniOrbitBadge name={name} />
+                        <Box className="hero-name-text-block">
+                          {/* FIX: name uses hero-name-display (no uppercase transform) */}
+                          <Typography className="hero-name hero-name-display">{name}</Typography>
+                          <Stack spacing={0.8} className="hero-meta-stack">
+                            <Typography className="hero-role-line">{title}</Typography>
+                            {location ? <Typography className="hero-detail-line">📍 {location}</Typography> : null}
+                            {contactEmail ? (
+                              <Typography className="hero-detail-line">✉️ {contactEmail}</Typography>
+                            ) : null}
+                          </Stack>
+                        </Box>
                       </Box>
-
-                      <Stack spacing={0.8} className="hero-meta-stack">
-                        <Typography className="hero-role-line">{title}</Typography>
-                        {location ? <Typography className="hero-detail-line">📍 {location}</Typography> : null}
-                        {contactEmail ? (
-                          <Typography className="hero-detail-line">✉️ {contactEmail}</Typography>
-                        ) : null}
-                      </Stack>
 
                       <Typography className="hero-title">{tagline}</Typography>
 
@@ -737,6 +754,7 @@ export default function Home({ toggleTheme }) {
                         </HeroActionButton>
                       </Stack>
 
+                      {/* FIX: social icons are always shown (they were removed from index.css unintentionally) */}
                       <Stack direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
                         {socials?.github ? (
                           <IconButton
@@ -779,6 +797,17 @@ export default function Home({ toggleTheme }) {
                             }
                           >
                             <MdPhone />
+                          </IconButton>
+                        ) : null}
+
+                        {socials?.website ? (
+                          <IconButton
+                            className="hero-social-btn"
+                            onClick={() =>
+                              window.open(safeString(socials.website), "_blank", "noopener,noreferrer")
+                            }
+                          >
+                            <MdLink />
                           </IconButton>
                         ) : null}
                       </Stack>
@@ -1061,7 +1090,7 @@ export default function Home({ toggleTheme }) {
           >
             <Box className="section-scroll-area">
               <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Contact" subtitle="Let’s build something great together." />
+                <SectionHeading title="Contact" subtitle="Let's build something great together." />
 
                 <Box className="contact-grid">
                   <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
@@ -1187,11 +1216,14 @@ export default function Home({ toggleTheme }) {
         <span className="portfolio-grid" />
         <span className="portfolio-grid-glow" />
         <span className="portfolio-mesh-lines" />
+        {/* FIX: Web-like network structure canvas */}
+        <NetworkCanvas mode={mode} />
       </Box>
 
       <VerticalNav items={sectionIds} activeId={activeSection} onJump={jumpTo} />
 
       <Container maxWidth="xl" className="portfolio-shell">
+        {/* FIX: topbar padding-top removed (was causing top space), now flush to top */}
         <Box className="portfolio-topbar">
           <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: "auto" }}>
             <Tooltip title="Reload">
@@ -1230,5 +1262,116 @@ export default function Home({ toggleTheme }) {
         loading={resumePreviewLoading}
       />
     </Box>
+  );
+}
+
+// FIX: Canvas-based web/network structure background (like the reference image)
+function NetworkCanvas({ mode }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    let animationId;
+    let nodes = [];
+    const NODE_COUNT = 55;
+    const MAX_DIST = 160;
+
+    const isDark = mode === "dark";
+    const nodeColor = isDark ? "rgba(255,255,255,0.55)" : "rgba(17,24,39,0.45)";
+    const lineColor = isDark ? "rgba(255,255,255,0.09)" : "rgba(17,24,39,0.08)";
+    const accentNodeColor = "rgba(241,48,36,0.7)";
+    const accentLineColor = isDark ? "rgba(241,48,36,0.18)" : "rgba(241,48,36,0.12)";
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+
+    const initNodes = () => {
+      nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.38,
+        vy: (Math.random() - 0.5) * 0.38,
+        r: Math.random() * 2.2 + 1.2,
+        accent: i < 6,
+      }));
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Update positions
+      nodes.forEach((n) => {
+        n.x += n.vx;
+        n.y += n.vy;
+        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+      });
+
+      // Draw lines
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < MAX_DIST) {
+            const alpha = 1 - dist / MAX_DIST;
+            const isAccent = nodes[i].accent || nodes[j].accent;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            if (isAccent) {
+              ctx.strokeStyle = accentLineColor.replace("0.18", `${0.18 * alpha}`).replace("0.12", `${0.12 * alpha}`);
+            } else {
+              ctx.strokeStyle = lineColor.replace("0.09", `${0.09 * alpha}`).replace("0.08", `${0.08 * alpha}`);
+            }
+            ctx.lineWidth = isAccent ? 1.1 : 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Draw nodes
+      nodes.forEach((n) => {
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+        ctx.fillStyle = n.accent ? accentNodeColor : nodeColor;
+        ctx.fill();
+      });
+
+      animationId = requestAnimationFrame(draw);
+    };
+
+    resize();
+    initNodes();
+    draw();
+
+    window.addEventListener("resize", () => {
+      resize();
+      initNodes();
+    });
+
+    return () => {
+      cancelAnimationFrame(animationId);
+    };
+  }, [mode]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "absolute",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 0,
+        opacity: 0.7,
+      }}
+    />
   );
 }
