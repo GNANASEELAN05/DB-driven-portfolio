@@ -291,7 +291,11 @@ button { font-family: inherit; }
 
 .section-scroll-area::-webkit-scrollbar { width: 0; height: 0; }
 
-.home-scroll-area { overflow-y: auto; }
+.home-scroll-area { overflow-y: hidden; }
+
+@media (max-width: 899px) {
+  .home-scroll-area { overflow-y: auto; }
+}
 
 .portfolio-section {
   min-height: 100%;
