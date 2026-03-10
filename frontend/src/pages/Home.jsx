@@ -277,53 +277,27 @@ function ProfilePhotoCard() {
 }
 
 // =============================================
-// LUXURY SPINNER — clean rings, dots only, initials in center
+// BLACK HOLE BADGE — replaces MiniOrbitBadge spinner
+// Sits to the LEFT of the name and three text lines (role, location, email)
+// Uses CSS classes from index.css: hero-blackhole-badge, bh-photon-ring,
+// bh-initials, bh-gravity-haze and keyframes bhDiskSpin, bhPhotonSpin,
+// bhCorePulse, bhGravityPulse
 // =============================================
-function MiniOrbitBadge({ initials, name }) {
+function BlackholeBadge({ initials, name }) {
   const resolvedInitials =
     safeString(initials).trim() ||
     safeString(name).split(" ").filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
 
   return (
-    <Box className="hero-name-spinner-badge" aria-hidden="true">
-      <svg viewBox="0 0 120 120" className="hero-name-spinner-svg">
-        <defs>
-          <path id="miniOrbitPath" d="M60,60 m-43,0 a43,43 0 1,1 86,0 a43,43 0 1,1 -86,0" />
-          <linearGradient id="spinnerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#f13024" />
-            <stop offset="50%" stopColor="#f97316" />
-            <stop offset="100%" stopColor="#fbbf24" />
-          </linearGradient>
-          <linearGradient id="spinnerGoldRing" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="rgba(251,191,36,0.5)" />
-            <stop offset="100%" stopColor="rgba(241,48,36,0.35)" />
-          </linearGradient>
-          <filter id="spinnerGlow">
-            <feGaussianBlur stdDeviation="1.5" result="blur" />
-            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
-          </filter>
-          <radialGradient id="centerFill" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(241,48,36,0.12)" />
-            <stop offset="100%" stopColor="rgba(0,0,0,0.0)" />
-          </radialGradient>
-        </defs>
-        <circle cx="60" cy="60" r="56" fill="none" stroke="url(#spinnerGoldRing)" strokeWidth="0.6" strokeDasharray="1.5 5" />
-        <circle className="hero-name-spinner-ring" cx="60" cy="60" r="49" />
-        <text className="hero-name-spinner-text">
-          <textPath href="#miniOrbitPath" startOffset="0%">· · · · · · · · · · · · · ·</textPath>
-        </text>
-        <circle className="hero-name-spinner-ring-inner" cx="60" cy="60" r="34" />
-        <circle cx="60" cy="60" r="32" fill="url(#centerFill)" />
-        <text
-          x="60" y="67"
-          textAnchor="middle"
-          className="hero-name-spinner-center-initials"
-          fill="url(#spinnerGradient)"
-          filter="url(#spinnerGlow)"
-        >
-          {resolvedInitials || "?"}
-        </text>
-      </svg>
+    <Box className="hero-blackhole-badge" aria-hidden="true">
+      {/* Gravitational lensing haze — outermost glow, z-index 1 */}
+      <Box className="bh-gravity-haze" />
+      {/* Accretion disk rendered via ::after pseudo-element, z-index 2 */}
+      {/* Dark gravitational core rendered via ::before pseudo-element, z-index 3 */}
+      {/* Photon ring — spinning arc around the core, z-index 4 */}
+      <Box className="bh-photon-ring" />
+      {/* Glowing initials — centred on top of everything, z-index 5 */}
+      <Box className="bh-initials">{resolvedInitials || "?"}</Box>
     </Box>
   );
 }
@@ -609,7 +583,8 @@ export default function Home({ toggleTheme }) {
                   <Box className="hero-left hero-left-expanded">
                     <MotionBox variants={fadeUp}>
                       <Box className="hero-name-row">
-                        <MiniOrbitBadge initials={profileInitials} name={name} />
+                        {/* BLACK HOLE BADGE — left side of name and three text lines */}
+                        <BlackholeBadge initials={profileInitials} name={name} />
                         <Box className="hero-name-text-block">
                           <Typography className="hero-name hero-name-display">{name}</Typography>
                           <Stack spacing={0.8} className="hero-meta-stack">

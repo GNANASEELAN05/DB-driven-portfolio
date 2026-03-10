@@ -498,7 +498,7 @@ button { font-family: inherit; }
 }
 
 /* ==============================================
-   HERO NAME ROW — spinner badge + name/meta
+   HERO NAME ROW — black hole badge + name/meta
    ============================================== */
 .hero-name-row {
   display: flex;
@@ -508,68 +508,122 @@ button { font-family: inherit; }
 }
 
 /* ==============================================
-   LUXURY SPINNER — clean, dots only, initials center
+   BLACK HOLE BADGE — spinning black hole wheel
+   Sits LEFT of the name and three text lines
    ============================================== */
-.hero-name-spinner-badge {
-  width: clamp(90px, 9vw, 110px);
-  height: clamp(90px, 9vw, 110px);
+.hero-blackhole-badge {
+  width: clamp(100px, 10vw, 124px);
+  height: clamp(100px, 10vw, 124px);
   flex: 0 0 auto;
-  animation: heroBadgeSpin 28s linear infinite;
-  transform-origin: center;
-  filter: drop-shadow(0 0 14px rgba(241, 48, 36, 0.28));
   align-self: center;
+  position: relative;
+  border-radius: 50%;
 }
 
-.hero-name-spinner-svg {
-  width: 100%;
-  height: 100%;
-  display: block;
-  overflow: visible;
+/* Dark gravitational core */
+.hero-blackhole-badge::before {
+  content: "";
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 38%, #1a0a0a 0%, #000000 55%, transparent 100%);
+  box-shadow: 0 0 0 2px rgba(241,48,36,0.18), 0 0 18px 6px rgba(0,0,0,0.9), 0 0 40px 14px rgba(0,0,0,0.7);
+  z-index: 3;
+  animation: bhCorePulse 5s ease-in-out infinite;
 }
 
-.hero-name-spinner-ring {
-  fill: transparent;
-  stroke: url(#spinnerGradient);
-  stroke-width: 1.2;
-  stroke-dasharray: 2 6;
-  stroke-linecap: round;
-  opacity: 0.9;
+/* Accretion disk */
+.hero-blackhole-badge::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%, rgba(241,48,36,0.08) 8%,
+    rgba(249,115,22,0.55) 18%, rgba(255,200,80,0.75) 25%,
+    rgba(249,115,22,0.55) 32%, rgba(241,48,36,0.08) 42%,
+    transparent 55%, rgba(241,48,36,0.04) 70%,
+    rgba(249,115,22,0.2) 80%, rgba(241,48,36,0.04) 90%,
+    transparent 100%
+  );
+  animation: bhDiskSpin 6s linear infinite;
+  z-index: 2;
+  filter: blur(1.5px);
+  mask-image: radial-gradient(circle at center, transparent 30%, black 48%, black 60%, transparent 75%);
+  -webkit-mask-image: radial-gradient(circle at center, transparent 30%, black 48%, black 60%, transparent 75%);
 }
 
-.mode-light .hero-name-spinner-ring { opacity: 0.8; }
-
-.hero-name-spinner-ring-inner {
-  fill: transparent;
-  stroke-width: 0.6;
-  animation: heroBadgeSpinReverse 18s linear infinite;
+/* Photon ring */
+.bh-photon-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 90deg,
+    rgba(241,48,36,0.0) 0%, rgba(249,115,22,0.7) 20%,
+    rgba(255,220,100,0.9) 35%, rgba(249,115,22,0.5) 50%,
+    rgba(241,48,36,0.0) 65%, rgba(241,48,36,0.3) 85%,
+    rgba(241,48,36,0.0) 100%
+  );
+  border: 1.5px solid transparent;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: destination-out;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  animation: bhPhotonSpin 3.5s linear infinite;
+  z-index: 4;
+  filter: blur(0.5px);
 }
 
-.mode-dark .hero-name-spinner-ring-inner { stroke: rgba(255, 255, 255, 0.1); }
-.mode-light .hero-name-spinner-ring-inner { stroke: rgba(17, 24, 39, 0.12); }
-
-.hero-name-spinner-text {
-  font-size: 9px;
-  font-weight: 400;
-  letter-spacing: 5px;
-  fill: rgba(241, 48, 36, 0.55);
-}
-
-.mode-light .hero-name-spinner-text { fill: rgba(241, 48, 36, 0.5); }
-
-.hero-name-spinner-center-initials {
+/* Glowing initials */
+.bh-initials {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
   font-size: 22px;
   font-weight: 900;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
+  color: rgba(255,255,255,0.92);
+  text-shadow: 0 0 12px rgba(241,48,36,0.9), 0 0 28px rgba(249,115,22,0.6), 0 0 2px rgba(255,255,255,0.8);
 }
 
-@keyframes heroBadgeSpin {
+/* Gravitational lensing haze */
+.bh-gravity-haze {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background: radial-gradient(circle at center,
+    transparent 42%, rgba(241,48,36,0.06) 52%,
+    rgba(241,48,36,0.12) 58%, rgba(241,48,36,0.04) 65%,
+    transparent 75%
+  );
+  animation: bhGravityPulse 7s ease-in-out infinite;
+  z-index: 1;
+  pointer-events: none;
+}
+
+@keyframes bhDiskSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
 
-@keyframes heroBadgeSpinReverse {
+@keyframes bhPhotonSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(-360deg); }
+}
+
+@keyframes bhCorePulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(241,48,36,0.18), 0 0 18px 6px rgba(0,0,0,0.9), 0 0 40px 14px rgba(0,0,0,0.7); }
+  50% { box-shadow: 0 0 0 3px rgba(241,48,36,0.35), 0 0 24px 8px rgba(0,0,0,0.95), 0 0 52px 18px rgba(0,0,0,0.75); }
+}
+
+@keyframes bhGravityPulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.06); }
 }
 
 .hero-name-text-block {
@@ -967,8 +1021,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
     margin-right: auto;
   }
 
-  .hero-section .hero-name-row { justify-content: center; flex-wrap: wrap; }
-  .hero-section .hero-name-text-block { align-items: center; }
+  .hero-section .hero-name-row { justify-content: center; flex-wrap: wrap; flex-direction: column; align-items: center; }
+  .hero-section .hero-name-text-block { align-items: center; width: 100%; text-align: center; }
   .hero-section .hero-meta-stack { align-items: center; }
   .hero-section .hero-detail-line { justify-content: center; }
 
@@ -1000,7 +1054,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .portfolio-side-nav-item { width: 36px; height: 36px; flex: 0 0 auto; }
   .hero-name-row { margin-bottom: 10px; }
   .hero-name-display { font-size: clamp(1.25rem, 5vw, 1.55rem) !important; }
-  .hero-name-spinner-badge { width: 72px; height: 72px; }
+  .hero-blackhole-badge { width: 80px; height: 80px; }
+  .bh-initials { font-size: 18px; }
   .segmented-meter { grid-template-columns: 1fr; }
   .segment { height: 34px; }
 
