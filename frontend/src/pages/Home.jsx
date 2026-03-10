@@ -61,7 +61,6 @@ import {
   viewResumeUrl,
 } from "../api/portfolio";
 
-// ---- Profile photos ----
 import AnimatedPhoto from "../assets/Animated_Prof_Photo.png";
 import OriginalPhoto from "../assets/Proffessional_Gnanaseelan_V_Photo.png";
 
@@ -212,11 +211,11 @@ function GlassPanel({ children, sx, className = "" }) {
 }
 
 // =============================================
-// PROFILE PHOTO — Full bleed, no box/card
-// - Shows animated photo by default
-// - Hover → reveals "See Original" button
-// - Click → crossfades to original photo (no timer hint)
-// - Auto-reverts to animated after 20 seconds
+// PROFILE PHOTO — Large full-bleed, blends into bg
+// FIXED:
+//  - "See Original" button: ONLY shows on hover (hidden by default)
+//  - NO timer hint text shown anywhere
+//  - Click shows original, click again reverts, auto-reverts after 20s
 // =============================================
 function ProfilePhotoCard() {
   const [showOriginal, setShowOriginal] = useState(false);
@@ -225,7 +224,6 @@ function ProfilePhotoCard() {
 
   const handleClick = () => {
     if (showOriginal) {
-      // clicking again reverts
       setShowOriginal(false);
       clearTimeout(timerRef.current);
       return;
@@ -260,13 +258,13 @@ function ProfilePhotoCard() {
         <img src={OriginalPhoto} alt="Original profile" className="profile-photo-img profile-photo-original" />
       </Box>
 
-      {/* "See Original" button — only visible on hover when animated is showing */}
+      {/* "See Original" button — ONLY visible on hover when animated is showing. NO timer hint anywhere. */}
       <Box
         className="profile-photo-btn-wrap"
         style={{
           opacity: (hovered && !showOriginal) ? 1 : 0,
           pointerEvents: (hovered && !showOriginal) ? "auto" : "none",
-          transition: "opacity 0.25s ease"
+          transition: "opacity 0.22s ease",
         }}
       >
         <Box className="profile-photo-reveal-btn">
@@ -279,16 +277,12 @@ function ProfilePhotoCard() {
 }
 
 // =============================================
-// LUXURY SPINNER BADGE — clean, no sparkles
-// Only initials in center, no outer text ring initials
+// LUXURY SPINNER — clean rings, dots only, initials in center
 // =============================================
 function MiniOrbitBadge({ initials, name }) {
   const resolvedInitials =
     safeString(initials).trim() ||
     safeString(name).split(" ").filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
-
-  // Spinning ring text — dots only, no initials in outer ring
-  const spinText = "· · · · · · · · · · · · · ·";
 
   return (
     <Box className="hero-name-spinner-badge" aria-hidden="true">
@@ -313,28 +307,15 @@ function MiniOrbitBadge({ initials, name }) {
             <stop offset="100%" stopColor="rgba(0,0,0,0.0)" />
           </radialGradient>
         </defs>
-
-        {/* Outer dashed decorative ring */}
         <circle cx="60" cy="60" r="56" fill="none" stroke="url(#spinnerGoldRing)" strokeWidth="0.6" strokeDasharray="1.5 5" />
-
-        {/* Main spinning ring */}
         <circle className="hero-name-spinner-ring" cx="60" cy="60" r="49" />
-
-        {/* Spinning dot text on path */}
         <text className="hero-name-spinner-text">
-          <textPath href="#miniOrbitPath" startOffset="0%">{spinText}</textPath>
+          <textPath href="#miniOrbitPath" startOffset="0%">· · · · · · · · · · · · · ·</textPath>
         </text>
-
-        {/* Inner ring */}
         <circle className="hero-name-spinner-ring-inner" cx="60" cy="60" r="34" />
-
-        {/* Center glow fill */}
         <circle cx="60" cy="60" r="32" fill="url(#centerFill)" />
-
-        {/* Center initials — ONLY here, nowhere else */}
         <text
-          x="60"
-          y="67"
+          x="60" y="67"
           textAnchor="middle"
           className="hero-name-spinner-center-initials"
           fill="url(#spinnerGradient)"
@@ -622,8 +603,6 @@ export default function Home({ toggleTheme }) {
             initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
             <Box className="section-scroll-area home-scroll-area">
               <MotionBox className="portfolio-section hero-section" initial="hidden" animate="show" variants={fadeUp}>
-
-                {/* TWO-COLUMN layout: left = content, right = photo */}
                 <Box className="hero-layout hero-layout-two-col">
 
                   {/* LEFT COLUMN */}
@@ -635,8 +614,16 @@ export default function Home({ toggleTheme }) {
                           <Typography className="hero-name hero-name-display">{name}</Typography>
                           <Stack spacing={0.8} className="hero-meta-stack">
                             <Typography className="hero-role-line">{title}</Typography>
-                            {location ? <Typography className="hero-detail-line"><MdLocationOn style={{ marginRight: 5, flexShrink: 0 }} />{location}</Typography> : null}
-                            {contactEmail ? <Typography className="hero-detail-line"><MdEmail style={{ marginRight: 5, flexShrink: 0 }} />{contactEmail}</Typography> : null}
+                            {location ? (
+                              <Typography className="hero-detail-line">
+                                <MdLocationOn style={{ marginRight: 5, flexShrink: 0 }} />{location}
+                              </Typography>
+                            ) : null}
+                            {contactEmail ? (
+                              <Typography className="hero-detail-line">
+                                <MdEmail style={{ marginRight: 5, flexShrink: 0 }} />{contactEmail}
+                              </Typography>
+                            ) : null}
                           </Stack>
                         </Box>
                       </Box>
@@ -656,7 +643,7 @@ export default function Home({ toggleTheme }) {
                         </HeroActionButton>
                       </Stack>
 
-                      <Stack className="hero-social-row" direction="row" spacing={1.2} sx={{ mt: 4, flexWrap: "wrap" }}>
+                      <Stack className="hero-social-row" direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
                         {socials?.github ? (
                           <IconButton className="hero-social-btn" onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}><FaGithub /></IconButton>
                         ) : null}
@@ -676,7 +663,7 @@ export default function Home({ toggleTheme }) {
                     </MotionBox>
                   </Box>
 
-                  {/* RIGHT COLUMN — Profile photo, full bleed no card */}
+                  {/* RIGHT COLUMN — large blended photo, fills full column height */}
                   <Box className="hero-right">
                     <ProfilePhotoCard />
                   </Box>
@@ -877,7 +864,7 @@ export default function Home({ toggleTheme }) {
                   <Stack spacing={1.6} sx={{ mt: 2 }}>
                     {contactEmail ? <Typography className="contact-line"><MdEmail style={{ marginRight: 10 }} />{contactEmail}</Typography> : null}
                     {socials?.phone ? <Typography className="contact-line"><MdPhone style={{ marginRight: 10 }} />{safeString(socials.phone)}</Typography> : null}
-                    {location ? <Typography className="contact-line"><MdSchool style={{ marginRight: 10 }} />{location}</Typography> : null}
+                    {location ? <Typography className="contact-line"><MdLocationOn style={{ marginRight: 10 }} />{location}</Typography> : null}
                   </Stack>
                   <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
                     {socials?.github ? (

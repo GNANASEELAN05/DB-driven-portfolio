@@ -202,16 +202,22 @@ button { font-family: inherit; }
   50% { transform: translate3d(0, -18px, 0) scale(1.06); }
 }
 
+/* ==============================================
+   SHELL — right padding accounts for side nav (60px wide + 16px gap each side = ~92px)
+   Bottom padding ensures social icons are NEVER cut off
+   ============================================== */
 .portfolio-shell {
   position: relative;
   z-index: 2;
   height: 100vh;
   padding-top: 10px;
-  padding-bottom: 32px;
+  /* FIXED: enough bottom padding so social icons are fully visible */
+  padding-bottom: 48px;
   display: flex;
   flex-direction: column;
   padding-left: 24px;
-  padding-right: 68px;
+  /* FIXED: side nav is 60px + 16px from right edge = 76px, add 16px buffer = 92px */
+  padding-right: 92px;
 }
 
 .portfolio-topbar {
@@ -291,6 +297,7 @@ button { font-family: inherit; }
 
 .section-scroll-area::-webkit-scrollbar { width: 0; height: 0; }
 
+/* Home section does NOT scroll — photo fills the full height */
 .home-scroll-area { overflow-y: hidden; }
 
 @media (max-width: 899px) {
@@ -311,22 +318,26 @@ button { font-family: inherit; }
   min-height: 100%;
 }
 
-.hero-section { padding-top: 4px; }
+.hero-section { padding-top: 4px; padding-bottom: 0; }
 
-/* =============================================
+/* ==============================================
    HERO TWO-COLUMN LAYOUT
-   ============================================= */
+   Left: all text content
+   Right: large blended photo — fills full height
+   ============================================== */
 .hero-layout {
   display: grid;
   gap: 0;
-  align-items: center;
+  align-items: stretch;
 }
 
-/* Left gets free space, right is the photo column */
+/* Left takes free space; right column is fixed width for the photo */
 .hero-layout-two-col {
-  grid-template-columns: 1fr 340px;
+  grid-template-columns: 1fr 360px;
   align-items: stretch;
-  min-height: calc(100vh - 120px);
+  /* Fill available height so photo can be tall */
+  height: calc(100vh - 120px);
+  max-height: calc(100vh - 120px);
 }
 
 .hero-layout-single {
@@ -339,35 +350,35 @@ button { font-family: inherit; }
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-right: 24px;
+  padding-right: 28px;
+  /* Ensure content does not overflow vertically */
+  overflow: hidden;
 }
 
-/* RIGHT COLUMN — full bleed photo, no card/box */
+/* RIGHT COLUMN — full bleed photo fills entire height, no card */
 .hero-right {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   justify-content: center;
+  /* Clip so photo never bleeds outside column */
   overflow: hidden;
-  /* Clip so image never bleeds outside the column */
-  clip-path: inset(0 0 0 0);
 }
 
-/* =============================================
-   PROFILE PHOTO — Full bleed, no box/card/border
-   Blends into background just like the reference
-   ============================================= */
+/* ==============================================
+   PROFILE PHOTO — Large, full-column, blends into bg
+   No border-radius, no box, no background color
+   ============================================== */
 .profile-photo-wrap {
   position: relative;
   width: 100%;
   height: 100%;
-  min-height: 480px;
   cursor: pointer;
   /* NO border-radius, NO box-shadow, NO background */
-  overflow: visible;
+  overflow: hidden;
 }
 
-/* Each layer fills the full column */
+/* Each layer: absolute, fills full wrap */
 .profile-photo-layer {
   position: absolute;
   inset: 0;
@@ -376,65 +387,67 @@ button { font-family: inherit; }
   justify-content: center;
 }
 
-/* Image fills full height, blends into background */
+/* Animated photo: lighten blend fades dark PNG bg into portfolio bg */
 .profile-photo-img {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  object-position: bottom center;
+  object-fit: cover;
+  object-position: top center;
   display: block;
-  /* Key: lighten blends the dark bg of the PNG transparent */
   mix-blend-mode: lighten;
-  /* Fade out at bottom to blend with page */
+  /* Fade bottom edge into bg */
   mask-image: linear-gradient(
     to bottom,
     black 0%,
-    black 65%,
-    rgba(0,0,0,0.7) 80%,
-    rgba(0,0,0,0.2) 92%,
+    black 55%,
+    rgba(0,0,0,0.75) 72%,
+    rgba(0,0,0,0.25) 88%,
     transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to bottom,
     black 0%,
-    black 65%,
-    rgba(0,0,0,0.7) 80%,
-    rgba(0,0,0,0.2) 92%,
+    black 55%,
+    rgba(0,0,0,0.75) 72%,
+    rgba(0,0,0,0.25) 88%,
     transparent 100%
   );
   user-select: none;
   pointer-events: none;
 }
 
-/* Original photo — normal blend mode, still fade bottom */
+/* Original photo: normal blend, still fade bottom */
 .profile-photo-original {
   mix-blend-mode: normal;
   mask-image: linear-gradient(
     to bottom,
     black 0%,
-    black 60%,
-    rgba(0,0,0,0.75) 76%,
-    rgba(0,0,0,0.25) 90%,
+    black 50%,
+    rgba(0,0,0,0.78) 68%,
+    rgba(0,0,0,0.28) 86%,
     transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to bottom,
     black 0%,
-    black 60%,
-    rgba(0,0,0,0.75) 76%,
-    rgba(0,0,0,0.25) 90%,
+    black 50%,
+    rgba(0,0,0,0.78) 68%,
+    rgba(0,0,0,0.28) 86%,
     transparent 100%
   );
 }
 
-/* "See Original" button — only visible on hover */
+/* "See Original" button:
+   - opacity is controlled by JS (hovered && !showOriginal)
+   - never visible by default
+   - transition is smooth */
 .profile-photo-btn-wrap {
   position: absolute;
-  bottom: 28px;
+  bottom: 32px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
-  pointer-events: auto;
+  white-space: nowrap;
 }
 
 .profile-photo-reveal-btn {
@@ -463,7 +476,9 @@ button { font-family: inherit; }
   box-shadow: 0 12px 36px rgba(249, 115, 22, 0.45);
 }
 
-/* hero-name-row — spinner + name+meta side by side */
+/* ==============================================
+   HERO NAME ROW — spinner badge + name/meta
+   ============================================== */
 .hero-name-row {
   display: flex;
   align-items: flex-start;
@@ -471,9 +486,9 @@ button { font-family: inherit; }
   margin-bottom: 14px;
 }
 
-/* =============================================
-   LUXURY SPINNER — clean rings, no sparkles
-   ============================================= */
+/* ==============================================
+   LUXURY SPINNER — clean, dots only, initials center
+   ============================================== */
 .hero-name-spinner-badge {
   width: clamp(90px, 9vw, 110px);
   height: clamp(90px, 9vw, 110px);
@@ -491,7 +506,6 @@ button { font-family: inherit; }
   overflow: visible;
 }
 
-/* Main rotating ring — elegant dashed */
 .hero-name-spinner-ring {
   fill: transparent;
   stroke: url(#spinnerGradient);
@@ -501,26 +515,17 @@ button { font-family: inherit; }
   opacity: 0.9;
 }
 
-.mode-light .hero-name-spinner-ring {
-  opacity: 0.8;
-}
+.mode-light .hero-name-spinner-ring { opacity: 0.8; }
 
-/* Inner subtle ring */
 .hero-name-spinner-ring-inner {
   fill: transparent;
   stroke-width: 0.6;
   animation: heroBadgeSpinReverse 18s linear infinite;
 }
 
-.mode-dark .hero-name-spinner-ring-inner {
-  stroke: rgba(255, 255, 255, 0.1);
-}
+.mode-dark .hero-name-spinner-ring-inner { stroke: rgba(255, 255, 255, 0.1); }
+.mode-light .hero-name-spinner-ring-inner { stroke: rgba(17, 24, 39, 0.12); }
 
-.mode-light .hero-name-spinner-ring-inner {
-  stroke: rgba(17, 24, 39, 0.12);
-}
-
-/* Spinning dots on path */
 .hero-name-spinner-text {
   font-size: 9px;
   font-weight: 400;
@@ -528,11 +533,8 @@ button { font-family: inherit; }
   fill: rgba(241, 48, 36, 0.55);
 }
 
-.mode-light .hero-name-spinner-text {
-  fill: rgba(241, 48, 36, 0.5);
-}
+.mode-light .hero-name-spinner-text { fill: rgba(241, 48, 36, 0.5); }
 
-/* Center initials — only element, large and prominent */
 .hero-name-spinner-center-initials {
   font-size: 22px;
   font-weight: 900;
@@ -580,18 +582,18 @@ button { font-family: inherit; }
 }
 
 .hero-title {
-  font-size: clamp(2.6rem, 5vw, 4.8rem) !important;
+  font-size: clamp(2.4rem, 5vw, 4.6rem) !important;
   font-weight: 900 !important;
   line-height: 1.02 !important;
   letter-spacing: -0.04em;
-  max-width: 680px;
+  max-width: 640px;
 }
 
 .hero-description {
-  max-width: 620px;
-  margin-top: 20px !important;
-  font-size: 1rem !important;
-  line-height: 1.95 !important;
+  max-width: 600px;
+  margin-top: 16px !important;
+  font-size: 0.97rem !important;
+  line-height: 1.9 !important;
   opacity: 0.78;
   text-align: justify;
   text-align-last: left;
@@ -618,10 +620,7 @@ button { font-family: inherit; }
   box-shadow: 0 2px 8px rgba(17, 24, 39, 0.07);
 }
 
-.hero-social-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12);
-}
+.hero-social-btn:hover { transform: translateY(-3px); box-shadow: 0 16px 32px rgba(0, 0, 0, 0.12); }
 
 .mode-dark .hero-social-btn:hover {
   background: rgba(255, 255, 255, 0.1) !important;
@@ -780,9 +779,9 @@ button { font-family: inherit; }
 
 .portfolio-footer { padding: 24px 0 10px; text-align: center; opacity: 0.7; }
 
-/* =============================================
-   SIDEBAR NAV
-   ============================================= */
+/* ==============================================
+   SIDEBAR NAV — fixed right side, centered vertically
+   ============================================== */
 .portfolio-side-nav {
   position: fixed;
   right: 16px;
@@ -852,15 +851,17 @@ button { font-family: inherit; }
 
 table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
-/* =============================================
-   RESPONSIVE
-   ============================================= */
+/* ==============================================
+   RESPONSIVE — 1199px and below
+   ============================================== */
 @media (max-width: 1199px) {
-  .portfolio-shell { padding-right: 68px; }
+  .portfolio-shell {
+    padding-right: 80px;
+    padding-bottom: 48px;
+  }
 
   .hero-layout-two-col {
-    grid-template-columns: 1fr 280px;
-    min-height: auto;
+    grid-template-columns: 1fr 300px;
   }
 
   .project-grid, .achievement-grid, .lang-grid {
@@ -868,16 +869,21 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   }
 }
 
+/* ==============================================
+   RESPONSIVE — 899px and below (mobile/tablet)
+   ============================================== */
 @media (max-width: 899px) {
   .portfolio-shell {
     padding-top: 10px;
     padding-right: 16px;
     padding-left: 16px;
-    padding-bottom: calc(var(--side-nav-mobile-space) + 16px);
+    /* Bottom padding = nav bar height + safe gap */
+    padding-bottom: calc(var(--side-nav-mobile-space) + 24px);
   }
 
   .portfolio-topbar { border-radius: 24px; padding: 10px; top: 10px; }
 
+  /* Nav moves to bottom bar on mobile */
   .portfolio-side-nav {
     top: auto;
     left: 14px;
@@ -894,28 +900,27 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
   .portfolio-section { padding: 26px 0; }
 
-  /* Stack hero: photo first (top), then content */
+  /* Stack to single column: photo on top, content below */
   .hero-layout-two-col {
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    min-height: auto;
+    grid-template-rows: 280px auto;
+    height: auto;
+    max-height: none;
   }
 
-  /* On mobile, photo goes on top */
+  /* Photo column: fixed height on mobile, on top */
   .hero-right {
     order: -1;
-    height: 260px;
-    justify-content: center;
+    height: 280px;
     overflow: hidden;
   }
 
   .profile-photo-wrap {
     width: 100%;
-    height: 260px;
-    min-height: 260px;
+    height: 280px;
   }
 
-  /* On mobile animated photo: use contain so head is never cut */
+  /* On mobile: contain so full figure is visible without cropping */
   .profile-photo-img {
     object-fit: contain;
     object-position: bottom center;
@@ -924,13 +929,10 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .hero-left-expanded {
     padding-right: 0;
     order: 1;
+    overflow: visible;
   }
 
-  /* Ensure social icons row has enough space */
-  .hero-social-row {
-    padding-bottom: 4px;
-  }
-
+  /* Center everything on mobile */
   .hero-section .hero-name-row,
   .hero-section .hero-meta-stack,
   .hero-section .hero-title,
@@ -950,7 +952,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .hero-section .hero-detail-line { justify-content: center; }
 
   .hero-action-buttons { align-items: center !important; justify-content: center !important; }
-  .hero-social-row { justify-content: center !important; }
+  /* Social icons row: make sure it never clips into nav */
+  .hero-social-row { justify-content: center !important; padding-bottom: 8px; }
 
   .section-static:not(.about-section-plain) .body-copy,
   .section-static:not(.about-section-plain) .section-title,
@@ -963,12 +966,12 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   }
 
   .hero-left-expanded { max-width: 100%; }
-
-  .project-grid, .achievement-grid, .lang-grid {
-    grid-template-columns: 1fr;
-  }
+  .project-grid, .achievement-grid, .lang-grid { grid-template-columns: 1fr; }
 }
 
+/* ==============================================
+   RESPONSIVE — 767px and below (small phones)
+   ============================================== */
 @media (max-width: 767px) {
   .portfolio-section { min-height: 100%; padding: 24px 0; }
   .hero-title { font-size: clamp(2rem, 12vw, 3.2rem) !important; }
@@ -980,6 +983,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .segmented-meter { grid-template-columns: 1fr; }
   .segment { height: 34px; }
 
+  .hero-layout-two-col { grid-template-rows: 220px auto; }
   .hero-right { height: 220px; }
-  .profile-photo-wrap { height: 220px; min-height: 220px; }
+  .profile-photo-wrap { height: 220px; }
 }
