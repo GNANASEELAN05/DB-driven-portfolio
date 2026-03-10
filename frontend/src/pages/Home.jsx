@@ -150,7 +150,26 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
         )}
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
-        <Button onClick={onClose} variant="outlined" startIcon={<MdClose />}>Close</Button>
+        <Button
+  onClick={onClose}
+  variant="contained"
+  startIcon={<MdClose />}
+  sx={{
+    background: "linear-gradient(135deg, #f13024, #f97316)",
+    color: "white",
+    borderRadius: 999,
+    fontWeight: 800,
+    textTransform: "none",
+    px: 3,
+    boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
+    "&:hover": {
+      background: "linear-gradient(135deg, #d42a1e, #e8650a)",
+      boxShadow: "0 10px 28px rgba(241,48,36,0.45)",
+    },
+  }}
+>
+  Close
+</Button>
       </DialogActions>
     </Dialog>
   );
@@ -749,15 +768,55 @@ export default function Home({ toggleTheme }) {
                       <Typography className="hero-description">{about}</Typography>
 
                       <Stack className="hero-action-buttons" direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
-                        <HeroActionButton variant="contained" startIcon={<MdArrowOutward />} onClick={() => jumpTo("projects")}>
-                          View Work
-                        </HeroActionButton>
-                        <HeroActionButton variant="outlined" startIcon={<MdDownload />} onClick={onDownloadResume} disabled={downloading}>
-                          {downloading ? "Downloading..." : "Download Resume"}
-                        </HeroActionButton>
-                        <HeroActionButton variant="outlined" startIcon={<MdVisibility />} onClick={onPreviewResume}>
-                          Preview Resume
-                        </HeroActionButton>
+<HeroActionButton
+  variant="contained"
+  startIcon={<MdArrowOutward />}
+  onClick={() => jumpTo("projects")}
+  sx={{
+    background: "linear-gradient(135deg, #f13024, #f97316) !important",
+    color: "white !important",
+    border: "none !important",
+    boxShadow: "0 8px 24px rgba(241,48,36,0.35) !important",
+    "&:hover": {
+      background: "linear-gradient(135deg, #d42a1e, #e8650a) !important",
+      boxShadow: "0 12px 32px rgba(241,48,36,0.5) !important",
+      transform: "translateY(-2px)",
+    },
+  }}
+>
+  View Work
+</HeroActionButton>
+<HeroActionButton
+  variant="outlined"
+  startIcon={<MdDownload />}
+  onClick={onDownloadResume}
+  disabled={downloading}
+  sx={{
+    borderColor: "rgba(241,48,36,0.5) !important",
+    color: "#f13024 !important",
+    "&:hover": {
+      borderColor: "#f13024 !important",
+      background: "rgba(241,48,36,0.08) !important",
+    },
+  }}
+>
+  {downloading ? "Downloading..." : "Download Resume"}
+</HeroActionButton>
+<HeroActionButton
+  variant="outlined"
+  startIcon={<MdVisibility />}
+  onClick={onPreviewResume}
+  sx={{
+    borderColor: "rgba(241,48,36,0.5) !important",
+    color: "#f13024 !important",
+    "&:hover": {
+      borderColor: "#f13024 !important",
+      background: "rgba(241,48,36,0.08) !important",
+    },
+  }}
+>
+  Preview Resume
+</HeroActionButton>
                       </Stack>
 
                       <Stack className="hero-social-row" direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
