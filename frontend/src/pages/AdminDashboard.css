@@ -1,48 +1,37 @@
 /* ============================================================
-   ADMIN DASHBOARD — Matches portfolio Home.jsx + index.css
+   ADMIN DASHBOARD — Portfolio-matching styles
    ─ Palette : #f13024 / #f97316  (red → orange accent)
    ─ Dark    : obsidian #0f1020 base, glass panels
    ─ Light   : ivory #f6f8fc base, frosted panels
-   ─ Effects : animated orbs · grid overlay · neon glow ·
-               shimmer sweep · page-enter animation
-   ─ File    : src/pages/AdminDashboard.css
-   ─ Import  : add  import "./AdminDashboard.css";
-               as the FIRST import in AdminDashboard.jsx
+   ─ Fix     : MUI label visibility + cool enhancements
    ============================================================ */
 
-/* ── Google Font (same as portfolio) ── */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap");
 
 /* ============================================================
    CSS CUSTOM PROPERTIES
    ============================================================ */
 :root {
-  /* accent */
   --adm-red:          #f13024;
   --adm-orange:       #f97316;
   --adm-red-soft:     rgba(241,48,36,0.14);
   --adm-red-glow:     rgba(241,48,36,0.30);
 
-  /* dark surfaces */
   --adm-dark-bg:      #0f1020;
   --adm-dark-glass:   rgba(22,24,46,0.60);
   --adm-dark-border:  rgba(255,255,255,0.09);
   --adm-dark-text:    #ffffff;
   --adm-dark-muted:   rgba(255,255,255,0.55);
 
-  /* light surfaces */
   --adm-light-bg:     #f6f8fc;
   --adm-light-glass:  rgba(255,255,255,0.80);
   --adm-light-border: rgba(17,24,39,0.08);
   --adm-light-text:   #111827;
   --adm-light-muted:  rgba(17,24,39,0.55);
 
-  /* radii */
   --adm-r-card:  20px;
   --adm-r-btn:   999px;
   --adm-r-input: 14px;
-
-  /* drawer */
   --adm-drawer:  280px;
 }
 
@@ -52,15 +41,110 @@
 .adm-root *::after { box-sizing: border-box; }
 
 /* ============================================================
-   ROOT — animated background identical to portfolio
+   CRITICAL FIX: Reset webkit-text-fill for ALL MUI inputs
+   The gradient title was bleeding -webkit-text-fill-color: transparent
+   into child MUI elements. We explicitly reset it here.
+   ============================================================ */
+.adm-root .MuiInputLabel-root,
+.adm-root .MuiInputBase-input,
+.adm-root .MuiOutlinedInput-input,
+.adm-root .MuiInputBase-inputMultiline,
+.adm-root .MuiSelect-select,
+.adm-root .MuiMenuItem-root,
+.adm-root .MuiTypography-root:not(.adm-page-title):not(.adm-page-title-light):not(.adm-bar-title):not(.adm-dialog-title),
+.adm-root .MuiFormLabel-root,
+.adm-root .MuiFormHelperText-root {
+  -webkit-text-fill-color: unset !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+  background: unset !important;
+  color: inherit !important;
+}
+
+/* Also reset inside dialogs specifically */
+.adm-dialog .MuiInputLabel-root,
+.adm-dialog .MuiInputBase-input,
+.adm-dialog .MuiOutlinedInput-input,
+.adm-dialog .MuiInputBase-inputMultiline,
+.adm-dialog .MuiSelect-select,
+.adm-dialog .MuiFormLabel-root,
+.adm-dialog .MuiTypography-root:not(.adm-dialog-title),
+.adm-dialog-light .MuiInputLabel-root,
+.adm-dialog-light .MuiInputBase-input,
+.adm-dialog-light .MuiOutlinedInput-input,
+.adm-dialog-light .MuiInputBase-inputMultiline,
+.adm-dialog-light .MuiFormLabel-root,
+.adm-dialog-light .MuiTypography-root:not(.adm-dialog-title) {
+  -webkit-text-fill-color: unset !important;
+  background-clip: unset !important;
+  -webkit-background-clip: unset !important;
+}
+
+/* Restore proper label colors in dark mode */
+.adm-root-dark .MuiInputLabel-root {
+  color: rgba(255,255,255,0.52) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.52) !important;
+}
+.adm-root-dark .MuiInputLabel-root.Mui-focused {
+  color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
+}
+.adm-root-dark .MuiOutlinedInput-input,
+.adm-root-dark .MuiInputBase-input {
+  color: rgba(255,255,255,0.88) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.88) !important;
+}
+.adm-root-dark .MuiSelect-select {
+  color: rgba(255,255,255,0.88) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.88) !important;
+}
+.adm-root-dark .MuiMenuItem-root {
+  color: rgba(255,255,255,0.82) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.82) !important;
+}
+
+/* Restore proper label colors in light mode */
+.adm-root-light .MuiInputLabel-root {
+  color: rgba(17,24,39,0.55) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.55) !important;
+}
+.adm-root-light .MuiInputLabel-root.Mui-focused {
+  color: #f13024 !important;
+  -webkit-text-fill-color: #f13024 !important;
+}
+.adm-root-light .MuiOutlinedInput-input,
+.adm-root-light .MuiInputBase-input {
+  color: rgba(17,24,39,0.90) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.90) !important;
+}
+.adm-root-light .MuiSelect-select {
+  color: rgba(17,24,39,0.90) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.90) !important;
+}
+
+/* Fix textarea specifically */
+.adm-root textarea {
+  -webkit-text-fill-color: inherit !important;
+  color: inherit !important;
+}
+.adm-root-dark textarea {
+  color: rgba(255,255,255,0.88) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.88) !important;
+}
+.adm-root-light textarea {
+  color: rgba(17,24,39,0.90) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.90) !important;
+}
+
+/* ============================================================
+   ROOT
    ============================================================ */
 .adm-root {
   position: relative;
   min-height: 100vh;
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Space Grotesk", system-ui, sans-serif;
 }
 
-/* dark bg */
 .adm-root-dark {
   background:
     radial-gradient(circle at 10% 8%,  rgba(241,48,36,0.13), transparent 26%),
@@ -69,7 +153,6 @@
   color: var(--adm-dark-text);
 }
 
-/* light bg */
 .adm-root-light {
   background:
     radial-gradient(circle at 10% 8%,  rgba(241,48,36,0.07), transparent 26%),
@@ -79,7 +162,7 @@
 }
 
 /* ============================================================
-   ANIMATED BACKGROUND ORBS (fixed, behind everything)
+   ANIMATED BACKGROUND ORBS
    ============================================================ */
 .adm-bg {
   position: fixed;
@@ -124,7 +207,6 @@
   66%     { transform: translate(-10px,12px) scale(0.95); }
 }
 
-/* ── Grid overlay (same as portfolio) ── */
 .adm-grid {
   position: fixed;
   inset: 0;
@@ -160,19 +242,19 @@
   box-shadow: 0 1px 0 rgba(241,48,36,0.08), 0 2px 16px rgba(0,0,0,0.06) !important;
 }
 
-/* Gradient title text */
+/* Gradient title text — SCOPED to only this element */
 .adm-bar-title {
-  font-weight: 900 !important;
+  font-family: "Syne", sans-serif !important;
+  font-weight: 800 !important;
   font-size: 1rem !important;
   letter-spacing: 0.015em;
-  background: linear-gradient(135deg, #f13024, #f97316);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: linear-gradient(135deg, #f13024, #f97316) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
   user-select: none;
 }
 
-/* Top-bar icon buttons */
 .adm-bar-btn {
   border-radius: 12px !important;
   border: 1px solid rgba(255,255,255,0.09) !important;
@@ -214,14 +296,25 @@
   box-shadow: 2px 0 24px rgba(0,0,0,0.07), 1px 0 0 rgba(241,48,36,0.06) !important;
 }
 
-/* Brand header inside drawer */
 .adm-drawer-header {
   padding: 20px 18px 16px;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   display: flex;
   align-items: center;
   gap: 12px;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Subtle background sweep on drawer header */
+.adm-drawer-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(241,48,36,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
 .adm-drawer-header-light {
   border-bottom: 1px solid rgba(17,24,39,0.07);
 }
@@ -235,13 +328,13 @@
   font-size: 1.05rem !important;
   box-shadow: 0 4px 18px rgba(241,48,36,0.40) !important;
   flex-shrink: 0;
+  font-family: "Syne", sans-serif !important;
 }
 
-.adm-drawer-brand-text {
-  line-height: 1.15;
-}
+.adm-drawer-brand-text { line-height: 1.15; }
 .adm-drawer-brand-name {
-  font-weight: 900 !important;
+  font-family: "Syne", sans-serif !important;
+  font-weight: 800 !important;
   font-size: 0.92rem !important;
 }
 .adm-drawer-brand-sub {
@@ -250,7 +343,6 @@
   font-weight: 500 !important;
 }
 
-/* Section label */
 .adm-nav-section {
   font-size: 0.65rem !important;
   font-weight: 700 !important;
@@ -260,50 +352,75 @@
   padding: 14px 18px 4px !important;
 }
 
-/* Nav item */
+/* ── Enhanced Nav item with left accent bar ── */
 .adm-nav-item {
   border-radius: 14px !important;
   margin: 2px 10px !important;
   padding: 9px 12px !important;
   position: relative;
   overflow: hidden;
-  transition: all 0.22s ease !important;
+  transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1) !important;
 }
 
+/* Left accent bar */
 .adm-nav-item::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 20%; bottom: 20%;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #f13024, #f97316);
+  opacity: 0;
+  transform: scaleY(0);
+  transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.adm-nav-item:hover::before,
+.adm-nav-item-active::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+/* Hover fill */
+.adm-nav-item::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgba(241,48,36,0.14), rgba(249,115,22,0.07));
+  background: linear-gradient(135deg, rgba(241,48,36,0.10), rgba(249,115,22,0.05));
   opacity: 0;
   transition: opacity 0.22s ease;
 }
-.adm-nav-item:hover::before { opacity: 1; }
-.adm-nav-item:hover { transform: translateX(4px); }
+.adm-nav-item:hover::after { opacity: 1; }
+.adm-nav-item:hover { transform: translateX(5px) !important; }
 
-/* Active state */
 .adm-nav-item-active {
-  background: linear-gradient(135deg, rgba(241,48,36,0.18), rgba(249,115,22,0.10)) !important;
-  box-shadow: inset 0 0 0 1px rgba(241,48,36,0.28), 0 4px 18px rgba(241,48,36,0.12);
+  background: linear-gradient(135deg, rgba(241,48,36,0.16), rgba(249,115,22,0.08)) !important;
+  box-shadow: inset 0 0 0 1px rgba(241,48,36,0.24), 0 4px 18px rgba(241,48,36,0.10);
+  transform: translateX(3px) !important;
 }
 
-/* Active indicator dot */
-.adm-nav-item-active::after {
+.adm-nav-item-active .adm-nav-label {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.adm-nav-item-active .adm-nav-label::after {
   content: "";
-  position: absolute;
-  right: 12px; top: 50%;
-  transform: translateY(-50%);
-  width: 6px; height: 6px;
+  display: block;
+  width: 5px; height: 5px;
   border-radius: 50%;
   background: #f13024;
-  box-shadow: 0 0 8px rgba(241,48,36,0.85);
+  box-shadow: 0 0 6px rgba(241,48,36,0.85);
+  margin-left: auto; /* ← this pushes it to the far right */
+  flex-shrink: 0;
 }
 
 .adm-nav-icon {
   color: rgba(255,255,255,0.38) !important;
   min-width: 36px !important;
-  transition: color 0.22s ease, filter 0.22s ease !important;
+  transition: color 0.22s ease, filter 0.22s ease, transform 0.28s cubic-bezier(0.34,1.56,0.64,1) !important;
 }
 .adm-nav-icon-light { color: rgba(17,24,39,0.38) !important; }
 
@@ -312,21 +429,44 @@
   font-weight: 600 !important;
   font-size: 0.875rem !important;
   transition: color 0.22s ease !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.62) !important;
 }
-.adm-nav-label-light { color: rgba(17,24,39,0.62) !important; }
+.adm-nav-label-light {
+  color: rgba(17,24,39,0.62) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.62) !important;
+}
 
-.adm-nav-item:hover .adm-nav-icon  { color: #f97316 !important; filter: drop-shadow(0 0 5px rgba(241,48,36,0.5)); }
-.adm-nav-item:hover .adm-nav-label { color: #fff !important; }
+.adm-nav-item:hover .adm-nav-icon {
+  color: #f97316 !important;
+  filter: drop-shadow(0 0 5px rgba(241,48,36,0.5));
+  transform: scale(1.15);
+}
+.adm-nav-item:hover .adm-nav-label {
+  color: #fff !important;
+  -webkit-text-fill-color: #fff !important;
+}
 
-.adm-nav-item-active .adm-nav-icon  { color: #f97316 !important; filter: drop-shadow(0 0 6px rgba(241,48,36,0.65)); }
-.adm-nav-item-active .adm-nav-label { color: #fff !important; font-weight: 800 !important; }
+.adm-nav-item-active .adm-nav-icon {
+  color: #f97316 !important;
+  filter: drop-shadow(0 0 6px rgba(241,48,36,0.65));
+}
+.adm-nav-item-active .adm-nav-label {
+  color: #fff !important;
+  font-weight: 800 !important;
+  -webkit-text-fill-color: #fff !important;
+}
 
 .adm-nav-item:hover .adm-nav-icon-light  { color: #f13024 !important; }
-.adm-nav-item:hover .adm-nav-label-light { color: #111827 !important; }
+.adm-nav-item:hover .adm-nav-label-light {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
 .adm-nav-item-active .adm-nav-icon-light  { color: #f13024 !important; }
-.adm-nav-item-active .adm-nav-label-light { color: #111827 !important; }
+.adm-nav-item-active .adm-nav-label-light {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
 
-/* Logout button */
 .adm-logout {
   border-radius: var(--adm-r-btn) !important;
   font-weight: 800 !important;
@@ -336,6 +476,7 @@
   border: 1px solid rgba(220,38,38,0.24) !important;
   color: #f87171 !important;
   transition: all 0.22s ease !important;
+  -webkit-text-fill-color: #f87171 !important;
 }
 .adm-logout:hover {
   background: rgba(220,38,38,0.22) !important;
@@ -354,30 +495,51 @@
 }
 
 /* ============================================================
-   PAGE HEADER  (animated title identical to portfolio)
+   PAGE HEADER — GRADIENT TEXT SCOPED ONLY TO THESE CLASSES
    ============================================================ */
-.adm-page-header { margin-bottom: 28px; }
+.adm-page-header { margin-bottom: 28px; position: relative; }
 
+/* ── Decorative horizontal rule under the page header ── */
+.adm-page-header::after {
+  content: "";
+  display: block;
+  margin-top: 12px;
+  height: 1px;
+  background: linear-gradient(90deg, #f13024 0%, #f97316 30%, rgba(249,115,22,0.1) 70%, transparent 100%);
+  border-radius: 2px;
+  animation: admRuleExpand 0.6s cubic-bezier(0.16,1,0.3,1) both;
+  transform-origin: left;
+}
+
+@keyframes admRuleExpand {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+/* ONLY .adm-page-title gets the gradient — explicitly isolated */
 .adm-page-title {
+  font-family: "Syne", sans-serif !important;
   font-size: clamp(1.6rem, 3.2vw, 2.4rem) !important;
-  font-weight: 900 !important;
+  font-weight: 800 !important;
   letter-spacing: -0.035em !important;
   line-height: 1.05 !important;
-  background: linear-gradient(135deg,#f13024 0%,#f97316 40%,#ffffff 68%,#f97316 85%,#f13024 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: linear-gradient(135deg,#f13024 0%,#f97316 40%,#ffffff 68%,#f97316 85%,#f13024 100%) !important;
+  background-size: 200% auto !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
   animation: admTitleShift 5s linear infinite;
+  display: inline-block; /* critical: keeps gradient isolated */
 }
 
 .adm-page-title-light {
-  background: linear-gradient(135deg,#f13024 0%,#f97316 40%,#111827 68%,#f97316 85%,#f13024 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: linear-gradient(135deg,#f13024 0%,#f97316 40%,#111827 68%,#f97316 85%,#f13024 100%) !important;
+  background-size: 200% auto !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
   animation: admTitleShift 5s linear infinite;
+  display: inline-block;
 }
 
 @keyframes admTitleShift {
@@ -393,19 +555,25 @@
 }
 
 /* ============================================================
-   PAGE ENTER ANIMATION  (same vibe as portfolio section transitions)
+   PAGE ENTER ANIMATION — staggered + morphing
    ============================================================ */
 .adm-page-enter {
-  animation: admPageIn 0.42s cubic-bezier(0.16,1,0.3,1) both;
+  animation: admPageIn 0.5s cubic-bezier(0.16,1,0.3,1) both;
 }
 
 @keyframes admPageIn {
-  from { opacity:0; transform: translateY(20px) scale(0.99); filter: blur(5px); }
-  to   { opacity:1; transform: translateY(0)    scale(1);    filter: blur(0); }
+  from { opacity:0; transform: translateY(24px) scale(0.985); filter: blur(6px); }
+  to   { opacity:1; transform: translateY(0)    scale(1);     filter: blur(0); }
 }
 
+/* Stagger children of page-enter */
+.adm-page-enter > *:nth-child(1) { animation-delay: 0ms; }
+.adm-page-enter > *:nth-child(2) { animation: admPageIn 0.5s cubic-bezier(0.16,1,0.3,1) 80ms both; }
+.adm-page-enter > *:nth-child(3) { animation: admPageIn 0.5s cubic-bezier(0.16,1,0.3,1) 160ms both; }
+.adm-page-enter > *:nth-child(4) { animation: admPageIn 0.5s cubic-bezier(0.16,1,0.3,1) 240ms both; }
+
 /* ============================================================
-   GLASS CARDS — matches .glass-panel from portfolio
+   GLASS CARDS
    ============================================================ */
 .adm-glass {
   border-radius: var(--adm-r-card) !important;
@@ -415,14 +583,13 @@
   box-shadow: 0 8px 32px rgba(0,0,0,0.26), inset 0 1px 0 rgba(255,255,255,0.06) !important;
   position: relative;
   overflow: hidden;
-  transition: box-shadow 0.26s ease, transform 0.26s ease !important;
+  transition: box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.34,1.56,0.64,1) !important;
 }
 .adm-glass:hover {
-  box-shadow: 0 14px 44px rgba(0,0,0,0.32), 0 0 0 1px rgba(241,48,36,0.16), inset 0 1px 0 rgba(255,255,255,0.08) !important;
-  transform: translateY(-2px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.32), 0 0 0 1px rgba(241,48,36,0.18), inset 0 1px 0 rgba(255,255,255,0.09) !important;
+  transform: translateY(-3px);
 }
 
-/* shimmer sweep (same as .shimmer-panel in portfolio) */
 .adm-glass::after {
   content: "";
   position: absolute;
@@ -456,19 +623,18 @@
   box-shadow: 0 8px 32px rgba(0,0,0,0.09), 0 0 0 1px rgba(241,48,36,0.12) !important;
 }
 
-/* Neon top-border accent */
 .adm-neon-top::before {
   content: "";
   position: absolute;
   top:0; left:0; right:0;
-  height: 1.5px;
-  background: linear-gradient(90deg, transparent, #f13024 30%, #f97316 70%, transparent);
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #f13024 25%, #f97316 75%, transparent);
   border-radius: var(--adm-r-card) var(--adm-r-card) 0 0;
-  opacity: 0.72;
+  opacity: 0.80;
 }
 
 /* ============================================================
-   STAT CARDS
+   STAT CARDS — enhanced with number counter feel
    ============================================================ */
 .adm-stat {
   border-radius: var(--adm-r-card) !important;
@@ -478,19 +644,41 @@
   box-shadow: 0 8px 32px rgba(0,0,0,0.26) !important;
   overflow: hidden !important;
   position: relative;
-  transition: all 0.28s ease !important;
+  transition: all 0.32s cubic-bezier(0.34,1.56,0.64,1) !important;
+  cursor: default;
 }
+
+/* Animated gradient border on hover */
 .adm-stat::before {
   content: "";
   position: absolute;
-  top:0; left:0; right:0;
-  height: 2px;
-  background: linear-gradient(90deg,#f13024,#f97316);
+  inset: -1px;
+  border-radius: calc(var(--adm-r-card) + 1px);
+  background: linear-gradient(135deg, #f13024, #f97316, transparent, transparent);
   opacity: 0;
-  transition: opacity 0.28s ease;
+  transition: opacity 0.32s ease;
+  z-index: -1;
 }
-.adm-stat:hover { transform: translateY(-4px) !important; }
+.adm-stat:hover { transform: translateY(-6px) scale(1.02) !important; }
 .adm-stat:hover::before { opacity: 1; }
+
+/* Subtle diagonal stripe texture */
+.adm-stat::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 8px,
+    rgba(241,48,36,0.015) 8px,
+    rgba(241,48,36,0.015) 9px
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.32s ease;
+}
+.adm-stat:hover::after { opacity: 1; }
 
 .adm-stat-light {
   background: rgba(255,255,255,0.86) !important;
@@ -499,19 +687,25 @@
 }
 
 .adm-stat-icon {
-  width: 46px; height: 46px;
-  border-radius: 14px;
+  width: 48px; height: 48px;
+  border-radius: 16px;
   display: grid; place-items: center;
   background: linear-gradient(135deg,#f13024,#f97316);
-  box-shadow: 0 4px 16px rgba(241,48,36,0.38);
+  box-shadow: 0 4px 18px rgba(241,48,36,0.42), inset 0 1px 0 rgba(255,255,255,0.20);
   color: white;
   flex-shrink: 0;
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.32s ease;
+}
+.adm-stat:hover .adm-stat-icon {
+  transform: rotate(-6deg) scale(1.1);
+  box-shadow: 0 8px 28px rgba(241,48,36,0.55), inset 0 1px 0 rgba(255,255,255,0.20);
 }
 
 .adm-stat-value {
-  font-size: 2.1rem !important;
-  font-weight: 900 !important;
+  font-family: "Syne", sans-serif !important;
+  font-size: 2.2rem !important;
+  font-weight: 800 !important;
   line-height: 1 !important;
 }
 .adm-stat-label {
@@ -548,10 +742,11 @@
 }
 
 .adm-sec-title {
-  font-weight: 900 !important;
-  font-size: 1.05rem !important;
+  font-family: "Syne", sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.08rem !important;
   letter-spacing: -0.01em !important;
-  opacity: 0.90 !important;
+  opacity: 0.92 !important;
 }
 
 .adm-sec-sub {
@@ -563,37 +758,50 @@
 /* ============================================================
    BUTTONS
    ============================================================ */
-/* Primary — gradient red-orange */
 .adm-btn-primary {
   background: linear-gradient(135deg,#f13024,#f97316) !important;
   color: white !important;
+  -webkit-text-fill-color: white !important;
   border-radius: var(--adm-r-btn) !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
+  font-family: "Space Grotesk", sans-serif !important;
   text-transform: none !important;
   letter-spacing: 0.02em !important;
   box-shadow: 0 4px 16px rgba(241,48,36,0.35) !important;
   border: none !important;
   transition: all 0.22s ease !important;
+  position: relative;
+  overflow: hidden;
 }
+.adm-btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+.adm-btn-primary:hover::before { opacity: 1; }
 .adm-btn-primary:hover {
-  background: linear-gradient(135deg,#d42a1e,#e8650a) !important;
-  box-shadow: 0 8px 26px rgba(241,48,36,0.52) !important;
+  box-shadow: 0 8px 28px rgba(241,48,36,0.55) !important;
   transform: translateY(-1px);
 }
 .adm-btn-primary:disabled {
   background: rgba(255,255,255,0.10) !important;
   box-shadow: none !important;
   color: rgba(255,255,255,0.28) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.28) !important;
 }
 
-/* Outlined */
 .adm-btn-outlined {
   border-radius: var(--adm-r-btn) !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
+  font-family: "Space Grotesk", sans-serif !important;
   text-transform: none !important;
   letter-spacing: 0.02em !important;
   border-color: rgba(241,48,36,0.45) !important;
   color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
   background: transparent !important;
   transition: all 0.22s ease !important;
 }
@@ -604,14 +812,15 @@
   transform: translateY(-1px);
 }
 
-/* Error / delete */
 .adm-btn-error {
   border-radius: var(--adm-r-btn) !important;
-  font-weight: 800 !important;
+  font-weight: 700 !important;
+  font-family: "Space Grotesk", sans-serif !important;
   text-transform: none !important;
   background: rgba(220,38,38,0.12) !important;
   border: 1px solid rgba(220,38,38,0.28) !important;
   color: #f87171 !important;
+  -webkit-text-fill-color: #f87171 !important;
   transition: all 0.22s ease !important;
 }
 .adm-btn-error:hover {
@@ -619,19 +828,19 @@
   box-shadow: 0 4px 16px rgba(220,38,38,0.22) !important;
 }
 
-/* Icon buttons */
 .adm-icon-btn {
   border-radius: 10px !important;
   width: 34px !important; height: 34px !important;
   background: rgba(255,255,255,0.05) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   color: rgba(255,255,255,0.52) !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
 }
 .adm-icon-btn:hover {
   background: rgba(241,48,36,0.12) !important;
   border-color: rgba(241,48,36,0.32) !important;
   color: #f97316 !important;
+  transform: scale(1.12);
 }
 
 .adm-icon-btn-light {
@@ -643,6 +852,7 @@
   background: rgba(241,48,36,0.08) !important;
   border-color: rgba(241,48,36,0.24) !important;
   color: #f13024 !important;
+  transform: scale(1.12);
 }
 
 .adm-icon-btn-err {
@@ -651,16 +861,17 @@
   background: rgba(220,38,38,0.06) !important;
   border: 1px solid rgba(220,38,38,0.14) !important;
   color: rgba(248,113,113,0.68) !important;
-  transition: all 0.2s ease !important;
+  transition: all 0.2s cubic-bezier(0.34,1.56,0.64,1) !important;
 }
 .adm-icon-btn-err:hover {
   background: rgba(220,38,38,0.18) !important;
   border-color: rgba(220,38,38,0.40) !important;
   color: #f87171 !important;
+  transform: scale(1.12);
 }
 
 /* ============================================================
-   TABLE
+   TABLE — enhanced with hover row glow
    ============================================================ */
 .adm-table-wrap {
   border-radius: var(--adm-r-card) !important;
@@ -668,74 +879,54 @@
   border: 1px solid rgba(255,255,255,0.08) !important;
   backdrop-filter: blur(16px) !important;
   background: rgba(16,18,38,0.55) !important;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.20) !important;
 }
 .adm-table-wrap-light {
   background: rgba(255,255,255,0.88) !important;
   border: 1px solid rgba(17,24,39,0.08) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
 }
 
 .adm-th {
   background: rgba(241,48,36,0.08) !important;
   border-bottom: 1px solid rgba(241,48,36,0.18) !important;
   font-weight: 800 !important;
-  font-size: 0.75rem !important;
-  letter-spacing: 0.08em !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.10em !important;
   text-transform: uppercase !important;
-  color: rgba(255,255,255,0.60) !important;
+  color: rgba(255,255,255,0.55) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.55) !important;
   padding: 14px 16px !important;
+  font-family: "Space Grotesk", sans-serif !important;
 }
 .adm-th-light {
   background: rgba(241,48,36,0.04) !important;
   color: rgba(17,24,39,0.56) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.56) !important;
   border-bottom: 1px solid rgba(241,48,36,0.10) !important;
 }
 
 .adm-tr {
-  transition: background 0.18s ease !important;
+  transition: background 0.18s ease, box-shadow 0.18s ease !important;
+  position: relative;
 }
-.adm-tr:hover { background: rgba(241,48,36,0.05) !important; }
+.adm-tr:hover {
+  background: rgba(241,48,36,0.05) !important;
+  box-shadow: inset 3px 0 0 rgba(241,48,36,0.60) !important;
+}
 
 .adm-td {
   border-bottom: 1px solid rgba(255,255,255,0.05) !important;
   font-size: 0.875rem !important;
   padding: 13px 16px !important;
   color: rgba(255,255,255,0.80) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.80) !important;
 }
 .adm-td-light {
   border-bottom: 1px solid rgba(17,24,39,0.06) !important;
   color: rgba(17,24,39,0.80) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.80) !important;
 }
-
-/* ============================================================
-   FORM INPUTS
-   ============================================================ */
-.adm-input .MuiOutlinedInput-root {
-  border-radius: var(--adm-r-input) !important;
-  background: rgba(255,255,255,0.04) !important;
-  transition: all 0.22s ease !important;
-}
-.adm-input .MuiOutlinedInput-notchedOutline {
-  border-color: rgba(255,255,255,0.10) !important;
-  transition: border-color 0.22s ease !important;
-}
-.adm-input .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: rgba(241,48,36,0.45) !important;
-}
-.adm-input .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: #f13024 !important;
-  border-width: 1.5px !important;
-  box-shadow: 0 0 0 3px rgba(241,48,36,0.10) !important;
-}
-.adm-input .MuiInputLabel-root.Mui-focused { color: #f97316 !important; }
-
-.adm-select .MuiOutlinedInput-root {
-  border-radius: var(--adm-r-input) !important;
-  background: rgba(255,255,255,0.04) !important;
-}
-.adm-select .MuiOutlinedInput-notchedOutline { border-color: rgba(255,255,255,0.10) !important; }
-.adm-select .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline { border-color: rgba(241,48,36,0.45) !important; }
-.adm-select .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline { border-color:#f13024 !important; }
-.adm-select .MuiInputLabel-root.Mui-focused { color:#f97316 !important; }
 
 /* ============================================================
    CHIPS / BADGES
@@ -743,6 +934,7 @@
 .adm-chip-yes {
   background: rgba(241,48,36,0.13) !important;
   color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
   border: 1px solid rgba(241,48,36,0.28) !important;
   border-radius: 8px !important;
   font-weight: 800 !important;
@@ -752,6 +944,7 @@
 .adm-chip-no {
   background: rgba(255,255,255,0.05) !important;
   color: rgba(255,255,255,0.36) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.36) !important;
   border: 1px solid rgba(255,255,255,0.08) !important;
   border-radius: 8px !important;
   font-weight: 700 !important;
@@ -761,6 +954,7 @@
 .adm-chip-primary {
   background: rgba(255,152,0,0.14) !important;
   color: #ff9800 !important;
+  -webkit-text-fill-color: #ff9800 !important;
   border: 1px solid rgba(255,152,0,0.34) !important;
   border-radius: 8px !important;
   font-weight: 800 !important;
@@ -776,65 +970,188 @@
   background: rgba(34,197,94,0.10) !important;
   border: 1px solid rgba(34,197,94,0.22) !important;
   color: #86efac !important;
+  -webkit-text-fill-color: #86efac !important;
   font-weight: 600 !important;
   backdrop-filter: blur(10px) !important;
   margin-bottom: 20px;
+  animation: admSlideIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
 }
 .adm-alert-err {
   border-radius: var(--adm-r-card) !important;
   background: rgba(241,48,36,0.10) !important;
   border: 1px solid rgba(241,48,36,0.28) !important;
   color: #fca5a5 !important;
+  -webkit-text-fill-color: #fca5a5 !important;
   font-weight: 600 !important;
   backdrop-filter: blur(10px) !important;
   margin-bottom: 20px;
+  animation: admSlideIn 0.4s cubic-bezier(0.16,1,0.3,1) both;
+}
+
+@keyframes admSlideIn {
+  from { opacity:0; transform: translateY(-10px); }
+  to   { opacity:1; transform: translateY(0); }
 }
 
 /* ============================================================
-   DIALOGS
+   DIALOGS — enhanced with morphing background + glow border
    ============================================================ */
 .adm-dialog .MuiPaper-root {
-  border-radius: 24px !important;
-  backdrop-filter: blur(28px) !important;
-  background: rgba(13,15,35,0.94) !important;
+  border-radius: 28px !important;
+  backdrop-filter: blur(32px) !important;
+  background: rgba(11,13,30,0.96) !important;
   border: 1px solid rgba(255,255,255,0.09) !important;
-  box-shadow: 0 24px 80px rgba(0,0,0,0.52) !important;
+  box-shadow:
+    0 24px 80px rgba(0,0,0,0.58),
+    0 0 0 1px rgba(241,48,36,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.05) !important;
+  animation: admDialogIn 0.36s cubic-bezier(0.16,1,0.3,1) both !important;
+  position: relative;
+  overflow: hidden;
 }
+
+/* Top neon glow line on dialogs */
+.adm-dialog .MuiPaper-root::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #f13024 25%, #f97316 75%, transparent);
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+@keyframes admDialogIn {
+  from { opacity:0; transform: scale(0.94) translateY(12px); filter: blur(8px); }
+  to   { opacity:1; transform: scale(1) translateY(0);       filter: blur(0); }
+}
+
 .adm-dialog-light .MuiPaper-root {
   background: rgba(255,255,255,0.97) !important;
   border: 1px solid rgba(17,24,39,0.08) !important;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.12), 0 0 0 1px rgba(241,48,36,0.08) !important;
 }
+
+/* Dialog title — SCOPED gradient text */
 .adm-dialog-title {
-  font-weight: 900 !important;
-  font-size: 1.08rem !important;
-  background: linear-gradient(135deg,#f13024,#f97316);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: "Syne", sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 1.15rem !important;
+  background: linear-gradient(135deg,#f13024,#f97316) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  display: inline-block !important;
+}
+
+/* Dialog inputs — ensure visibility */
+.adm-dialog .MuiOutlinedInput-root,
+.adm-dialog-light .MuiOutlinedInput-root {
+  border-radius: var(--adm-r-input) !important;
+  transition: all 0.22s ease !important;
+}
+
+.adm-dialog .MuiOutlinedInput-root {
+  background: rgba(255,255,255,0.04) !important;
+}
+.adm-dialog .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255,255,255,0.12) !important;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease !important;
+}
+.adm-dialog .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(241,48,36,0.50) !important;
+}
+.adm-dialog .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #f13024 !important;
+  border-width: 1.5px !important;
+  box-shadow: 0 0 0 3px rgba(241,48,36,0.10) !important;
+}
+.adm-dialog .MuiInputLabel-root {
+  color: rgba(255,255,255,0.50) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.50) !important;
+}
+.adm-dialog .MuiInputLabel-root.Mui-focused {
+  color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
+}
+.adm-dialog .MuiOutlinedInput-input,
+.adm-dialog .MuiInputBase-input {
+  color: rgba(255,255,255,0.90) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.90) !important;
+}
+.adm-dialog textarea {
+  color: rgba(255,255,255,0.90) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.90) !important;
+}
+.adm-dialog .MuiSelect-select {
+  color: rgba(255,255,255,0.90) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.90) !important;
+}
+
+/* Light dialog inputs */
+.adm-dialog-light .MuiOutlinedInput-root {
+  background: rgba(17,24,39,0.03) !important;
+}
+.adm-dialog-light .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(17,24,39,0.12) !important;
+}
+.adm-dialog-light .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(241,48,36,0.40) !important;
+}
+.adm-dialog-light .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #f13024 !important;
+}
+.adm-dialog-light .MuiInputLabel-root {
+  color: rgba(17,24,39,0.55) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.55) !important;
+}
+.adm-dialog-light .MuiInputLabel-root.Mui-focused {
+  color: #f13024 !important;
+  -webkit-text-fill-color: #f13024 !important;
+}
+.adm-dialog-light .MuiOutlinedInput-input,
+.adm-dialog-light .MuiInputBase-input {
+  color: rgba(17,24,39,0.90) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.90) !important;
+}
+.adm-dialog-light textarea {
+  color: rgba(17,24,39,0.90) !important;
+  -webkit-text-fill-color: rgba(17,24,39,0.90) !important;
 }
 
 /* ============================================================
    MENUS
    ============================================================ */
 .adm-menu .MuiPaper-root {
-  border-radius: 16px !important;
-  backdrop-filter: blur(20px) !important;
-  background: rgba(16,18,40,0.96) !important;
+  border-radius: 18px !important;
+  backdrop-filter: blur(24px) !important;
+  background: rgba(13,15,36,0.97) !important;
   border: 1px solid rgba(255,255,255,0.09) !important;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.42) !important;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.46), 0 0 0 1px rgba(241,48,36,0.10) !important;
   min-width: 160px !important;
+  overflow: hidden;
+  animation: admMenuIn 0.24s cubic-bezier(0.16,1,0.3,1) both !important;
 }
+
+@keyframes admMenuIn {
+  from { opacity:0; transform: scale(0.92) translateY(-8px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+
 .adm-menu .MuiMenuItem-root {
   border-radius: 10px !important;
   margin: 3px 6px !important;
   font-size: 0.875rem !important;
   font-weight: 600 !important;
   color: rgba(255,255,255,0.72) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.72) !important;
   transition: all 0.18s ease !important;
 }
 .adm-menu .MuiMenuItem-root:hover {
-  background: rgba(241,48,36,0.10) !important;
+  background: rgba(241,48,36,0.12) !important;
   color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
+  padding-left: 18px !important;
 }
 
 /* ============================================================
@@ -844,10 +1161,8 @@
 .adm-divider-light { border-color: rgba(17,24,39,0.08) !important; }
 
 /* ============================================================
-   SCROLLBAR — hidden everywhere, scroll still works
+   SCROLLBAR — hidden but scroll works
    ============================================================ */
-
-/* Hide all scrollbars inside the admin root */
 .adm-root * {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
@@ -858,11 +1173,9 @@
   height: 0 !important;
 }
 
-/* The .adm-scroll class (sidebar nav) also hidden */
 .adm-scroll { scrollbar-width: none; -ms-overflow-style: none; }
 .adm-scroll::-webkit-scrollbar { display: none; }
 
-/* MUI dialog / menu scroll containers */
 .adm-dialog *::-webkit-scrollbar,
 .adm-menu *::-webkit-scrollbar { display: none !important; }
 .adm-dialog *,
@@ -873,4 +1186,82 @@
    ============================================================ */
 @media (max-width: 899px) {
   .adm-page-title { font-size: 1.4rem !important; }
+  .adm-stat-value { font-size: 1.8rem !important; }
+}
+
+/* ============================================================
+   FORM INPUTS (global, inside panels)
+   ============================================================ */
+.adm-root .MuiOutlinedInput-root {
+  border-radius: var(--adm-r-input) !important;
+  transition: all 0.22s ease !important;
+}
+.adm-root-dark .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(255,255,255,0.10) !important;
+}
+.adm-root-dark .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(241,48,36,0.45) !important;
+}
+.adm-root-dark .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #f13024 !important;
+  border-width: 1.5px !important;
+  box-shadow: 0 0 0 3px rgba(241,48,36,0.09) !important;
+}
+
+.adm-root-light .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(17,24,39,0.12) !important;
+}
+.adm-root-light .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: rgba(241,48,36,0.38) !important;
+}
+.adm-root-light .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: #f13024 !important;
+  border-width: 1.5px !important;
+}
+
+/* ============================================================
+   SELECT DROPDOWN POPOVER
+   ============================================================ */
+.MuiMenu-paper {
+  border-radius: 14px !important;
+  backdrop-filter: blur(20px) !important;
+}
+.adm-root-dark .MuiMenu-paper {
+  background: rgba(13,15,36,0.97) !important;
+  border: 1px solid rgba(255,255,255,0.09) !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.42) !important;
+}
+.adm-root-dark .MuiMenuItem-root {
+  color: rgba(255,255,255,0.82) !important;
+  -webkit-text-fill-color: rgba(255,255,255,0.82) !important;
+}
+.adm-root-dark .MuiMenuItem-root:hover {
+  background: rgba(241,48,36,0.10) !important;
+  color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
+}
+
+/* ============================================================
+   EXTRA: PULSE EFFECT on Save buttons
+   ============================================================ */
+.adm-btn-primary:not(:disabled)::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 0 rgba(241,48,36,0.50);
+  animation: admBtnPulse 3s ease-out infinite;
+}
+
+@keyframes admBtnPulse {
+  0%   { box-shadow: 0 0 0 0 rgba(241,48,36,0.40); }
+  60%  { box-shadow: 0 0 0 8px rgba(241,48,36,0); }
+  100% { box-shadow: 0 0 0 0 rgba(241,48,36,0); }
+}
+
+/* ============================================================
+   EXTRA: Toast-style alert entrance animation
+   ============================================================ */
+.adm-root .MuiAlert-root {
+  animation: admSlideIn 0.4s cubic-bezier(0.16,1,0.3,1) both !important;
 }
