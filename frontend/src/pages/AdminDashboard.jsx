@@ -435,6 +435,7 @@ export default function AdminDashboard(props) {
 
   const [resumes,              setResumes]              = useState([]);
   const [resumeMenuAnchor,     setResumeMenuAnchor]     = useState(null);
+  const [resumeMenuPosition, setResumeMenuPosition] = useState(null);
   const [resumeMenuItem,       setResumeMenuItem]       = useState(null);
   const [resumePreviewOpen,    setResumePreviewOpen]    = useState(false);
   const [resumePreviewTitle,   setResumePreviewTitle]   = useState("");
@@ -713,8 +714,21 @@ export default function AdminDashboard(props) {
   };
 
   // FIX 1: Store anchor element for three-dot menu so it anchors to the button
-  const openResumeMenu = (e, item) => { setResumeMenuAnchor(e.currentTarget); setResumeMenuItem(item); };
-  const closeResumeMenu = () => { setResumeMenuAnchor(null); setResumeMenuItem(null); };
+const openResumeMenu = (event, resume) => {
+  const rect = event.currentTarget.getBoundingClientRect();
+
+  setResumeMenuAnchor(event.currentTarget);
+  setResumeMenuPosition({
+    top: rect.bottom + window.scrollY,
+    left: rect.left + window.scrollX,
+  });
+
+  setSelectedResume(resume);
+};
+  const closeResumeMenu = () => {
+  setResumeMenuAnchor(null);
+  setResumeMenuPosition(null);
+};
 
   const previewSelectedResumeInline = async () => { const item=resumeMenuItem; closeResumeMenu(); if(!item?.id) return; await openResumePreviewInline(item.fileName||"Resume",viewResumeByIdUrl(item.id)); };
   const makePrimaryResume = async () => {
@@ -1486,13 +1500,16 @@ export default function AdminDashboard(props) {
 
               {/* FIX 1: anchorEl is set to e.currentTarget so menu opens at the three-dot button */}
               <Menu
-                anchorEl={resumeMenuAnchor}
-                open={Boolean(resumeMenuAnchor)}
-                onClose={closeResumeMenu}
-                className="adm-menu"
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                transformOrigin={{ vertical: "top", horizontal: "right" }}
-              >
+  anchorEl={resumeMenuAnchor}
+  anchorReference="anchorPosition"
+  anchorPosition={
+    resumeMenuPosition
+      ? { top: resumeMenuPosition.top, left: resumeMenuPosition.left }
+      : undefined
+  }
+  open={Boolean(resumeMenuAnchor)}
+  onClose={closeResumeMenu}
+>
                 <MenuItem onClick={previewSelectedResumeInline}><ListItemIcon sx={{minWidth:34}}><MdVisibility /></ListItemIcon>Preview</MenuItem>
                 <MenuItem onClick={makePrimaryResume}><ListItemIcon sx={{minWidth:34}}><MdStar /></ListItemIcon>Make Primary</MenuItem>
                 <Divider className={isDark?"adm-divider":"adm-divider-light"} />
