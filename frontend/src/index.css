@@ -315,18 +315,18 @@ button { font-family: inherit; }
 
 /* =============================================
    HERO TWO-COLUMN LAYOUT
-   Left: text content | Right: profile photo
    ============================================= */
 .hero-layout {
   display: grid;
-  gap: 42px;
+  gap: 0;
   align-items: center;
 }
 
-/* NEW: two-column on desktop — left gets more space */
+/* Left gets free space, right is the photo column */
 .hero-layout-two-col {
-  grid-template-columns: 1fr 320px;
-  align-items: center;
+  grid-template-columns: 1fr 380px;
+  align-items: stretch;
+  min-height: calc(100vh - 120px);
 }
 
 .hero-layout-single {
@@ -336,47 +336,36 @@ button { font-family: inherit; }
 .hero-left-expanded {
   max-width: 100%;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-right: 32px;
 }
 
-/* RIGHT COLUMN — centers the photo card vertically */
+/* RIGHT COLUMN — full bleed photo, no card/box */
 .hero-right {
+  position: relative;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  flex-shrink: 0;
+  overflow: hidden;
 }
 
 /* =============================================
-   PROFILE PHOTO CARD
-   - Stack of two absolutely-positioned layers
-   - Transparent background — portfolio bg shows through
-   - "See Original" button at bottom
+   PROFILE PHOTO — Full bleed, no box/card/border
+   Blends into background just like the reference
    ============================================= */
 .profile-photo-wrap {
   position: relative;
-  width: 280px;
-  height: 340px;
+  width: 100%;
+  height: 100%;
+  min-height: 480px;
   cursor: pointer;
-  border-radius: 28px;
-  overflow: hidden;
-  flex-shrink: 0;
-  /* Subtle glow border */
-  box-shadow:
-    0 0 0 1.5px rgba(241, 48, 36, 0.22),
-    0 24px 60px rgba(0, 0, 0, 0.38),
-    0 0 40px rgba(241, 48, 36, 0.12);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  /* NO border-radius, NO box-shadow, NO background */
+  overflow: visible;
 }
 
-.profile-photo-wrap:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow:
-    0 0 0 1.5px rgba(241, 48, 36, 0.38),
-    0 32px 72px rgba(0, 0, 0, 0.44),
-    0 0 60px rgba(241, 48, 36, 0.18);
-}
-
-/* Each layer is absolutely stacked, full size */
+/* Each layer fills the full column */
 .profile-photo-layer {
   position: absolute;
   inset: 0;
@@ -385,27 +374,61 @@ button { font-family: inherit; }
   justify-content: center;
 }
 
-/* The actual image — object-fit cover, transparent bg via mix-blend */
+/* Image fills full height, blends into background */
 .profile-photo-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: top center;
   display: block;
-  /* Transparent black backgrounds show as portfolio bg */
+  /* Key: lighten blends the dark bg of the PNG transparent */
   mix-blend-mode: lighten;
-  background: transparent;
+  /* Fade out at bottom to blend with page */
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 60%,
+    rgba(0,0,0,0.7) 75%,
+    rgba(0,0,0,0.2) 90%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 60%,
+    rgba(0,0,0,0.7) 75%,
+    rgba(0,0,0,0.2) 90%,
+    transparent 100%
+  );
+  user-select: none;
+  pointer-events: none;
 }
 
-/* Original photo — no blend mode, shows natural photo */
+/* Original photo — normal blend mode, still fade bottom */
 .profile-photo-original {
   mix-blend-mode: normal;
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 55%,
+    rgba(0,0,0,0.75) 72%,
+    rgba(0,0,0,0.25) 88%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 55%,
+    rgba(0,0,0,0.75) 72%,
+    rgba(0,0,0,0.25) 88%,
+    transparent 100%
+  );
 }
 
-/* "See Original" button — pinned to bottom center */
+/* "See Original" button — only visible on hover */
 .profile-photo-btn-wrap {
   position: absolute;
-  bottom: 14px;
+  bottom: 28px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 10;
@@ -416,42 +439,26 @@ button { font-family: inherit; }
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 7px 16px;
+  padding: 8px 20px;
   border-radius: 999px;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   white-space: nowrap;
   cursor: pointer;
-  background: rgba(241, 48, 36, 0.88);
+  background: rgba(241, 48, 36, 0.82);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 6px 20px rgba(241, 48, 36, 0.35);
-  transition: background 0.22s ease, transform 0.18s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 28px rgba(241, 48, 36, 0.4), 0 0 0 1px rgba(255,255,255,0.06);
+  transition: background 0.2s ease, transform 0.18s ease, box-shadow 0.2s ease;
   user-select: none;
 }
 
 .profile-photo-reveal-btn:hover {
   background: rgba(249, 115, 22, 0.92);
-  transform: scale(1.05);
-}
-
-/* Revert hint — top-right corner */
-.profile-photo-revert-hint {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 10;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 600;
-  color: rgba(255, 255, 255, 0.82);
-  background: rgba(0, 0, 0, 0.52);
-  backdrop-filter: blur(8px);
-  pointer-events: none;
-  transition: opacity 0.35s ease;
+  transform: scale(1.06);
+  box-shadow: 0 12px 36px rgba(249, 115, 22, 0.45);
 }
 
 /* hero-name-row — spinner + name+meta side by side */
@@ -463,15 +470,15 @@ button { font-family: inherit; }
 }
 
 /* =============================================
-   SPINNER
+   LUXURY SPINNER — clean rings, no sparkles
    ============================================= */
 .hero-name-spinner-badge {
-  width: clamp(90px, 9vw, 120px);
-  height: clamp(90px, 9vw, 120px);
+  width: clamp(90px, 9vw, 110px);
+  height: clamp(90px, 9vw, 110px);
   flex: 0 0 auto;
-  animation: heroBadgeSpin 22s linear infinite;
+  animation: heroBadgeSpin 28s linear infinite;
   transform-origin: center;
-  filter: drop-shadow(0 0 18px rgba(241, 48, 36, 0.38)) drop-shadow(0 0 6px rgba(251, 191, 36, 0.22));
+  filter: drop-shadow(0 0 14px rgba(241, 48, 36, 0.28));
   align-self: center;
 }
 
@@ -482,49 +489,62 @@ button { font-family: inherit; }
   overflow: visible;
 }
 
+/* Main rotating ring — elegant dashed */
 .hero-name-spinner-ring {
   fill: transparent;
   stroke: url(#spinnerGradient);
-  stroke-width: 1.4;
-  stroke-dasharray: 3 4 1 4;
+  stroke-width: 1.2;
+  stroke-dasharray: 2 6;
+  stroke-linecap: round;
+  opacity: 0.9;
 }
 
 .mode-light .hero-name-spinner-ring {
-  stroke: url(#spinnerGradient);
-  opacity: 0.85;
+  opacity: 0.8;
 }
 
+/* Inner subtle ring */
 .hero-name-spinner-ring-inner {
   fill: transparent;
-  stroke: rgba(255, 255, 255, 0.12);
-  stroke-width: 0.8;
+  stroke-width: 0.6;
+  animation: heroBadgeSpinReverse 18s linear infinite;
+}
+
+.mode-dark .hero-name-spinner-ring-inner {
+  stroke: rgba(255, 255, 255, 0.1);
 }
 
 .mode-light .hero-name-spinner-ring-inner {
-  stroke: rgba(17, 24, 39, 0.15);
+  stroke: rgba(17, 24, 39, 0.12);
 }
 
+/* Spinning dots on path */
 .hero-name-spinner-text {
-  font-size: 7.5px;
-  font-weight: 700;
-  letter-spacing: 2.8px;
-  text-transform: uppercase;
-  fill: rgba(255, 255, 255, 0.82);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 5px;
+  fill: rgba(241, 48, 36, 0.55);
 }
 
 .mode-light .hero-name-spinner-text {
-  fill: rgba(17, 24, 39, 0.7);
+  fill: rgba(241, 48, 36, 0.5);
 }
 
+/* Center initials — only element, large and prominent */
 .hero-name-spinner-center-initials {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 900;
-  letter-spacing: 0.04em;
+  letter-spacing: -0.02em;
 }
 
 @keyframes heroBadgeSpin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
+}
+
+@keyframes heroBadgeSpinReverse {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
 }
 
 .hero-name-text-block {
@@ -552,15 +572,15 @@ button { font-family: inherit; }
 .hero-detail-line { font-size: 0.97rem !important; opacity: 0.78; word-break: break-word; }
 
 .hero-title {
-  font-size: clamp(2.6rem, 6vw, 5.4rem) !important;
+  font-size: clamp(2.6rem, 5vw, 4.8rem) !important;
   font-weight: 900 !important;
   line-height: 1.02 !important;
   letter-spacing: -0.04em;
-  max-width: 760px;
+  max-width: 680px;
 }
 
 .hero-description {
-  max-width: 720px;
+  max-width: 620px;
   margin-top: 20px !important;
   font-size: 1rem !important;
   line-height: 1.95 !important;
@@ -830,14 +850,9 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 @media (max-width: 1199px) {
   .portfolio-shell { padding-right: 110px; }
 
-  /* Stack hero to single col, photo goes below content */
   .hero-layout-two-col {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
-
-  .hero-right {
-    justify-content: flex-start;
+    grid-template-columns: 1fr 300px;
+    min-height: auto;
   }
 
   .project-grid, .achievement-grid, .lang-grid {
@@ -871,6 +886,32 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
   .portfolio-section { padding: 26px 0; }
 
+  /* Stack hero: photo first (top), then content */
+  .hero-layout-two-col {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto;
+    min-height: auto;
+  }
+
+  /* On mobile, photo goes on top */
+  .hero-right {
+    order: -1;
+    height: 320px;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .profile-photo-wrap {
+    width: 100%;
+    height: 320px;
+    min-height: 320px;
+  }
+
+  .hero-left-expanded {
+    padding-right: 0;
+    order: 1;
+  }
+
   .hero-section .hero-name-row,
   .hero-section .hero-meta-stack,
   .hero-section .hero-title,
@@ -890,15 +931,6 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
   .hero-action-buttons { align-items: center !important; justify-content: center !important; }
   .hero-social-row { justify-content: center !important; }
-
-  /* Center photo on mobile */
-  .hero-right { justify-content: center; }
-
-  /* Smaller photo on mobile */
-  .profile-photo-wrap {
-    width: 220px;
-    height: 270px;
-  }
 
   .section-static:not(.about-section-plain) .body-copy,
   .section-static:not(.about-section-plain) .section-title,
@@ -928,8 +960,6 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .segmented-meter { grid-template-columns: 1fr; }
   .segment { height: 34px; }
 
-  .profile-photo-wrap {
-    width: 190px;
-    height: 230px;
-  }
+  .hero-right { height: 260px; }
+  .profile-photo-wrap { height: 260px; min-height: 260px; }
 }

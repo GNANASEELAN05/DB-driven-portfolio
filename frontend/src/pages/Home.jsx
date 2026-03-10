@@ -61,7 +61,6 @@ import {
 } from "../api/portfolio";
 
 // ---- Profile photos ----
-// Place both images in src/assets/ and update these paths if needed
 import AnimatedPhoto from "../assets/Animated_Prof_Photo.png";
 import OriginalPhoto from "../assets/Proffessional_Gnanaseelan_V_Photo.png";
 
@@ -212,18 +211,24 @@ function GlassPanel({ children, sx, className = "" }) {
 }
 
 // =============================================
-// PROFILE PHOTO CARD
+// PROFILE PHOTO — Full bleed, no box/card
 // - Shows animated photo by default
-// - Click → crossfades to original photo
+// - Hover → reveals "See Original" button
+// - Click → crossfades to original photo (no timer hint)
 // - Auto-reverts to animated after 20 seconds
-// - Background transparent so portfolio bg shows through
 // =============================================
 function ProfilePhotoCard() {
   const [showOriginal, setShowOriginal] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const timerRef = useRef(null);
 
   const handleClick = () => {
-    if (showOriginal) return;
+    if (showOriginal) {
+      // clicking again reverts
+      setShowOriginal(false);
+      clearTimeout(timerRef.current);
+      return;
+    }
     setShowOriginal(true);
     clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setShowOriginal(false), 20000);
@@ -232,45 +237,57 @@ function ProfilePhotoCard() {
   useEffect(() => () => clearTimeout(timerRef.current), []);
 
   return (
-    <Box className="profile-photo-wrap" onClick={handleClick}>
+    <Box
+      className="profile-photo-wrap"
+      onClick={handleClick}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
       {/* Animated photo layer */}
-      <Box className="profile-photo-layer"
-        style={{ opacity: showOriginal ? 0 : 1, transition: "opacity 0.75s ease" }}>
+      <Box
+        className="profile-photo-layer"
+        style={{ opacity: showOriginal ? 0 : 1, transition: "opacity 0.75s ease" }}
+      >
         <img src={AnimatedPhoto} alt="Animated profile" className="profile-photo-img" />
       </Box>
 
       {/* Original photo layer */}
-      <Box className="profile-photo-layer"
-        style={{ opacity: showOriginal ? 1 : 0, transition: "opacity 0.75s ease" }}>
+      <Box
+        className="profile-photo-layer"
+        style={{ opacity: showOriginal ? 1 : 0, transition: "opacity 0.75s ease" }}
+      >
         <img src={OriginalPhoto} alt="Original profile" className="profile-photo-img profile-photo-original" />
       </Box>
 
-      {/* "See Original" button — visible only when animated is showing */}
-      <Box className="profile-photo-btn-wrap"
-        style={{ opacity: showOriginal ? 0 : 1, pointerEvents: showOriginal ? "none" : "auto", transition: "opacity 0.35s ease" }}>
+      {/* "See Original" button — only visible on hover when animated is showing */}
+      <Box
+        className="profile-photo-btn-wrap"
+        style={{
+          opacity: (hovered && !showOriginal) ? 1 : 0,
+          pointerEvents: (hovered && !showOriginal) ? "auto" : "none",
+          transition: "opacity 0.25s ease"
+        }}
+      >
         <Box className="profile-photo-reveal-btn">
           <MdVisibility style={{ fontSize: "0.85rem", flexShrink: 0 }} />
           See Original
         </Box>
       </Box>
-
-      {/* Revert hint — visible only when original is showing */}
-      <Box className="profile-photo-revert-hint"
-        style={{ opacity: showOriginal ? 1 : 0, transition: "opacity 0.35s ease" }}>
-        Reverting in 20s…
-      </Box>
     </Box>
   );
 }
 
+// =============================================
+// LUXURY SPINNER BADGE — clean, no sparkles
+// Only initials in center, no outer text ring initials
+// =============================================
 function MiniOrbitBadge({ initials, name }) {
   const resolvedInitials =
     safeString(initials).trim() ||
     safeString(name).split(" ").filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
 
-  const spinText = resolvedInitials
-    ? `${resolvedInitials} • ${resolvedInitials} • ${resolvedInitials} • ${resolvedInitials} •`
-    : "• • • • • • • • • •";
+  // Spinning ring text — dots only, no initials in outer ring
+  const spinText = "· · · · · · · · · · · · · ·";
 
   return (
     <Box className="hero-name-spinner-badge" aria-hidden="true">
@@ -283,42 +300,47 @@ function MiniOrbitBadge({ initials, name }) {
             <stop offset="100%" stopColor="#fbbf24" />
           </linearGradient>
           <linearGradient id="spinnerGoldRing" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="rgba(251,191,36,0.7)" />
-            <stop offset="100%" stopColor="rgba(241,48,36,0.5)" />
+            <stop offset="0%" stopColor="rgba(251,191,36,0.5)" />
+            <stop offset="100%" stopColor="rgba(241,48,36,0.35)" />
           </linearGradient>
           <filter id="spinnerGlow">
-            <feGaussianBlur stdDeviation="2" result="blur" />
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
             <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
-          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="rgba(241,48,36,0.18)" />
-            <stop offset="100%" stopColor="transparent" />
+          <radialGradient id="centerFill" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="rgba(241,48,36,0.12)" />
+            <stop offset="100%" stopColor="rgba(0,0,0,0.0)" />
           </radialGradient>
         </defs>
-        <circle cx="60" cy="60" r="56" fill="none" stroke="url(#spinnerGoldRing)" strokeWidth="0.5" strokeDasharray="2 6" />
+
+        {/* Outer dashed decorative ring */}
+        <circle cx="60" cy="60" r="56" fill="none" stroke="url(#spinnerGoldRing)" strokeWidth="0.6" strokeDasharray="1.5 5" />
+
+        {/* Main spinning ring */}
         <circle className="hero-name-spinner-ring" cx="60" cy="60" r="49" />
+
+        {/* Spinning dot text on path */}
         <text className="hero-name-spinner-text">
           <textPath href="#miniOrbitPath" startOffset="0%">{spinText}</textPath>
         </text>
-        <circle cx="60" cy="60" r="34" fill="url(#centerGlow)" />
-        <circle className="hero-name-spinner-ring-inner" cx="60" cy="60" r="30" />
-        {[0, 90, 180, 270].map((angle, i) => {
-          const rad = (angle * Math.PI) / 180;
-          const mx = 60 + 43 * Math.cos(rad);
-          const my = 60 + 43 * Math.sin(rad);
-          return <rect key={i} x={mx - 3} y={my - 3} width="6" height="6"
-            fill="url(#spinnerGradient)" transform={`rotate(45 ${mx} ${my})`}
-            filter="url(#spinnerGlow)" opacity="0.9" />;
-        })}
-        <text x="60" y="65" textAnchor="middle" className="hero-name-spinner-center-initials" fill="url(#spinnerGradient)">
+
+        {/* Inner ring */}
+        <circle className="hero-name-spinner-ring-inner" cx="60" cy="60" r="34" />
+
+        {/* Center glow fill */}
+        <circle cx="60" cy="60" r="32" fill="url(#centerFill)" />
+
+        {/* Center initials — ONLY here, nowhere else */}
+        <text
+          x="60"
+          y="67"
+          textAnchor="middle"
+          className="hero-name-spinner-center-initials"
+          fill="url(#spinnerGradient)"
+          filter="url(#spinnerGlow)"
+        >
           {resolvedInitials || "?"}
         </text>
-        {[45, 135, 225, 315].map((angle, i) => {
-          const rad = (angle * Math.PI) / 180;
-          const dx = 60 + 30 * Math.cos(rad);
-          const dy = 60 + 30 * Math.sin(rad);
-          return <circle key={i} cx={dx} cy={dy} r="1.5" fill="rgba(251,191,36,0.8)" />;
-        })}
       </svg>
     </Box>
   );
@@ -653,7 +675,7 @@ export default function Home({ toggleTheme }) {
                     </MotionBox>
                   </Box>
 
-                  {/* RIGHT COLUMN — Profile photo */}
+                  {/* RIGHT COLUMN — Profile photo, full bleed no card */}
                   <Box className="hero-right">
                     <ProfilePhotoCard />
                   </Box>
