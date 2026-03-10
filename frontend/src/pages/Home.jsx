@@ -44,6 +44,7 @@ import {
   MdEmojiEvents,
   MdContacts,
   MdTerminal,
+  MdLocationOn,
 } from "react-icons/md";
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 
@@ -634,8 +635,8 @@ export default function Home({ toggleTheme }) {
                           <Typography className="hero-name hero-name-display">{name}</Typography>
                           <Stack spacing={0.8} className="hero-meta-stack">
                             <Typography className="hero-role-line">{title}</Typography>
-                            {location ? <Typography className="hero-detail-line">📍 {location}</Typography> : null}
-                            {contactEmail ? <Typography className="hero-detail-line">✉️ {contactEmail}</Typography> : null}
+                            {location ? <Typography className="hero-detail-line"><MdLocationOn style={{ marginRight: 5, flexShrink: 0 }} />{location}</Typography> : null}
+                            {contactEmail ? <Typography className="hero-detail-line"><MdEmail style={{ marginRight: 5, flexShrink: 0 }} />{contactEmail}</Typography> : null}
                           </Stack>
                         </Box>
                       </Box>
