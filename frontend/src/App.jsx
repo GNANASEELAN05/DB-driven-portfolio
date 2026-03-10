@@ -8,8 +8,8 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 
 const makeTheme = (mode, flavor = "viewer") => {
-  const viewerPrimary = mode === "dark" ? "#f13024" : "#e11d48";
-  const viewerSecondary = mode === "dark" ? "#131424" : "#f8fafc";
+  const viewerPrimary = "#7C3AED";
+  const viewerSecondary = "#06B6D4";
 
   const adminPrimary = "#F59E0B";
   const adminSecondary = "#3B82F6";
@@ -23,65 +23,38 @@ const makeTheme = (mode, flavor = "viewer") => {
       primary: { main: primary },
       secondary: { main: secondary },
       background: {
-        default: mode === "dark" ? "#0f1020" : "#f6f8fc",
-        paper: mode === "dark" ? "rgba(19,20,36,0.72)" : "rgba(255,255,255,0.78)",
-      },
-      text: {
-        primary: mode === "dark" ? "#ffffff" : "#111827",
-        secondary: mode === "dark" ? "rgba(255,255,255,0.7)" : "rgba(17,24,39,0.72)",
+        default: mode === "dark" ? "#0B1220" : "#F6F7FB",
+        paper: mode === "dark" ? "#0F1A2B" : "#FFFFFF",
       },
     },
-    shape: { borderRadius: 18 },
+    shape: { borderRadius: 14 },
     typography: {
-      fontFamily: `"Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif`,
-    },
-    components: {
-      MuiCssBaseline: {
-        styleOverrides: {
-          html: {
-            scrollBehavior: "smooth",
-          },
-          body: {
-            overflowX: "hidden",
-          },
-          "*": {
-            boxSizing: "border-box",
-          },
-        },
-      },
-      MuiPaper: {
-        styleOverrides: {
-          root: {
-            backgroundImage: "none",
-          },
-        },
-      },
-      MuiButton: {
-        styleOverrides: {
-          root: {
-            textTransform: "none",
-          },
-        },
-      },
+      fontFamily: `"Inter", system-ui, -apple-system, Segoe UI, Roboto, Arial`,
     },
   });
 };
 
 export default function App() {
+  // viewer theme
   const [viewerDark, setViewerDark] = useState(
     localStorage.getItem("viewer_theme")
       ? localStorage.getItem("viewer_theme") === "dark"
       : true
   );
 
+  // admin theme
   const [adminDark, setAdminDark] = useState(
     localStorage.getItem("admin_theme")
       ? localStorage.getItem("admin_theme") === "dark"
       : true
   );
 
-  const [loggedIn, setLoggedIn] = useState(!!localStorage.getItem("token"));
+  // 🔥 IMPORTANT: reactive login state
+  const [loggedIn, setLoggedIn] = useState(
+    !!localStorage.getItem("token")
+  );
 
+  // 🔥 watch token changes live
   useEffect(() => {
     const checkToken = () => {
       setLoggedIn(!!localStorage.getItem("token"));
@@ -95,6 +68,7 @@ export default function App() {
       window.removeEventListener("focus", checkToken);
     };
   }, []);
+  
 
   const viewerTheme = useMemo(
     () => makeTheme(viewerDark ? "dark" : "light", "viewer"),
@@ -125,6 +99,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
+        {/* VIEWER */}
         <Route
           path="/"
           element={
@@ -135,6 +111,7 @@ export default function App() {
           }
         />
 
+        {/* ADMIN LOGIN */}
         <Route
           path="/admin/login"
           element={
@@ -145,6 +122,7 @@ export default function App() {
           }
         />
 
+        {/* ADMIN DASHBOARD */}
         <Route
           path="/admin"
           element={
@@ -159,7 +137,9 @@ export default function App() {
           }
         />
 
+        {/* FALLBACK */}
         <Route path="*" element={<Navigate to="/" replace />} />
+
       </Routes>
     </BrowserRouter>
   );
