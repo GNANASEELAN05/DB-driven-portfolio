@@ -110,7 +110,7 @@ import http from "../api/http";
 const drawerWidth = 280;
 
 const BRAND_PRIMARY = "#c680f2";
-const BRAND_DARK    = "#7A3F91";
+const BRAND_DARK = "#7A3F91";
 
 const bumpContentVersion = () => {
   localStorage.setItem("content_version", String(Date.now()));
@@ -121,7 +121,9 @@ const formatDate = (iso) => {
     if (!iso) return "-";
     const d = new Date(iso);
     return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "2-digit" });
-  } catch { return iso; }
+  } catch {
+    return iso;
+  }
 };
 
 // ── TextField sx (unchanged logic, updated radius token) ──────────────────
@@ -171,7 +173,7 @@ function SmallTextField(props) {
 
 // ── StatCard ───────────────────────────────────────────────────────────────
 function StatCard({ title, value, subtitle, icon, trendLabel }) {
-  const theme  = useTheme();
+  const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   return (
     <Box
@@ -208,7 +210,7 @@ function SectionHeader({ title, subtitle, right }) {
 
 // ── SimpleItemDialog ───────────────────────────────────────────────────────
 function SimpleItemDialog({ open, title, children, onClose, onSave, saveText = "Save" }) {
-  const theme  = useTheme();
+  const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   return (
     <Dialog
@@ -219,7 +221,7 @@ function SimpleItemDialog({ open, title, children, onClose, onSave, saveText = "
       <DialogContent sx={{ pt: 2 }}>{children}</DialogContent>
       <DialogActions sx={{ p: 2, gap: 1 }}>
         <Button onClick={onClose} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>Cancel</Button>
-        <Button onClick={onSave}  size="small" className="adm-btn-primary"  startIcon={<MdSave  />}>{saveText}</Button>
+        <Button onClick={onSave} size="small" className="adm-btn-primary" startIcon={<MdSave />}>{saveText}</Button>
       </DialogActions>
     </Dialog>
   );
@@ -227,7 +229,7 @@ function SimpleItemDialog({ open, title, children, onClose, onSave, saveText = "
 
 // ── ConfirmDialog ──────────────────────────────────────────────────────────
 function ConfirmDialog({ open, title, description, confirmText, onClose, onConfirm }) {
-  const theme  = useTheme();
+  const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   return (
     <Dialog
@@ -239,7 +241,7 @@ function ConfirmDialog({ open, title, description, confirmText, onClose, onConfi
         <Typography variant="body2" sx={{ opacity: 0.82 }}>{description}</Typography>
       </DialogContent>
       <DialogActions sx={{ p: 2, gap: 1 }}>
-        <Button onClick={onClose}   size="small" className="adm-btn-outlined">Cancel</Button>
+        <Button onClick={onClose} size="small" className="adm-btn-outlined">Cancel</Button>
         <Button onClick={onConfirm} size="small" className="adm-btn-error">{confirmText}</Button>
       </DialogActions>
     </Dialog>
@@ -248,7 +250,7 @@ function ConfirmDialog({ open, title, description, confirmText, onClose, onConfi
 
 // ── ProjectEditorDialog (logic unchanged) ──────────────────────────────────
 function ProjectEditorDialog({ open, mode, initial, onClose, onSave }) {
-  const theme  = useTheme();
+  const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const [form, setForm] = useState(
     initial || { title: "", description: "", tech: "", liveUrl: "", repoUrl: "", featured: true }
@@ -282,7 +284,7 @@ function ProjectEditorDialog({ open, mode, initial, onClose, onSave }) {
               label="Description" value={form.description || ""} onChange={handleChange("description")}
               fullWidth multiline
               InputProps={{ inputComponent: TextareaAutosize, inputProps: { minRows: 2 } }}
-              sx={{ width:"100%","& .MuiInputBase-root":{width:"100%",alignItems:"flex-start"},"& textarea":{width:"100%",boxSizing:"border-box",resize:"none",overflow:"hidden",whiteSpace:"pre-wrap",overflowWrap:"break-word"} }}
+              sx={{ width: "100%", "& .MuiInputBase-root": { width: "100%", alignItems: "flex-start" }, "& textarea": { width: "100%", boxSizing: "border-box", resize: "none", overflow: "hidden", whiteSpace: "pre-wrap", overflowWrap: "break-word" } }}
             />
           </Grid>
 
@@ -313,28 +315,28 @@ function ProjectEditorDialog({ open, mode, initial, onClose, onSave }) {
 
 // ── ResumePreviewDialog (logic unchanged) ──────────────────────────────────
 function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
-  const theme  = useTheme();
+  const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
-  const src    = blobUrl || url;
+  const src = blobUrl || url;
   return (
     <Dialog
       open={open} onClose={onClose} fullWidth maxWidth="md"
       className={isDark ? "adm-dialog" : "adm-dialog adm-dialog-light"}
     >
       <DialogTitle className="adm-dialog-title">{title}</DialogTitle>
-      <DialogContent sx={{ height:650, p:0, overflow:"hidden", background: isDark ? "#000":"#fff" }}>
+      <DialogContent sx={{ height: 650, p: 0, overflow: "hidden", background: isDark ? "#000" : "#fff" }}>
         {loading ? (
-          <Box sx={{ p:2 }}><Typography sx={{ opacity:0.7 }}>Loading preview…</Typography></Box>
+          <Box sx={{ p: 2 }}><Typography sx={{ opacity: 0.7 }}>Loading preview…</Typography></Box>
         ) : src ? (
-          <Box sx={{ width:"100%",height:"100%",overflowY:"scroll",overflowX:"hidden",position:"relative",scrollbarWidth:"none",msOverflowStyle:"none","&::-webkit-scrollbar":{width:"0px",background:"transparent"} }}>
-            <Box sx={{ position:"absolute",right:0,top:0,width:"16px",height:"100%",background:isDark?"#000":"#fff",zIndex:5,pointerEvents:"none" }} />
-            <iframe title="Resume Preview" src={src} style={{ width:"100%",height:"200%",border:"none",display:"block",overflow:"hidden" }} />
+          <Box sx={{ width: "100%", height: "100%", overflowY: "scroll", overflowX: "hidden", position: "relative", scrollbarWidth: "none", msOverflowStyle: "none", "&::-webkit-scrollbar": { width: "0px", background: "transparent" } }}>
+            <Box sx={{ position: "absolute", right: 0, top: 0, width: "16px", height: "100%", background: isDark ? "#000" : "#fff", zIndex: 5, pointerEvents: "none" }} />
+            <iframe title="Resume Preview" src={src} style={{ width: "100%", height: "200%", border: "none", display: "block", overflow: "hidden" }} />
           </Box>
         ) : (
-          <Box sx={{ p:2 }}><Typography sx={{ opacity:0.7 }}>Preview not available.</Typography></Box>
+          <Box sx={{ p: 2 }}><Typography sx={{ opacity: 0.7 }}>Preview not available.</Typography></Box>
         )}
       </DialogContent>
-      <DialogActions sx={{ p:2 }}>
+      <DialogActions sx={{ p: 2 }}>
         <Button onClick={onClose} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>Close</Button>
       </DialogActions>
     </Dialog>
@@ -343,7 +345,7 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
 
 // ── ResumeUploadSuccessDialog ──────────────────────────────────────────────
 function ResumeUploadSuccessDialog({ open, fileName, onClose }) {
-  const theme  = useTheme();
+  const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   return (
     <Dialog
@@ -382,70 +384,70 @@ function ResumeUploadSuccessDialog({ open, fileName, onClose }) {
 export default function AdminDashboard(props) {
   React.useEffect(() => { document.title = "Gnanaseelan Admin Panel"; }, []);
 
-  const theme   = useTheme();
+  const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const isDark  = theme.palette.mode === "dark";
+  const isDark = theme.palette.mode === "dark";
 
   // ── ALL STATE (unchanged) ────────────────────────────────────────────────
   const [mobileOpen, setMobileOpen] = useState(false);
   const [active, setActive] = useState("dashboard");
   const [loading, setLoading] = useState(false);
-  const [ok,  setOk]  = useState("");
+  const [ok, setOk] = useState("");
   const [err, setErr] = useState("");
 
-  const [profile, setProfile] = useState({ name:"",title:"",tagline:"",location:"",emailPublic:"",initials:"",about:"" });
-  const [skills,  setSkills]  = useState({ frontend:"",backend:"",database:"",tools:"" });
+  const [profile, setProfile] = useState({ name: "", title: "", tagline: "", location: "", emailPublic: "", initials: "", about: "" });
+  const [skills, setSkills] = useState({ frontend: "", backend: "", database: "", tools: "" });
 
   const [skillCategory, setSkillCategory] = useState("frontend");
-  const [skillInput,    setSkillInput]    = useState("");
-  const [skillTable,    setSkillTable]    = useState([]);
-  const [editIndex,     setEditIndex]     = useState(null);
-  const [editValue,     setEditValue]     = useState("");
+  const [skillInput, setSkillInput] = useState("");
+  const [skillTable, setSkillTable] = useState([]);
+  const [editIndex, setEditIndex] = useState(null);
+  const [editValue, setEditValue] = useState("");
 
-  const [projects,     setProjects]     = useState([]);
-  const [socials,      setSocials]      = useState({ github:"",linkedin:"",email:"",phone:"",website:"" });
+  const [projects, setProjects] = useState([]);
+  const [socials, setSocials] = useState({ github: "", linkedin: "", email: "", phone: "", website: "" });
   const [achievements, setAchievements] = useState([]);
-  const [languages,    setLanguages]    = useState([]);
-  const [education,    setEducation]    = useState([]);
-  const [experience,   setExperience]   = useState([]);
+  const [languages, setLanguages] = useState([]);
+  const [education, setEducation] = useState([]);
+  const [experience, setExperience] = useState([]);
 
-  const [projDlgOpen,    setProjDlgOpen]    = useState(false);
-  const [projDlgMode,    setProjDlgMode]    = useState("add");
+  const [projDlgOpen, setProjDlgOpen] = useState(false);
+  const [projDlgMode, setProjDlgMode] = useState("add");
   const [projDlgInitial, setProjDlgInitial] = useState(null);
 
   // ── FIX 2: Unified confirm dialog state ──────────────────────────────────
-  const [confirmOpen,   setConfirmOpen]   = useState(false);
-  const [confirmPayload,setConfirmPayload] = useState({ title:"",description:"",confirmText:"",onConfirm:null });
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [confirmPayload, setConfirmPayload] = useState({ title: "", description: "", confirmText: "", onConfirm: null });
 
-  const [achDlgOpen,   setAchDlgOpen]   = useState(false);
+  const [achDlgOpen, setAchDlgOpen] = useState(false);
   const [achEditingId, setAchEditingId] = useState(null);
-  const [achForm,      setAchForm]      = useState({ title:"",issuer:"",year:"",link:"" });
+  const [achForm, setAchForm] = useState({ title: "", issuer: "", year: "", link: "" });
 
-  const [langDlgOpen,   setLangDlgOpen]   = useState(false);
+  const [langDlgOpen, setLangDlgOpen] = useState(false);
   const [langEditingId, setLangEditingId] = useState(null);
-  const [langForm,      setLangForm]      = useState({ language:"",level:"Beginner",years:1,notes:"" });
+  const [langForm, setLangForm] = useState({ language: "", level: "Beginner", years: 1, notes: "" });
 
-  const [eduDlgOpen,   setEduDlgOpen]   = useState(false);
+  const [eduDlgOpen, setEduDlgOpen] = useState(false);
   const [eduEditingId, setEduEditingId] = useState(null);
-  const [eduForm,      setEduForm]      = useState({ degree:"",institution:"",year:"",details:"" });
+  const [eduForm, setEduForm] = useState({ degree: "", institution: "", year: "", details: "" });
 
-  const [expDlgOpen,   setExpDlgOpen]   = useState(false);
+  const [expDlgOpen, setExpDlgOpen] = useState(false);
   const [expEditingId, setExpEditingId] = useState(null);
-  const [expForm,      setExpForm]      = useState({ company:"",role:"",start:"",end:"",description:"" });
+  const [expForm, setExpForm] = useState({ company: "", role: "", start: "", end: "", description: "" });
 
-  const [resumes,              setResumes]              = useState([]);
-  const [resumeMenuAnchor,     setResumeMenuAnchor]     = useState(null);
+  const [resumes, setResumes] = useState([]);
+  const [resumeMenuAnchor, setResumeMenuAnchor] = useState(null);
   const [resumeMenuPosition, setResumeMenuPosition] = useState(null);
-  const [resumeMenuItem,       setResumeMenuItem]       = useState(null);
-  const [resumePreviewOpen,    setResumePreviewOpen]    = useState(false);
-  const [resumePreviewTitle,   setResumePreviewTitle]   = useState("");
+  const [resumeMenuItem, setResumeMenuItem] = useState(null);
+  const [resumePreviewOpen, setResumePreviewOpen] = useState(false);
+  const [resumePreviewTitle, setResumePreviewTitle] = useState("");
   const [resumePreviewBlobUrl, setResumePreviewBlobUrl] = useState("");
   const [resumePreviewLoading, setResumePreviewLoading] = useState(false);
 
   // ── FIX 3: Resume upload progress + success dialog ───────────────────────
-  const [resumeUploading,      setResumeUploading]      = useState(false);
-  const [resumeUploadSuccess,  setResumeUploadSuccess]  = useState(false);
-  const [resumeUploadedName,   setResumeUploadedName]   = useState("");
+  const [resumeUploading, setResumeUploading] = useState(false);
+  const [resumeUploadSuccess, setResumeUploadSuccess] = useState(false);
+  const [resumeUploadedName, setResumeUploadedName] = useState("");
 
   const handleDrawerToggle = () => setMobileOpen((p) => !p);
 
@@ -454,41 +456,41 @@ export default function AdminDashboard(props) {
   const fetchAllAdmin = async () => {
     try {
       setErr(""); setOk(""); setLoading(true);
-      const [p,s,pr,so,a,l,edu,exp] = await Promise.all([
-        getProfile(),getSkills(),getAllProjectsAdmin(),getSocials(),
-        getAchievements(),getLanguageExperience(),getEducation(),getExperience(),
+      const [p, s, pr, so, a, l, edu, exp] = await Promise.all([
+        getProfile(), getSkills(), getAllProjectsAdmin(), getSocials(),
+        getAchievements(), getLanguageExperience(), getEducation(), getExperience(),
       ]);
       setProfile(p?.data || {});
-      setSkills(s?.data  || {});
+      setSkills(s?.data || {});
       const table = [];
-      const data  = s?.data || {};
-      ["frontend","backend","database","tools"].forEach(cat=>{
-        if(data[cat]) data[cat].split(",").forEach(sk=>{ if(sk.trim()) table.push({category:cat,name:sk.trim()}); });
+      const data = s?.data || {};
+      ["frontend", "backend", "database", "tools"].forEach(cat => {
+        if (data[cat]) data[cat].split(",").forEach(sk => { if (sk.trim()) table.push({ category: cat, name: sk.trim() }); });
       });
       setSkillTable(table);
       setProjects(pr?.data || []);
-      setSocials(so?.data  || {});
-      setAchievements(Array.isArray(a?.data)   ? a.data   : []);
-      setLanguages(   Array.isArray(l?.data)   ? l.data   : []);
-      setEducation(   Array.isArray(edu?.data) ? edu.data : []);
-      setExperience(  Array.isArray(exp?.data) ? exp.data : []);
-      try { const r = await listResumesAdmin(); if(r?.data && Array.isArray(r.data)) setResumes(r.data); } catch{}
+      setSocials(so?.data || {});
+      setAchievements(Array.isArray(a?.data) ? a.data : []);
+      setLanguages(Array.isArray(l?.data) ? l.data : []);
+      setEducation(Array.isArray(edu?.data) ? edu.data : []);
+      setExperience(Array.isArray(exp?.data) ? exp.data : []);
+      try { const r = await listResumesAdmin(); if (r?.data && Array.isArray(r.data)) setResumes(r.data); } catch {}
       setOk("Admin data loaded from DB.");
     } catch { setErr("Failed to load Admin data. Check backend is running + token + CORS."); }
-    finally  { setLoading(false); }
+    finally { setLoading(false); }
   };
 
   React.useEffect(() => { fetchAllAdmin(); }, []); // eslint-disable-line
 
   const toggleTheme = () => {
-    if(typeof props?.setDarkMode==="function"){ props.setDarkMode((p)=>!p); return; }
+    if (typeof props?.setDarkMode === "function") { props.setDarkMode((p) => !p); return; }
     const next = theme.palette.mode !== "dark";
-    localStorage.setItem("admin_pref_dark", next?"1":"0");
+    localStorage.setItem("admin_pref_dark", next ? "1" : "0");
     setOk("Theme toggle clicked. (Wire setDarkMode from App.jsx to apply instantly)");
   };
 
-  const [pushDialog, setPushDialog] = useState({ open:false, name:"" });
-  const handlePushResume = async (r) => { await pushResumeToViewer(r); setPushDialog({ open:true, name:r.fileName||"Resume.pdf" }); };
+  const [pushDialog, setPushDialog] = useState({ open: false, name: "" });
+  const handlePushResume = async (r) => { await pushResumeToViewer(r); setPushDialog({ open: true, name: r.fileName || "Resume.pdf" }); };
 
   const saveProfileNow = async () => {
     try { setErr(""); setOk(""); setLoading(true); await updateProfile(profile); setOk("Profile saved to DB."); bumpContentVersion(); }
@@ -499,42 +501,41 @@ export default function AdminDashboard(props) {
     try {
       setErr(""); setOk(""); setLoading(true);
       const payload = {
-        frontend: skillTable.filter(s=>s.category==="frontend").map(s=>s.name).join(","),
-        backend:  skillTable.filter(s=>s.category==="backend").map(s=>s.name).join(","),
-        database: skillTable.filter(s=>s.category==="database").map(s=>s.name).join(","),
-        tools:    skillTable.filter(s=>s.category==="tools").map(s=>s.name).join(","),
+        frontend: skillTable.filter(s => s.category === "frontend").map(s => s.name).join(","),
+        backend: skillTable.filter(s => s.category === "backend").map(s => s.name).join(","),
+        database: skillTable.filter(s => s.category === "database").map(s => s.name).join(","),
+        tools: skillTable.filter(s => s.category === "tools").map(s => s.name).join(","),
       };
       await updateSkills(payload);
       setOk("Skills saved to database successfully"); bumpContentVersion();
-    } catch(e){ console.error(e); setErr("Skills save failed"); } finally{ setLoading(false); }
+    } catch (e) { console.error(e); setErr("Skills save failed"); } finally { setLoading(false); }
   };
 
-  const addSkill    = () => { if(!skillInput.trim()) return; setSkillTable(p=>[...p,{category:skillCategory,name:skillInput.trim()}]); setSkillInput(""); };
+  const addSkill = () => { if (!skillInput.trim()) return; setSkillTable(p => [...p, { category: skillCategory, name: skillInput.trim() }]); setSkillInput(""); };
   const deleteSkill = (index) => {
-    // FIX 2: confirm before deleting skill
     setConfirmPayload({
       title: "Delete Skill?",
       description: `Remove "${skillTable[index]?.name}" from skills?`,
       confirmText: "Delete",
-      onConfirm: () => { setConfirmOpen(false); setSkillTable(p=>p.filter((_,i)=>i!==index)); },
+      onConfirm: () => { setConfirmOpen(false); setSkillTable(p => p.filter((_, i) => i !== index)); },
     });
     setConfirmOpen(true);
   };
   const startEditSkill = (i) => { setEditIndex(i); setEditValue(skillTable[i].name); };
-  const saveEditSkill  = (i) => { setSkillTable(p=>p.map((x,idx)=>(idx===i?{...x,name:editValue}:x))); setEditIndex(null); };
+  const saveEditSkill = (i) => { setSkillTable(p => p.map((x, idx) => (idx === i ? { ...x, name: editValue } : x))); setEditIndex(null); };
 
   const saveSocialsNow = async () => {
     try { setErr(""); setOk(""); setLoading(true); await updateSocials(socials); setOk("Contact / Links saved to DB."); bumpContentVersion(); }
     catch { setErr("Saving socials failed."); } finally { setLoading(false); }
   };
 
-  const openAddProject  = () => { setProjDlgMode("add");  setProjDlgInitial(null);  setProjDlgOpen(true); };
+  const openAddProject = () => { setProjDlgMode("add"); setProjDlgInitial(null); setProjDlgOpen(true); };
   const openEditProject = (proj) => { setProjDlgMode("edit"); setProjDlgInitial(proj); setProjDlgOpen(true); };
 
   const onSaveProjectDialog = async (form) => {
     try {
       setErr(""); setOk(""); setLoading(true);
-      if(projDlgMode==="edit" && projDlgInitial?.id){ await updateProject(projDlgInitial.id,form); setOk("Project updated."); }
+      if (projDlgMode === "edit" && projDlgInitial?.id) { await updateProject(projDlgInitial.id, form); setOk("Project updated."); }
       else { await createProject(form); setOk("Project added."); }
       setProjDlgOpen(false); await fetchAllAdmin(); bumpContentVersion();
     } catch { setErr("Project save failed."); } finally { setLoading(false); }
@@ -542,74 +543,71 @@ export default function AdminDashboard(props) {
 
   const askDeleteProject = (proj) => {
     setConfirmPayload({
-      title:"Delete Project?",
-      description:`This will permanently delete "${proj.title}".`,
-      confirmText:"Delete",
-      onConfirm: async()=>{
-        try{ setConfirmOpen(false); setErr(""); setOk(""); setLoading(true); await deleteProject(proj.id); setOk("Project deleted."); await fetchAllAdmin(); bumpContentVersion(); }
-        catch{ setErr("Delete failed."); } finally{ setLoading(false); }
+      title: "Delete Project?",
+      description: `This will permanently delete "${proj.title}".`,
+      confirmText: "Delete",
+      onConfirm: async () => {
+        try { setConfirmOpen(false); setErr(""); setOk(""); setLoading(true); await deleteProject(proj.id); setOk("Project deleted."); await fetchAllAdmin(); bumpContentVersion(); }
+        catch { setErr("Delete failed."); } finally { setLoading(false); }
       },
     });
     setConfirmOpen(true);
   };
 
-  const openAchAdd  = () => { setAchEditingId(null); setAchForm({title:"",issuer:"",year:"",link:""}); setAchDlgOpen(true); };
-  const openAchEdit = (a)  => { setAchEditingId(a.id); setAchForm({title:a.title||"",issuer:a.issuer||"",year:a.year||"",link:a.link||""}); setAchDlgOpen(true); };
-  
-  // FIX 2: Confirm before deleting achievement
+  const openAchAdd = () => { setAchEditingId(null); setAchForm({ title: "", issuer: "", year: "", link: "" }); setAchDlgOpen(true); };
+  const openAchEdit = (a) => { setAchEditingId(a.id); setAchForm({ title: a.title || "", issuer: a.issuer || "", year: a.year || "", link: a.link || "" }); setAchDlgOpen(true); };
+
   const deleteAchLocal = (id) => {
     const ach = achievements.find(x => x.id === id);
     setConfirmPayload({
       title: "Delete Achievement?",
       description: `Remove "${ach?.title || "this achievement"}" permanently?`,
       confirmText: "Delete",
-      onConfirm: () => { setConfirmOpen(false); setAchievements((p)=>p.filter((x)=>x.id!==id)); },
+      onConfirm: () => { setConfirmOpen(false); setAchievements((p) => p.filter((x) => x.id !== id)); },
     });
     setConfirmOpen(true);
   };
 
   const saveAchLocal = () => {
-    if(achEditingId) setAchievements((p)=>p.map((x)=>(x.id===achEditingId?{...x,...achForm}:x)));
-    else setAchievements((p)=>[{...achForm,id:Date.now()},...p]);
+    if (achEditingId) setAchievements((p) => p.map((x) => (x.id === achEditingId ? { ...x, ...achForm } : x)));
+    else setAchievements((p) => [{ ...achForm, id: Date.now() }, ...p]);
     setAchDlgOpen(false);
   };
   const persistAchievements = async () => {
-    try{ setErr(""); setOk(""); setLoading(true); await saveAchievements(achievements.map(({id,...rest})=>rest)); setOk("Achievements saved to DB."); await fetchAllAdmin(); bumpContentVersion(); }
-    catch{ setErr("Saving achievements failed."); } finally{ setLoading(false); }
+    try { setErr(""); setOk(""); setLoading(true); await saveAchievements(achievements.map(({ id, ...rest }) => rest)); setOk("Achievements saved to DB."); await fetchAllAdmin(); bumpContentVersion(); }
+    catch { setErr("Saving achievements failed."); } finally { setLoading(false); }
   };
 
-  const openLangAdd  = () => { setLangEditingId(null); setLangForm({language:"",level:"Beginner",years:1,notes:""}); setLangDlgOpen(true); };
-  const openLangEdit = (l)  => { setLangEditingId(l.id); setLangForm({language:l.language||l.name||"",level:l.level||"Beginner",years:Number(l.years||1),notes:l.notes||""}); setLangDlgOpen(true); };
-  
-  // FIX 2: Confirm before deleting language
+  const openLangAdd = () => { setLangEditingId(null); setLangForm({ language: "", level: "Beginner", years: 1, notes: "" }); setLangDlgOpen(true); };
+  const openLangEdit = (l) => { setLangEditingId(l.id); setLangForm({ language: l.language || l.name || "", level: l.level || "Beginner", years: Number(l.years || 1), notes: l.notes || "" }); setLangDlgOpen(true); };
+
   const deleteLangLocal = (id) => {
     const lang = languages.find(x => x.id === id);
     setConfirmPayload({
       title: "Delete Language?",
       description: `Remove "${lang?.language || lang?.name || "this language"}" permanently?`,
       confirmText: "Delete",
-      onConfirm: () => { setConfirmOpen(false); setLanguages((p)=>p.filter((x)=>x.id!==id)); },
+      onConfirm: () => { setConfirmOpen(false); setLanguages((p) => p.filter((x) => x.id !== id)); },
     });
     setConfirmOpen(true);
   };
 
   const saveLangLocal = () => {
-    if(langEditingId) setLanguages((p)=>p.map((x)=>(x.id===langEditingId?{...x,...langForm}:x)));
-    else setLanguages((p)=>[{...langForm,id:Date.now()},...p]);
+    if (langEditingId) setLanguages((p) => p.map((x) => (x.id === langEditingId ? { ...x, ...langForm } : x)));
+    else setLanguages((p) => [{ ...langForm, id: Date.now() }, ...p]);
     setLangDlgOpen(false);
   };
   const persistLanguages = async () => {
-    try{
+    try {
       setErr(""); setOk(""); setLoading(true);
-      const payload = languages.map((l)=>({language:l.language||l.name||"",level:l.level||"Beginner",years:String(l.years??1),notes:l.notes||""}));
+      const payload = languages.map((l) => ({ language: l.language || l.name || "", level: l.level || "Beginner", years: String(l.years ?? 1), notes: l.notes || "" }));
       await saveLanguageExperience(payload); setOk("Languages experience saved to DB."); await fetchAllAdmin(); bumpContentVersion();
-    } catch{ setErr("Saving language experience failed."); } finally{ setLoading(false); }
+    } catch { setErr("Saving language experience failed."); } finally { setLoading(false); }
   };
 
-  const openEduAdd  = () => { setEduEditingId(null); setEduForm({degree:"",institution:"",year:"",details:""}); setEduDlgOpen(true); };
-  const openEduEdit = (e)  => { setEduEditingId(e.id); setEduForm({degree:e.degree||"",institution:e.institution||"",year:e.year||"",details:e.details||""}); setEduDlgOpen(true); };
+  const openEduAdd = () => { setEduEditingId(null); setEduForm({ degree: "", institution: "", year: "", details: "" }); setEduDlgOpen(true); };
+  const openEduEdit = (e) => { setEduEditingId(e.id); setEduForm({ degree: e.degree || "", institution: e.institution || "", year: e.year || "", details: e.details || "" }); setEduDlgOpen(true); };
 
-  // FIX 2: Confirm before deleting education
   const deleteEduLocal = async (id) => {
     const edu = education.find(x => x.id === id);
     setConfirmPayload({
@@ -618,33 +616,32 @@ export default function AdminDashboard(props) {
       confirmText: "Delete",
       onConfirm: async () => {
         setConfirmOpen(false);
-        const prev = education; const next = prev.filter((x)=>x.id!==id); setEducation(next);
-        try{
+        const prev = education; const next = prev.filter((x) => x.id !== id); setEducation(next);
+        try {
           setErr(""); setOk(""); setLoading(true);
           let deleted = false;
-          try{ await http.delete(`/api/portfolio/education/${id}`); deleted=true; } catch{}
-          if(!deleted){ const payload = next.map(({id:_id,...rest})=>rest); await updateEducation(payload); }
+          try { await http.delete(`/api/portfolio/education/${id}`); deleted = true; } catch {}
+          if (!deleted) { const payload = next.map(({ id: _id, ...rest }) => rest); await updateEducation(payload); }
           setOk("Education deleted."); await fetchAllAdmin(); bumpContentVersion();
-        } catch{ setErr("Deleting education failed."); setEducation(prev); } finally{ setLoading(false); }
+        } catch { setErr("Deleting education failed."); setEducation(prev); } finally { setLoading(false); }
       },
     });
     setConfirmOpen(true);
   };
 
   const saveEduLocal = () => {
-    if(eduEditingId) setEducation((p)=>p.map((x)=>(x.id===eduEditingId?{...x,...eduForm}:x)));
-    else setEducation((p)=>[{...eduForm,id:Date.now()},...p]);
+    if (eduEditingId) setEducation((p) => p.map((x) => (x.id === eduEditingId ? { ...x, ...eduForm } : x)));
+    else setEducation((p) => [{ ...eduForm, id: Date.now() }, ...p]);
     setEduDlgOpen(false);
   };
   const persistEducation = async () => {
-    try{ setErr(""); setOk(""); setLoading(true); const payload=education.map(({id,...rest})=>rest); await updateEducation(payload); setOk("Education saved to DB."); await fetchAllAdmin(); bumpContentVersion(); }
-    catch{ setErr("Saving education failed."); } finally{ setLoading(false); }
+    try { setErr(""); setOk(""); setLoading(true); const payload = education.map(({ id, ...rest }) => rest); await updateEducation(payload); setOk("Education saved to DB."); await fetchAllAdmin(); bumpContentVersion(); }
+    catch { setErr("Saving education failed."); } finally { setLoading(false); }
   };
 
-  const openExpAdd  = () => { setExpEditingId(null); setExpForm({company:"",role:"",start:"",end:"",description:""}); setExpDlgOpen(true); };
-  const openExpEdit = (e)  => { setExpEditingId(e.id); setExpForm({company:e.company||"",role:e.role||"",start:e.start||"",end:e.end||"",description:e.description||""}); setExpDlgOpen(true); };
+  const openExpAdd = () => { setExpEditingId(null); setExpForm({ company: "", role: "", start: "", end: "", description: "" }); setExpDlgOpen(true); };
+  const openExpEdit = (e) => { setExpEditingId(e.id); setExpForm({ company: e.company || "", role: e.role || "", start: e.start || "", end: e.end || "", description: e.description || "" }); setExpDlgOpen(true); };
 
-  // FIX 2: Confirm before deleting experience
   const deleteExpLocal = async (id) => {
     const exp = experience.find(x => x.id === id);
     setConfirmPayload({
@@ -653,129 +650,135 @@ export default function AdminDashboard(props) {
       confirmText: "Delete",
       onConfirm: async () => {
         setConfirmOpen(false);
-        const prev = experience; const next = prev.filter((x)=>x.id!==id); setExperience(next);
-        try{
+        const prev = experience; const next = prev.filter((x) => x.id !== id); setExperience(next);
+        try {
           setErr(""); setOk(""); setLoading(true);
           let deleted = false;
-          try{ await http.delete(`/api/portfolio/experience/${id}`); deleted=true; } catch{}
-          if(!deleted){ const payload=next.map(({id:_id,...rest})=>rest); await updateExperience(payload); }
+          try { await http.delete(`/api/portfolio/experience/${id}`); deleted = true; } catch {}
+          if (!deleted) { const payload = next.map(({ id: _id, ...rest }) => rest); await updateExperience(payload); }
           setOk("Experience deleted."); await fetchAllAdmin(); bumpContentVersion();
-        } catch{ setErr("Deleting experience failed."); setExperience(prev); } finally{ setLoading(false); }
+        } catch { setErr("Deleting experience failed."); setExperience(prev); } finally { setLoading(false); }
       },
     });
     setConfirmOpen(true);
   };
 
   const saveExpLocal = () => {
-    if(expEditingId) setExperience((p)=>p.map((x)=>(x.id===expEditingId?{...x,...expForm}:x)));
-    else setExperience((p)=>[{...expForm,id:Date.now()},...p]);
+    if (expEditingId) setExperience((p) => p.map((x) => (x.id === expEditingId ? { ...x, ...expForm } : x)));
+    else setExperience((p) => [{ ...expForm, id: Date.now() }, ...p]);
     setExpDlgOpen(false);
   };
   const persistExperience = async () => {
-    try{ setErr(""); setOk(""); setLoading(true); const payload=experience.map(({id,...rest})=>rest); await updateExperience(payload); setOk("Experience saved to DB."); await fetchAllAdmin(); bumpContentVersion(); }
-    catch{ setErr("Saving experience failed."); } finally{ setLoading(false); }
+    try { setErr(""); setOk(""); setLoading(true); const payload = experience.map(({ id, ...rest }) => rest); await updateExperience(payload); setOk("Experience saved to DB."); await fetchAllAdmin(); bumpContentVersion(); }
+    catch { setErr("Saving experience failed."); } finally { setLoading(false); }
   };
 
-  // FIX 3: Upload resume with progress + success dialog
   const onUploadResume = async (file) => {
-    try{
+    try {
       setErr(""); setOk("");
       setResumeUploading(true);
       setResumeUploadedName(file.name);
       await uploadResume(file);
-      const r=await listResumesAdmin();
-      if(r?.data && Array.isArray(r.data)) setResumes(r.data);
+      const r = await listResumesAdmin();
+      if (r?.data && Array.isArray(r.data)) setResumes(r.data);
       bumpContentVersion();
       setResumeUploadSuccess(true);
     }
-    catch{ setErr("Resume upload failed."); }
-    finally{ setResumeUploading(false); }
+    catch { setErr("Resume upload failed."); }
+    finally { setResumeUploading(false); }
   };
 
   const openResumePreviewInline = async (title, directUrl) => {
-    try{
-      setResumePreviewTitle(title||"Resume Preview"); setResumePreviewLoading(true); setResumePreviewOpen(true);
-      const res = await http.get(directUrl,{responseType:"blob"});
-      const blob = new Blob([res.data],{type:"application/pdf"});
+    try {
+      setResumePreviewTitle(title || "Resume Preview"); setResumePreviewLoading(true); setResumePreviewOpen(true);
+      const res = await http.get(directUrl, { responseType: "blob" });
+      const blob = new Blob([res.data], { type: "application/pdf" });
       setResumePreviewBlobUrl(URL.createObjectURL(blob));
-    } catch{ setResumePreviewBlobUrl(""); } finally{ setResumePreviewLoading(false); }
+    } catch { setResumePreviewBlobUrl(""); } finally { setResumePreviewLoading(false); }
   };
 
   const closeResumePreview = () => {
     setResumePreviewOpen(false);
-    if(resumePreviewBlobUrl){ try{ URL.revokeObjectURL(resumePreviewBlobUrl); }catch{} }
+    if (resumePreviewBlobUrl) { try { URL.revokeObjectURL(resumePreviewBlobUrl); } catch {} }
     setResumePreviewBlobUrl("");
   };
 
-  const previewCurrentResumeInline  = async () => openResumePreviewInline("Current Resume", viewResumeUrl());
+  const previewCurrentResumeInline = async () => openResumePreviewInline("Current Resume", viewResumeUrl());
   const pushResumeToViewer = async (item) => {
-    try{ if(!item?.id) return; setErr(""); setOk(""); setLoading(true); await setPrimaryResume(item.id); setOk(`Pushed to Viewer: ${item.fileName||"Resume"}`); await fetchAllAdmin(); bumpContentVersion(); }
-    catch{ setErr("Failed to push resume to Viewer."); } finally{ setLoading(false); }
+    try { if (!item?.id) return; setErr(""); setOk(""); setLoading(true); await setPrimaryResume(item.id); setOk(`Pushed to Viewer: ${item.fileName || "Resume"}`); await fetchAllAdmin(); bumpContentVersion(); }
+    catch { setErr("Failed to push resume to Viewer."); } finally { setLoading(false); }
   };
 
-  // FIX 1: Store anchor element for three-dot menu so it anchors to the button
-const openResumeMenu = (event, resume) => {
-  const rect = event.currentTarget.getBoundingClientRect();
+  // FIXED: store the clicked resume in resumeMenuItem
+  const openResumeMenu = (event, resume) => {
+    const rect = event.currentTarget.getBoundingClientRect();
 
-  setResumeMenuAnchor(event.currentTarget);
-  setResumeMenuPosition({
-    top: rect.bottom + window.scrollY,
-    left: rect.left + window.scrollX,
-  });
+    setResumeMenuAnchor(event.currentTarget);
+    setResumeMenuPosition({
+      top: rect.bottom + window.scrollY,
+      left: rect.left + window.scrollX,
+    });
+    setResumeMenuItem(resume);
+  };
 
-  setSelectedResume(resume);
-};
   const closeResumeMenu = () => {
-  setResumeMenuAnchor(null);
-  setResumeMenuPosition(null);
-};
-
-  const previewSelectedResumeInline = async () => { const item=resumeMenuItem; closeResumeMenu(); if(!item?.id) return; await openResumePreviewInline(item.fileName||"Resume",viewResumeByIdUrl(item.id)); };
-  const makePrimaryResume = async () => {
-    const item=resumeMenuItem; closeResumeMenu(); if(!item?.id) return;
-    try{ setErr(""); setOk(""); setLoading(true); await setPrimaryResume(item.id); setOk("Primary resume set."); await fetchAllAdmin(); bumpContentVersion(); }
-    catch{ setErr("Failed to set primary."); } finally{ setLoading(false); }
+    setResumeMenuAnchor(null);
+    setResumeMenuPosition(null);
+    setResumeMenuItem(null);
   };
 
-  // FIX 2: Confirm before deleting resume
+  const previewSelectedResumeInline = async () => {
+    const item = resumeMenuItem;
+    closeResumeMenu();
+    if (!item?.id) return;
+    await openResumePreviewInline(item.fileName || "Resume", viewResumeByIdUrl(item.id));
+  };
+
+  const makePrimaryResume = async () => {
+    const item = resumeMenuItem;
+    closeResumeMenu();
+    if (!item?.id) return;
+    try { setErr(""); setOk(""); setLoading(true); await setPrimaryResume(item.id); setOk("Primary resume set."); await fetchAllAdmin(); bumpContentVersion(); }
+    catch { setErr("Failed to set primary."); } finally { setLoading(false); }
+  };
+
   const deleteResume = async () => {
-    const item=resumeMenuItem; closeResumeMenu(); if(!item?.id) return;
+    const item = resumeMenuItem;
+    closeResumeMenu();
+    if (!item?.id) return;
     setConfirmPayload({
       title: "Delete Resume?",
       description: `Permanently delete "${item.fileName || "this resume"}"?`,
       confirmText: "Delete",
       onConfirm: async () => {
         setConfirmOpen(false);
-        try{ setErr(""); setOk(""); setLoading(true); await deleteResumeById(item.id); setOk("Resume deleted."); await fetchAllAdmin(); bumpContentVersion(); }
-        catch{ setErr("Failed to delete resume."); } finally{ setLoading(false); }
+        try { setErr(""); setOk(""); setLoading(true); await deleteResumeById(item.id); setOk("Resume deleted."); await fetchAllAdmin(); bumpContentVersion(); }
+        catch { setErr("Failed to delete resume."); } finally { setLoading(false); }
       },
     });
     setConfirmOpen(true);
   };
 
-  // ── pageLabel map ─────────────────────────────────────────────────────────
   const pageLabel = {
-    dashboard:"Dashboard",about:"About Me",skills:"Skills",projects:"Projects",
-    achievements:"Achievements",languages:"Languages Experience",education:"Education",
-    experience:"Experience",contact:"Contact / Links",resume:"Resume",
+    dashboard: "Dashboard", about: "About Me", skills: "Skills", projects: "Projects",
+    achievements: "Achievements", languages: "Languages Experience", education: "Education",
+    experience: "Experience", contact: "Contact / Links", resume: "Resume",
   };
 
-  // ── nav items ─────────────────────────────────────────────────────────────
   const navItems = [
-    { id:"dashboard",    label:"Dashboard",       icon:<MdDashboard /> },
-    { id:"about",        label:"About Me",        icon:<MdPerson /> },
-    { id:"skills",       label:"Skills",          icon:<MdBuild /> },
-    { id:"projects",     label:"Projects",        icon:<MdWork /> },
-    { id:"achievements", label:"Achievements",    icon:<MdEmojiEvents /> },
-    { id:"languages",    label:"Languages Exp",   icon:<MdCode /> },
-    { id:"education",    label:"Education",       icon:<MdSchool /> },
-    { id:"experience",   label:"Experience",      icon:<MdBadge /> },
-    { id:"contact",      label:"Contact / Links", icon:<MdLink /> },
-    { id:"resume",       label:"Resume",          icon:<MdDescription /> },
+    { id: "dashboard", label: "Dashboard", icon: <MdDashboard /> },
+    { id: "about", label: "About Me", icon: <MdPerson /> },
+    { id: "skills", label: "Skills", icon: <MdBuild /> },
+    { id: "projects", label: "Projects", icon: <MdWork /> },
+    { id: "achievements", label: "Achievements", icon: <MdEmojiEvents /> },
+    { id: "languages", label: "Languages Exp", icon: <MdCode /> },
+    { id: "education", label: "Education", icon: <MdSchool /> },
+    { id: "experience", label: "Experience", icon: <MdBadge /> },
+    { id: "contact", label: "Contact / Links", icon: <MdLink /> },
+    { id: "resume", label: "Resume", icon: <MdDescription /> },
   ];
 
-  // ── helper shortcuts ──────────────────────────────────────────────────────
-  const PBtn = ({ children, ...p }) => <Button size="small" className="adm-btn-primary"  fullWidth={isMobile} {...p}>{children}</Button>;
+  const PBtn = ({ children, ...p }) => <Button size="small" className="adm-btn-primary" fullWidth={isMobile} {...p}>{children}</Button>;
   const OBtn = ({ children, ...p }) => <Button size="small" className="adm-btn-outlined" fullWidth={isMobile} {...p}>{children}</Button>;
 
   const IconEdit = ({ onClick }) => (
@@ -785,7 +788,6 @@ const openResumeMenu = (event, resume) => {
     <IconButton size="small" className="adm-icon-btn-err" onClick={onClick}><MdDelete /></IconButton>
   );
 
-  // ── table helpers ─────────────────────────────────────────────────────────
   const TableWrap = ({ children }) => (
     <Paper elevation={0} className={`adm-table-wrap ${isDark ? "" : "adm-table-wrap-light"}`}>
       <TableContainer>{children}</TableContainer>
@@ -806,8 +808,9 @@ const openResumeMenu = (event, resume) => {
     <TableRow className={`adm-tr`}>{children}</TableRow>
   );
 
-  const TC = ({ children, bold, sx }) => (
+  const TC = ({ children, bold, sx, colSpan }) => (
     <TableCell
+      colSpan={colSpan}
       className={`adm-td ${isDark ? "" : "adm-td-light"}`}
       sx={{ fontWeight: bold ? 800 : undefined, ...sx }}
     >
@@ -815,11 +818,8 @@ const openResumeMenu = (event, resume) => {
     </TableCell>
   );
 
-  // ── DRAWER CONTENT ────────────────────────────────────────────────────────
   const drawer = (
-    <Box sx={{ height:"100%", display:"flex", flexDirection:"column" }}>
-
-      {/* Brand header */}
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <Box className={`adm-drawer-header ${isDark ? "" : "adm-drawer-header-light"}`}>
         <Avatar className="adm-drawer-avatar">G</Avatar>
         <Box className="adm-drawer-brand-text">
@@ -828,15 +828,14 @@ const openResumeMenu = (event, resume) => {
         </Box>
       </Box>
 
-      {/* Nav list */}
-      <Box sx={{ flex:1, overflowY:"auto", py:1 }} className="adm-scroll">
+      <Box sx={{ flex: 1, overflowY: "auto", py: 1 }} className="adm-scroll">
         <Typography className="adm-nav-section">Navigation</Typography>
         <List disablePadding>
           {navItems.map((it) => (
             <ListItemButton
               key={it.id}
               onClick={() => { setActive(it.id); setMobileOpen(false); }}
-              className={`adm-nav-item ${active===it.id ? "adm-nav-item-active" : ""}`}
+              className={`adm-nav-item ${active === it.id ? "adm-nav-item-active" : ""}`}
             >
               <ListItemIcon className={`adm-nav-icon ${isDark ? "" : "adm-nav-icon-light"}`}>
                 {it.icon}
@@ -844,20 +843,19 @@ const openResumeMenu = (event, resume) => {
               <ListItemText
                 primary={it.label}
                 className={`adm-nav-label ${isDark ? "" : "adm-nav-label-light"}`}
-                primaryTypographyProps={{ fontSize:"0.875rem", fontWeight: active===it.id ? 800 : 600 }}
+                primaryTypographyProps={{ fontSize: "0.875rem", fontWeight: active === it.id ? 800 : 600 }}
               />
             </ListItemButton>
           ))}
         </List>
       </Box>
 
-      {/* Logout */}
-      <Box sx={{ p:1.5, borderTop: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(17,24,39,0.07)" }}>
+      <Box sx={{ p: 1.5, borderTop: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(17,24,39,0.07)" }}>
         <Button
           fullWidth
           className="adm-logout"
           startIcon={<MdLogout />}
-          onClick={() => { localStorage.removeItem("token"); window.location.href="/admin-login"; }}
+          onClick={() => { localStorage.removeItem("token"); window.location.href = "/admin-login"; }}
         >
           Logout
         </Button>
@@ -865,17 +863,13 @@ const openResumeMenu = (event, resume) => {
     </Box>
   );
 
-  // ═════════════════════════════════════════════════════════════════════════
-  // RENDER
-  // ═════════════════════════════════════════════════════════════════════════
   return (
     <Box
-      sx={{ display:"flex", minHeight:"100vh" }}
+      sx={{ display: "flex", minHeight: "100vh" }}
       className={`adm-root ${isDark ? "adm-root-dark" : "adm-root-light"}`}
     >
       <CssBaseline />
 
-      {/* ── Animated background (dark only) ── */}
       {isDark && (
         <Box className="adm-bg" aria-hidden="true">
           <Box className="adm-orb adm-orb-1" />
@@ -885,104 +879,97 @@ const openResumeMenu = (event, resume) => {
         </Box>
       )}
 
-      {/* ── APP BAR ── */}
       <AppBar
         position="fixed"
         elevation={0}
         className={isDark ? "adm-appbar" : "adm-appbar adm-appbar-light"}
-        sx={{ zIndex:(t)=>t.zIndex.drawer+1, color:"text.primary" }}
+        sx={{ zIndex: (t) => t.zIndex.drawer + 1, color: "text.primary" }}
       >
-        <Toolbar sx={{ gap:1 }}>
+        <Toolbar sx={{ gap: 1 }}>
           <IconButton
             edge="start"
             onClick={handleDrawerToggle}
             className={`adm-bar-btn ${isDark ? "" : "adm-bar-btn-light"}`}
-            sx={{ mr:0.5, display:{ md:"none" } }}
+            sx={{ mr: 0.5, display: { md: "none" } }}
           >
             <MdMenu />
           </IconButton>
 
-          <Typography className="adm-bar-title" sx={{ flexGrow:1 }}>
+          <Typography className="adm-bar-title" sx={{ flexGrow: 1 }}>
             {pageLabel[active] || "Admin"}
           </Typography>
 
           <Tooltip title="View Portfolio">
-            <IconButton onClick={()=>window.open("/","_blank")} className={`adm-bar-btn ${isDark?"":"adm-bar-btn-light"}`}>
+            <IconButton onClick={() => window.open("/", "_blank")} className={`adm-bar-btn ${isDark ? "" : "adm-bar-btn-light"}`}>
               <MdVisibility />
             </IconButton>
           </Tooltip>
 
           <Tooltip title={isDark ? "Light Mode" : "Dark Mode"}>
-            <IconButton onClick={toggleTheme} className={`adm-bar-btn ${isDark?"":"adm-bar-btn-light"}`}>
+            <IconButton onClick={toggleTheme} className={`adm-bar-btn ${isDark ? "" : "adm-bar-btn-light"}`}>
               {isDark ? <MdLightMode /> : <MdDarkMode />}
             </IconButton>
           </Tooltip>
 
           <Tooltip title="Reload">
-            <IconButton onClick={fetchAllAdmin} className={`adm-bar-btn ${isDark?"":"adm-bar-btn-light"}`}>
+            <IconButton onClick={fetchAllAdmin} className={`adm-bar-btn ${isDark ? "" : "adm-bar-btn-light"}`}>
               <MdRefresh />
             </IconButton>
           </Tooltip>
         </Toolbar>
       </AppBar>
 
-      {/* ── DRAWER ── */}
-      <Box component="nav" sx={{ width:{ md:drawerWidth }, flexShrink:{ md:0 }, zIndex:2 }}>
+      <Box component="nav" sx={{ width: { md: drawerWidth }, flexShrink: { md: 0 }, zIndex: 2 }}>
         <Drawer
           variant="temporary" open={mobileOpen} onClose={handleDrawerToggle}
-          ModalProps={{ keepMounted:true }}
-          sx={{ display:{ xs:"block", md:"none" }, "& .MuiDrawer-paper":{ width:drawerWidth, borderRight:"none" } }}
-          PaperProps={{ className:`adm-drawer ${isDark?"":"adm-drawer-light"}` }}
+          ModalProps={{ keepMounted: true }}
+          sx={{ display: { xs: "block", md: "none" }, "& .MuiDrawer-paper": { width: drawerWidth, borderRight: "none" } }}
+          PaperProps={{ className: `adm-drawer ${isDark ? "" : "adm-drawer-light"}` }}
         >
           {drawer}
         </Drawer>
         <Drawer
           variant="permanent" open
-          sx={{ display:{ xs:"none", md:"block" }, "& .MuiDrawer-paper":{ width:drawerWidth } }}
-          PaperProps={{ className:`adm-drawer ${isDark?"":"adm-drawer-light"}` }}
+          sx={{ display: { xs: "none", md: "block" }, "& .MuiDrawer-paper": { width: drawerWidth } }}
+          PaperProps={{ className: `adm-drawer ${isDark ? "" : "adm-drawer-light"}` }}
         >
           {drawer}
         </Drawer>
       </Box>
 
-      {/* ── MAIN CONTENT ── */}
       <Box
         component="main"
         className="adm-main"
         sx={{
-          flexGrow:1, minWidth:0, pb:6,
-          width:{ md:`calc(100% - ${drawerWidth}px)` },
+          flexGrow: 1, minWidth: 0, pb: 6,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
         }}
       >
         <Toolbar />
 
-        <Container maxWidth="xl" sx={{ py:3 }}>
+        <Container maxWidth="xl" sx={{ py: 3 }}>
+          {ok && <Alert severity="success" className="adm-alert-ok">{ok}</Alert>}
+          {err && <Alert severity="error" className="adm-alert-err">{err}</Alert>}
 
-          {/* Alerts */}
-          {ok  && <Alert severity="success" className="adm-alert-ok">{ok}</Alert>}
-          {err && <Alert severity="error"   className="adm-alert-err">{err}</Alert>}
-
-          {/* ── PAGE HEADER ── */}
           <Box className="adm-page-header adm-page-enter">
             <Typography className={isDark ? "adm-page-title" : "adm-page-title adm-page-title-light"}>
               {pageLabel[active] || "Admin"}
             </Typography>
             <Typography className="adm-page-subtitle">
-              {active==="dashboard"    && "Portfolio overview — all data synced from DB"}
-              {active==="about"        && "Edit your public profile — saved directly to the database"}
-              {active==="skills"       && "Manage your tech stack with add / edit / delete"}
-              {active==="projects"     && "Add or edit featured projects shown on the viewer"}
-              {active==="achievements" && "Certifications, awards and recognitions"}
-              {active==="languages"    && "Programming language proficiency and years of experience"}
-              {active==="education"    && "Academic background and qualifications"}
-              {active==="experience"   && "Career and internship timeline"}
-              {active==="contact"      && "Social links and contact information shown in viewer"}
-              {active==="resume"       && "Upload, preview, and set the primary resume for download"}
+              {active === "dashboard" && "Portfolio overview — all data synced from DB"}
+              {active === "about" && "Edit your public profile — saved directly to the database"}
+              {active === "skills" && "Manage your tech stack with add / edit / delete"}
+              {active === "projects" && "Add or edit featured projects shown on the viewer"}
+              {active === "achievements" && "Certifications, awards and recognitions"}
+              {active === "languages" && "Programming language proficiency and years of experience"}
+              {active === "education" && "Academic background and qualifications"}
+              {active === "experience" && "Career and internship timeline"}
+              {active === "contact" && "Social links and contact information shown in viewer"}
+              {active === "resume" && "Upload, preview, and set the primary resume for download"}
             </Typography>
           </Box>
 
-          {/* ══════════════════════════════════════════════════════ DASHBOARD */}
-          {active==="dashboard" && (
+          {active === "dashboard" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Overview" subtitle="Quick counts — DB-backed"
@@ -990,29 +977,29 @@ const openResumeMenu = (event, resume) => {
               />
               <Grid container spacing={2.5}>
                 {[
-                  { title:"Projects",     value:projects.length,                                                                                        subtitle:"Featured + all",  icon:<MdWork />,        trendLabel:"DB" },
-                  { title:"Skills",       value:String(skills.frontend||"").split(",").filter(Boolean).length, subtitle:"Frontend tags",                 icon:<MdBuild />,       trendLabel:"DB" },
-                  { title:"Achievements", value:achievements.length,                                                                                    subtitle:"Awards + certs", icon:<MdEmojiEvents />, trendLabel:"DB" },
-                  { title:"Resumes",      value:resumes.length,                                                                                         subtitle:"Uploaded",       icon:<MdDescription />, trendLabel:"DB" },
-                ].map((s,i)=>(
+                  { title: "Projects", value: projects.length, subtitle: "Featured + all", icon: <MdWork />, trendLabel: "DB" },
+                  { title: "Skills", value: String(skills.frontend || "").split(",").filter(Boolean).length, subtitle: "Frontend tags", icon: <MdBuild />, trendLabel: "DB" },
+                  { title: "Achievements", value: achievements.length, subtitle: "Awards + certs", icon: <MdEmojiEvents />, trendLabel: "DB" },
+                  { title: "Resumes", value: resumes.length, subtitle: "Uploaded", icon: <MdDescription />, trendLabel: "DB" },
+                ].map((s, i) => (
                   <Grid key={i} item xs={12} sm={6} md={3}><StatCard {...s} /></Grid>
                 ))}
               </Grid>
 
               {projects.length > 0 && (
-                <Box sx={{ mt:3.5 }}>
-                  <Typography sx={{ fontWeight:800, mb:1.5, opacity:0.45, fontSize:"0.72rem", letterSpacing:"0.1em", textTransform:"uppercase" }}>
+                <Box sx={{ mt: 3.5 }}>
+                  <Typography sx={{ fontWeight: 800, mb: 1.5, opacity: 0.45, fontSize: "0.72rem", letterSpacing: "0.1em", textTransform: "uppercase" }}>
                     Recent Projects
                   </Typography>
                   <TableWrap>
                     <Table size="small">
-                      <THead cols={[{label:"Title"},{label:"Tech"},{label:"Featured",sx:{width:100}}]} />
+                      <THead cols={[{ label: "Title" }, { label: "Tech" }, { label: "Featured", sx: { width: 100 } }]} />
                       <TableBody>
-                        {projects.slice(0,5).map((p)=>(
+                        {projects.slice(0, 5).map((p) => (
                           <TRow key={p.id}>
                             <TC bold>{p.title}</TC>
                             <TC>{p.tech}</TC>
-                            <TC><Chip size="small" label={p.featured?"YES":"NO"} className={p.featured?"adm-chip-yes":"adm-chip-no"} /></TC>
+                            <TC><Chip size="small" label={p.featured ? "YES" : "NO"} className={p.featured ? "adm-chip-yes" : "adm-chip-no"} /></TC>
                           </TRow>
                         ))}
                       </TableBody>
@@ -1023,8 +1010,7 @@ const openResumeMenu = (event, resume) => {
             </Box>
           )}
 
-          {/* ══════════════════════════════════════════════════════ ABOUT */}
-          {active==="about" && (
+          {active === "about" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Profile Details" subtitle="Shown publicly on the portfolio viewer"
@@ -1032,88 +1018,83 @@ const openResumeMenu = (event, resume) => {
               />
               <Paper
                 elevation={0}
-                className={`adm-glass adm-neon-top ${isDark?"":"adm-glass-light"}`}
-                sx={{ p:{xs:2,md:3}, width:"100%", boxSizing:"border-box" }}
+                className={`adm-glass adm-neon-top ${isDark ? "" : "adm-glass-light"}`}
+                sx={{ p: { xs: 2, md: 3 }, width: "100%", boxSizing: "border-box" }}
               >
-                {/* Desktop: side-by-side | Mobile: stacked */}
                 <Box sx={{
-                  display:"flex",
-                  flexDirection:{ xs:"column", md:"row" },
-                  gap:2.5,
-                  width:"100%",
-                  minHeight:{ md:360 },
+                  display: "flex",
+                  flexDirection: { xs: "column", md: "row" },
+                  gap: 2.5,
+                  width: "100%",
+                  minHeight: { md: 360 },
                 }}>
 
-                  {/* LEFT — 6 small fields, fixed width on desktop */}
                   <Box sx={{
-                    width:{ xs:"100%", md:"320px" },
-                    flexShrink:0,
-                    display:"flex",
-                    flexDirection:"column",
-                    gap:2,
+                    width: { xs: "100%", md: "320px" },
+                    flexShrink: 0,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
                   }}>
-                    {[["Name","name"],["Title","title"],["Tagline","tagline"],["Location","location"],["Public Email","emailPublic"],["Initials","initials"]].map(([label,key])=>(
+                    {[["Name", "name"], ["Title", "title"], ["Tagline", "tagline"], ["Location", "location"], ["Public Email", "emailPublic"], ["Initials", "initials"]].map(([label, key]) => (
                       <SmallTextField
                         key={key}
                         label={label}
-                        value={profile[key]||""}
-                        onChange={(e)=>setProfile((p)=>({...p,[key]:e.target.value}))}
+                        value={profile[key] || ""}
+                        onChange={(e) => setProfile((p) => ({ ...p, [key]: e.target.value }))}
                       />
                     ))}
                   </Box>
 
-                  {/* RIGHT — About textarea: fills height on desktop, auto on mobile */}
                   <Box sx={{
-                    flex:{ xs:"unset", md:1 },
-                    minWidth:0,
-                    display:"flex",
-                    flexDirection:"column",
+                    flex: { xs: "unset", md: 1 },
+                    minWidth: 0,
+                    display: "flex",
+                    flexDirection: "column",
                   }}>
                     <TextField
                       label="About"
-                      value={profile.about||""}
-                      onChange={(e)=>setProfile((p)=>({...p,about:e.target.value}))}
+                      value={profile.about || ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, about: e.target.value }))}
                       fullWidth
                       multiline
                       variant="outlined"
                       size="small"
-                      /* On mobile: grow with content (minRows). On desktop: fill column height */
                       minRows={isMobile ? 6 : undefined}
-                      InputLabelProps={{ shrink: Boolean((profile.about||"").length) }}
+                      InputLabelProps={{ shrink: Boolean((profile.about || "").length) }}
                       sx={{
-                        flex:{ xs:"unset", md:1 },
-                        display:"flex",
-                        flexDirection:"column",
-                        height:{ xs:"auto", md:"100%" },
-                        "& .MuiOutlinedInput-root":{
-                          flex:{ xs:"unset", md:1 },
-                          height:{ xs:"auto", md:"100%" },
-                          alignItems:"flex-start",
-                          borderRadius:"14px",
+                        flex: { xs: "unset", md: 1 },
+                        display: "flex",
+                        flexDirection: "column",
+                        height: { xs: "auto", md: "100%" },
+                        "& .MuiOutlinedInput-root": {
+                          flex: { xs: "unset", md: 1 },
+                          height: { xs: "auto", md: "100%" },
+                          alignItems: "flex-start",
+                          borderRadius: "14px",
                           background: isDark ? "rgba(255,255,255,0.04)" : "rgba(241,48,36,0.04)",
-                          "& .MuiOutlinedInput-notchedOutline":{
+                          "& .MuiOutlinedInput-notchedOutline": {
                             borderColor: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.12)",
                           },
-                          "&:hover .MuiOutlinedInput-notchedOutline":{ borderColor:"#f13024" },
-                          "&.Mui-focused .MuiOutlinedInput-notchedOutline":{ borderColor:"#f13024", borderWidth:"1.5px" },
+                          "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#f13024" },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#f13024", borderWidth: "1.5px" },
                         },
-                        "& .MuiInputBase-root":{ flex:{ xs:"unset", md:1 }, height:{ xs:"auto", md:"100%" }, alignItems:"flex-start" },
-                        "& .MuiInputBase-inputMultiline":{
-                          height:{ xs:"auto !important", md:"100% !important" },
-                          overflowY:{ xs:"visible", md:"auto !important" },
-                          resize:"none",
-                          padding:"12px 14px",
-                          fontSize:"14px",
-                          lineHeight:1.75,
-                          boxSizing:"border-box",
-                          whiteSpace:"pre-wrap",
-                          overflowWrap:"break-word",
-                          /* hide scrollbar but keep scrolling */
-                          scrollbarWidth:"none",
-                          msOverflowStyle:"none",
-                          "&::-webkit-scrollbar":{ display:"none" },
+                        "& .MuiInputBase-root": { flex: { xs: "unset", md: 1 }, height: { xs: "auto", md: "100%" }, alignItems: "flex-start" },
+                        "& .MuiInputBase-inputMultiline": {
+                          height: { xs: "auto !important", md: "100% !important" },
+                          overflowY: { xs: "visible", md: "auto !important" },
+                          resize: "none",
+                          padding: "12px 14px",
+                          fontSize: "14px",
+                          lineHeight: 1.75,
+                          boxSizing: "border-box",
+                          whiteSpace: "pre-wrap",
+                          overflowWrap: "break-word",
+                          scrollbarWidth: "none",
+                          msOverflowStyle: "none",
+                          "&::-webkit-scrollbar": { display: "none" },
                         },
-                        "& .MuiInputLabel-root.Mui-focused":{ color:"#f97316" },
+                        "& .MuiInputLabel-root.Mui-focused": { color: "#f97316" },
                       }}
                     />
                   </Box>
@@ -1123,20 +1104,18 @@ const openResumeMenu = (event, resume) => {
             </Box>
           )}
 
-          {/* ══════════════════════════════════════════════════════ SKILLS */}
-          {active==="skills" && (
+          {active === "skills" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Skills Manager" subtitle="Add → Edit → Delete → Save to DB"
                 right={<PBtn startIcon={<MdSave />} onClick={saveSkillsNow}>Save Skills</PBtn>}
               />
-              {/* Add row */}
-              <Paper elevation={0} className={`adm-glass ${isDark?"":"adm-glass-light"}`} sx={{ p:{xs:2,md:2.5}, mb:2.5 }}>
+              <Paper elevation={0} className={`adm-glass ${isDark ? "" : "adm-glass-light"}`} sx={{ p: { xs: 2, md: 2.5 }, mb: 2.5 }}>
                 <Grid container spacing={2} alignItems="flex-end">
                   <Grid item xs={12} md={4}>
                     <FormControl fullWidth size="small" sx={tfSx}>
                       <InputLabel>Category</InputLabel>
-                      <Select value={skillCategory} label="Category" onChange={(e)=>setSkillCategory(e.target.value)}>
+                      <Select value={skillCategory} label="Category" onChange={(e) => setSkillCategory(e.target.value)}>
                         <MenuItem value="frontend">Frontend</MenuItem>
                         <MenuItem value="backend">Backend</MenuItem>
                         <MenuItem value="database">Database</MenuItem>
@@ -1145,33 +1124,32 @@ const openResumeMenu = (event, resume) => {
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} md={6}>
-                    <SmallTextField label="Skill name" value={skillInput} onChange={(e)=>setSkillInput(e.target.value)} />
+                    <SmallTextField label="Skill name" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} />
                   </Grid>
                   <Grid item xs={12} md={2}>
-                    <Button fullWidth className="adm-btn-primary" startIcon={<MdAdd />} onClick={addSkill} sx={{ height:42 }}>Add</Button>
+                    <Button fullWidth className="adm-btn-primary" startIcon={<MdAdd />} onClick={addSkill} sx={{ height: 42 }}>Add</Button>
                   </Grid>
                 </Grid>
               </Paper>
-              {/* Table */}
               <TableWrap>
                 <Table>
-                  <THead cols={[{label:"Category"},{label:"Skill"},{label:"Action",sx:{width:120}}]} />
+                  <THead cols={[{ label: "Category" }, { label: "Skill" }, { label: "Action", sx: { width: 120 } }]} />
                   <TableBody>
-                    {skillTable.length===0 && <TRow><TC colSpan={3} sx={{opacity:0.5}}>No skills added</TC></TRow>}
-                    {skillTable.map((s,i)=>(
+                    {skillTable.length === 0 && <TRow><TC colSpan={3} sx={{ opacity: 0.5 }}>No skills added</TC></TRow>}
+                    {skillTable.map((s, i) => (
                       <TRow key={i}>
-                        <TC bold sx={{textTransform:"capitalize"}}>{s.category}</TC>
+                        <TC bold sx={{ textTransform: "capitalize" }}>{s.category}</TC>
                         <TC>
-                          {editIndex===i
-                            ? <SmallTextField value={editValue} onChange={(e)=>setEditValue(e.target.value)} />
+                          {editIndex === i
+                            ? <SmallTextField value={editValue} onChange={(e) => setEditValue(e.target.value)} />
                             : s.name}
                         </TC>
                         <TC>
                           <Stack direction="row" spacing={0.8}>
-                            {editIndex===i
-                              ? <IconButton size="small" sx={{color:"#4ade80"}} onClick={()=>saveEditSkill(i)}><MdSave /></IconButton>
-                              : <IconEdit onClick={()=>startEditSkill(i)} />}
-                            <IconDel onClick={()=>deleteSkill(i)} />
+                            {editIndex === i
+                              ? <IconButton size="small" sx={{ color: "#4ade80" }} onClick={() => saveEditSkill(i)}><MdSave /></IconButton>
+                              : <IconEdit onClick={() => startEditSkill(i)} />}
+                            <IconDel onClick={() => deleteSkill(i)} />
                           </Stack>
                         </TC>
                       </TRow>
@@ -1182,8 +1160,7 @@ const openResumeMenu = (event, resume) => {
             </Box>
           )}
 
-          {/* ══════════════════════════════════════════════════════ PROJECTS */}
-          {active==="projects" && (
+          {active === "projects" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Projects Manager" subtitle="Add / edit / delete projects shown on Viewer"
@@ -1191,31 +1168,30 @@ const openResumeMenu = (event, resume) => {
               />
               <TableWrap>
                 <Table>
-                  <THead cols={[{label:"Title"},{label:"Tech"},{label:"Featured",sx:{width:100}},{label:"Actions",sx:{width:130}}]} />
+                  <THead cols={[{ label: "Title" }, { label: "Tech" }, { label: "Featured", sx: { width: 100 } }, { label: "Actions", sx: { width: 130 } }]} />
                   <TableBody>
-                    {projects.map((p)=>(
+                    {projects.map((p) => (
                       <TRow key={p.id}>
                         <TC bold>{p.title}</TC>
-                        <TC sx={{opacity:0.80}}>{p.tech}</TC>
-                        <TC><Chip size="small" label={p.featured?"YES":"NO"} className={p.featured?"adm-chip-yes":"adm-chip-no"} /></TC>
+                        <TC sx={{ opacity: 0.80 }}>{p.tech}</TC>
+                        <TC><Chip size="small" label={p.featured ? "YES" : "NO"} className={p.featured ? "adm-chip-yes" : "adm-chip-no"} /></TC>
                         <TC>
                           <Stack direction="row" spacing={0.8}>
-                            <IconEdit onClick={()=>openEditProject(p)} />
-                            <IconDel  onClick={()=>askDeleteProject(p)} />
+                            <IconEdit onClick={() => openEditProject(p)} />
+                            <IconDel onClick={() => askDeleteProject(p)} />
                           </Stack>
                         </TC>
                       </TRow>
                     ))}
-                    {projects.length===0 && <TRow><TC colSpan={4} sx={{opacity:0.55}}>No projects yet.</TC></TRow>}
+                    {projects.length === 0 && <TRow><TC colSpan={4} sx={{ opacity: 0.55 }}>No projects yet.</TC></TRow>}
                   </TableBody>
                 </Table>
               </TableWrap>
-              <ProjectEditorDialog open={projDlgOpen} mode={projDlgMode} initial={projDlgInitial} onClose={()=>setProjDlgOpen(false)} onSave={onSaveProjectDialog} />
+              <ProjectEditorDialog open={projDlgOpen} mode={projDlgMode} initial={projDlgInitial} onClose={() => setProjDlgOpen(false)} onSave={onSaveProjectDialog} />
             </Box>
           )}
 
-          {/* ══════════════════════════════════════════════════════ ACHIEVEMENTS */}
-          {active==="achievements" && (
+          {active === "achievements" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Achievements" subtitle="Add / edit / delete then Save to DB"
@@ -1223,33 +1199,32 @@ const openResumeMenu = (event, resume) => {
               />
               <TableWrap>
                 <Table>
-                  <THead cols={[{label:"Title"},{label:"Issuer"},{label:"Year"},{label:"Link"},{label:"Actions",sx:{width:110}}]} />
+                  <THead cols={[{ label: "Title" }, { label: "Issuer" }, { label: "Year" }, { label: "Link" }, { label: "Actions", sx: { width: 110 } }]} />
                   <TableBody>
-                    {achievements.map((a)=>(
-                      <TRow key={a.id||a.title}>
+                    {achievements.map((a) => (
+                      <TRow key={a.id || a.title}>
                         <TC bold>{a.title}</TC>
-                        <TC sx={{opacity:0.80}}>{a.issuer}</TC>
-                        <TC sx={{opacity:0.80}}>{a.year}</TC>
-                        <TC sx={{opacity:0.80}}>{a.link}</TC>
-                        <TC><Stack direction="row" spacing={0.8}><IconEdit onClick={()=>openAchEdit(a)} /><IconDel onClick={()=>deleteAchLocal(a.id)} /></Stack></TC>
+                        <TC sx={{ opacity: 0.80 }}>{a.issuer}</TC>
+                        <TC sx={{ opacity: 0.80 }}>{a.year}</TC>
+                        <TC sx={{ opacity: 0.80 }}>{a.link}</TC>
+                        <TC><Stack direction="row" spacing={0.8}><IconEdit onClick={() => openAchEdit(a)} /><IconDel onClick={() => deleteAchLocal(a.id)} /></Stack></TC>
                       </TRow>
                     ))}
-                    {achievements.length===0 && <TRow><TC colSpan={5} sx={{opacity:0.55}}>No achievements yet.</TC></TRow>}
+                    {achievements.length === 0 && <TRow><TC colSpan={5} sx={{ opacity: 0.55 }}>No achievements yet.</TC></TRow>}
                   </TableBody>
                 </Table>
               </TableWrap>
-              <SimpleItemDialog open={achDlgOpen} title={achEditingId?"Edit Achievement":"Add Achievement"} onClose={()=>setAchDlgOpen(false)} onSave={saveAchLocal}>
+              <SimpleItemDialog open={achDlgOpen} title={achEditingId ? "Edit Achievement" : "Add Achievement"} onClose={() => setAchDlgOpen(false)} onSave={saveAchLocal}>
                 <Grid container spacing={2}>
-                  {[["Title","title"],["Issuer","issuer"],["Year","year"],["Link","link"]].map(([label,key])=>(
-                    <Grid key={key} item xs={12} md={6}><SmallTextField label={label} value={achForm[key]} onChange={(e)=>setAchForm((p)=>({...p,[key]:e.target.value}))} /></Grid>
+                  {[["Title", "title"], ["Issuer", "issuer"], ["Year", "year"], ["Link", "link"]].map(([label, key]) => (
+                    <Grid key={key} item xs={12} md={6}><SmallTextField label={label} value={achForm[key]} onChange={(e) => setAchForm((p) => ({ ...p, [key]: e.target.value }))} /></Grid>
                   ))}
                 </Grid>
               </SimpleItemDialog>
             </Box>
           )}
 
-          {/* ══════════════════════════════════════════════════════ LANGUAGES */}
-          {active==="languages" && (
+          {active === "languages" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Programming Languages" subtitle="Language proficiency and experience"
@@ -1257,48 +1232,47 @@ const openResumeMenu = (event, resume) => {
               />
               <TableWrap>
                 <Table>
-                  <THead cols={[{label:"Language"},{label:"Level"},{label:"Years"},{label:"Notes"},{label:"Actions",sx:{width:110}}]} />
+                  <THead cols={[{ label: "Language" }, { label: "Level" }, { label: "Years" }, { label: "Notes" }, { label: "Actions", sx: { width: 110 } }]} />
                   <TableBody>
-                    {languages.map((l)=>(
-                      <TRow key={l.id||l.language}>
-                        <TC bold>{l.language||l.name}</TC>
-                        <TC sx={{opacity:0.80}}>{l.level}</TC>
-                        <TC sx={{opacity:0.80}}>{l.years}</TC>
-                        <TC sx={{opacity:0.80}}>{l.notes}</TC>
-                        <TC><Stack direction="row" spacing={0.8}><IconEdit onClick={()=>openLangEdit(l)} /><IconDel onClick={()=>deleteLangLocal(l.id)} /></Stack></TC>
+                    {languages.map((l) => (
+                      <TRow key={l.id || l.language}>
+                        <TC bold>{l.language || l.name}</TC>
+                        <TC sx={{ opacity: 0.80 }}>{l.level}</TC>
+                        <TC sx={{ opacity: 0.80 }}>{l.years}</TC>
+                        <TC sx={{ opacity: 0.80 }}>{l.notes}</TC>
+                        <TC><Stack direction="row" spacing={0.8}><IconEdit onClick={() => openLangEdit(l)} /><IconDel onClick={() => deleteLangLocal(l.id)} /></Stack></TC>
                       </TRow>
                     ))}
-                    {languages.length===0 && <TRow><TC colSpan={5} sx={{opacity:0.55}}>No languages yet.</TC></TRow>}
+                    {languages.length === 0 && <TRow><TC colSpan={5} sx={{ opacity: 0.55 }}>No languages yet.</TC></TRow>}
                   </TableBody>
                 </Table>
               </TableWrap>
-              <SimpleItemDialog open={langDlgOpen} title={langEditingId?"Edit Language":"Add Language"} onClose={()=>setLangDlgOpen(false)} onSave={saveLangLocal}>
+              <SimpleItemDialog open={langDlgOpen} title={langEditingId ? "Edit Language" : "Add Language"} onClose={() => setLangDlgOpen(false)} onSave={saveLangLocal}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}><SmallTextField label="Language" value={langForm.language} onChange={(e)=>setLangForm((p)=>({...p,language:e.target.value}))} /></Grid>
+                  <Grid item xs={12} md={6}><SmallTextField label="Language" value={langForm.language} onChange={(e) => setLangForm((p) => ({ ...p, language: e.target.value }))} /></Grid>
                   <Grid item xs={12} md={3}>
                     <FormControl fullWidth size="small" sx={tfSx}>
                       <InputLabel shrink>Level</InputLabel>
-                      <Select value={langForm.level} label="Level" onChange={(e)=>setLangForm((p)=>({...p,level:e.target.value}))} notched>
-                        {["Beginner","Intermediate","Advanced"].map(v=><MenuItem key={v} value={v}>{v}</MenuItem>)}
+                      <Select value={langForm.level} label="Level" onChange={(e) => setLangForm((p) => ({ ...p, level: e.target.value }))} notched>
+                        {["Beginner", "Intermediate", "Advanced"].map(v => <MenuItem key={v} value={v}>{v}</MenuItem>)}
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid item xs={12} md={3}>
                     <FormControl fullWidth size="small" sx={tfSx}>
                       <InputLabel shrink>Years</InputLabel>
-                      <Select value={langForm.years} label="Years" onChange={(e)=>setLangForm((p)=>({...p,years:Number(e.target.value)}))} notched>
-                        {Array.from({length:10}).map((_,i)=><MenuItem key={i+1} value={i+1}>{i+1}</MenuItem>)}
+                      <Select value={langForm.years} label="Years" onChange={(e) => setLangForm((p) => ({ ...p, years: Number(e.target.value) }))} notched>
+                        {Array.from({ length: 10 }).map((_, i) => <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem>)}
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12}><SmallTextField label="Notes (optional)" value={langForm.notes} onChange={(e)=>setLangForm((p)=>({...p,notes:e.target.value}))} /></Grid>
+                  <Grid item xs={12}><SmallTextField label="Notes (optional)" value={langForm.notes} onChange={(e) => setLangForm((p) => ({ ...p, notes: e.target.value }))} /></Grid>
                 </Grid>
               </SimpleItemDialog>
             </Box>
           )}
 
-          {/* ══════════════════════════════════════════════════════ EDUCATION */}
-          {active==="education" && (
+          {active === "education" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Education" subtitle="Academic background and qualifications"
@@ -1306,33 +1280,32 @@ const openResumeMenu = (event, resume) => {
               />
               <TableWrap>
                 <Table>
-                  <THead cols={[{label:"Degree"},{label:"Institution"},{label:"Year"},{label:"Actions",sx:{width:110}}]} />
+                  <THead cols={[{ label: "Degree" }, { label: "Institution" }, { label: "Year" }, { label: "Actions", sx: { width: 110 } }]} />
                   <TableBody>
-                    {education.map((e)=>(
-                      <TRow key={e.id||e.degree}>
+                    {education.map((e) => (
+                      <TRow key={e.id || e.degree}>
                         <TC bold>{e.degree}</TC>
-                        <TC sx={{opacity:0.80}}>{e.institution}</TC>
-                        <TC sx={{opacity:0.80}}>{e.year}</TC>
-                        <TC><Stack direction="row" spacing={0.8}><IconEdit onClick={()=>openEduEdit(e)} /><IconDel onClick={()=>deleteEduLocal(e.id)} /></Stack></TC>
+                        <TC sx={{ opacity: 0.80 }}>{e.institution}</TC>
+                        <TC sx={{ opacity: 0.80 }}>{e.year}</TC>
+                        <TC><Stack direction="row" spacing={0.8}><IconEdit onClick={() => openEduEdit(e)} /><IconDel onClick={() => deleteEduLocal(e.id)} /></Stack></TC>
                       </TRow>
                     ))}
-                    {education.length===0 && <TRow><TC colSpan={4} sx={{opacity:0.55}}>No education yet.</TC></TRow>}
+                    {education.length === 0 && <TRow><TC colSpan={4} sx={{ opacity: 0.55 }}>No education yet.</TC></TRow>}
                   </TableBody>
                 </Table>
               </TableWrap>
-              <SimpleItemDialog open={eduDlgOpen} title={eduEditingId?"Edit Education":"Add Education"} onClose={()=>setEduDlgOpen(false)} onSave={saveEduLocal}>
+              <SimpleItemDialog open={eduDlgOpen} title={eduEditingId ? "Edit Education" : "Add Education"} onClose={() => setEduDlgOpen(false)} onSave={saveEduLocal}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}><SmallTextField label="Degree" value={eduForm.degree} onChange={(e)=>setEduForm((p)=>({...p,degree:e.target.value}))} /></Grid>
-                  <Grid item xs={12} md={6}><SmallTextField label="Institution" value={eduForm.institution} onChange={(e)=>setEduForm((p)=>({...p,institution:e.target.value}))} /></Grid>
-                  <Grid item xs={12} md={6}><SmallTextField label="Year" value={eduForm.year} onChange={(e)=>setEduForm((p)=>({...p,year:e.target.value}))} /></Grid>
-                  <Grid item xs={12}><SmallTextField label="Details (optional)" value={eduForm.details} onChange={(e)=>setEduForm((p)=>({...p,details:e.target.value}))} multiline minRows={3} /></Grid>
+                  <Grid item xs={12} md={6}><SmallTextField label="Degree" value={eduForm.degree} onChange={(e) => setEduForm((p) => ({ ...p, degree: e.target.value }))} /></Grid>
+                  <Grid item xs={12} md={6}><SmallTextField label="Institution" value={eduForm.institution} onChange={(e) => setEduForm((p) => ({ ...p, institution: e.target.value }))} /></Grid>
+                  <Grid item xs={12} md={6}><SmallTextField label="Year" value={eduForm.year} onChange={(e) => setEduForm((p) => ({ ...p, year: e.target.value }))} /></Grid>
+                  <Grid item xs={12}><SmallTextField label="Details (optional)" value={eduForm.details} onChange={(e) => setEduForm((p) => ({ ...p, details: e.target.value }))} multiline minRows={3} /></Grid>
                 </Grid>
               </SimpleItemDialog>
             </Box>
           )}
 
-          {/* ══════════════════════════════════════════════════════ EXPERIENCE */}
-          {active==="experience" && (
+          {active === "experience" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Experience" subtitle="Career and internship timeline"
@@ -1340,32 +1313,32 @@ const openResumeMenu = (event, resume) => {
               />
               <TableWrap>
                 <Table>
-                  <THead cols={[{label:"Company"},{label:"Role"},{label:"Start"},{label:"End"},{label:"Actions",sx:{width:110}}]} />
+                  <THead cols={[{ label: "Company" }, { label: "Role" }, { label: "Start" }, { label: "End" }, { label: "Actions", sx: { width: 110 } }]} />
                   <TableBody>
-                    {experience.map((e)=>(
-                      <TRow key={e.id||e.company}>
+                    {experience.map((e) => (
+                      <TRow key={e.id || e.company}>
                         <TC bold>{e.company}</TC>
-                        <TC sx={{opacity:0.80}}>{e.role}</TC>
-                        <TC sx={{opacity:0.80}}>{e.start}</TC>
-                        <TC sx={{opacity:0.80}}>{e.end}</TC>
-                        <TC><Stack direction="row" spacing={0.8}><IconEdit onClick={()=>openExpEdit(e)} /><IconDel onClick={()=>deleteExpLocal(e.id)} /></Stack></TC>
+                        <TC sx={{ opacity: 0.80 }}>{e.role}</TC>
+                        <TC sx={{ opacity: 0.80 }}>{e.start}</TC>
+                        <TC sx={{ opacity: 0.80 }}>{e.end}</TC>
+                        <TC><Stack direction="row" spacing={0.8}><IconEdit onClick={() => openExpEdit(e)} /><IconDel onClick={() => deleteExpLocal(e.id)} /></Stack></TC>
                       </TRow>
                     ))}
-                    {experience.length===0 && <TRow><TC colSpan={5} sx={{opacity:0.55}}>No experience yet.</TC></TRow>}
+                    {experience.length === 0 && <TRow><TC colSpan={5} sx={{ opacity: 0.55 }}>No experience yet.</TC></TRow>}
                   </TableBody>
                 </Table>
               </TableWrap>
-              <SimpleItemDialog open={expDlgOpen} title={expEditingId?"Edit Experience":"Add Experience"} onClose={()=>setExpDlgOpen(false)} onSave={saveExpLocal}>
+              <SimpleItemDialog open={expDlgOpen} title={expEditingId ? "Edit Experience" : "Add Experience"} onClose={() => setExpDlgOpen(false)} onSave={saveExpLocal}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}><SmallTextField label="Company" value={expForm.company} onChange={(e)=>setExpForm((p)=>({...p,company:e.target.value}))} /></Grid>
-                  <Grid item xs={12} md={6}><SmallTextField label="Role" value={expForm.role} onChange={(e)=>setExpForm((p)=>({...p,role:e.target.value}))} /></Grid>
-                  <Grid item xs={12} md={6}><SmallTextField label="Start" value={expForm.start} onChange={(e)=>setExpForm((p)=>({...p,start:e.target.value}))} /></Grid>
-                  <Grid item xs={12} md={6}><SmallTextField label="End" value={expForm.end} onChange={(e)=>setExpForm((p)=>({...p,end:e.target.value}))} /></Grid>
-                  <Grid item xs={12} sx={{width:"100%"}}>
+                  <Grid item xs={12} md={6}><SmallTextField label="Company" value={expForm.company} onChange={(e) => setExpForm((p) => ({ ...p, company: e.target.value }))} /></Grid>
+                  <Grid item xs={12} md={6}><SmallTextField label="Role" value={expForm.role} onChange={(e) => setExpForm((p) => ({ ...p, role: e.target.value }))} /></Grid>
+                  <Grid item xs={12} md={6}><SmallTextField label="Start" value={expForm.start} onChange={(e) => setExpForm((p) => ({ ...p, start: e.target.value }))} /></Grid>
+                  <Grid item xs={12} md={6}><SmallTextField label="End" value={expForm.end} onChange={(e) => setExpForm((p) => ({ ...p, end: e.target.value }))} /></Grid>
+                  <Grid item xs={12} sx={{ width: "100%" }}>
                     <SmallTextField
-                      label="Description" value={expForm.description||""} onChange={(e)=>setExpForm((p)=>({...p,description:e.target.value}))}
-                      fullWidth multiline InputProps={{inputComponent:TextareaAutosize,inputProps:{minRows:2}}}
-                      sx={{ width:"100%","& .MuiInputBase-root":{width:"100%",alignItems:"flex-start"},"& textarea":{width:"100%",boxSizing:"border-box",resize:"none",overflow:"hidden",whiteSpace:"pre-wrap",overflowWrap:"break-word"} }}
+                      label="Description" value={expForm.description || ""} onChange={(e) => setExpForm((p) => ({ ...p, description: e.target.value }))}
+                      fullWidth multiline InputProps={{ inputComponent: TextareaAutosize, inputProps: { minRows: 2 } }}
+                      sx={{ width: "100%", "& .MuiInputBase-root": { width: "100%", alignItems: "flex-start" }, "& textarea": { width: "100%", boxSizing: "border-box", resize: "none", overflow: "hidden", whiteSpace: "pre-wrap", overflowWrap: "break-word" } }}
                     />
                   </Grid>
                 </Grid>
@@ -1373,26 +1346,24 @@ const openResumeMenu = (event, resume) => {
             </Box>
           )}
 
-          {/* ══════════════════════════════════════════════════════ CONTACT */}
-          {active==="contact" && (
+          {active === "contact" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Contact / Links" subtitle="Shown in the Viewer footer and contact section"
                 right={<PBtn startIcon={<MdSave />} onClick={saveSocialsNow}>Save</PBtn>}
               />
-              <Paper elevation={0} className={`adm-glass adm-neon-top ${isDark?"":"adm-glass-light"}`} sx={{ p:{xs:2,md:3} }}>
+              <Paper elevation={0} className={`adm-glass adm-neon-top ${isDark ? "" : "adm-glass-light"}`} sx={{ p: { xs: 2, md: 3 } }}>
                 <Grid container spacing={2.5}>
-                  {[["GitHub","github"],["LinkedIn","linkedin"],["Email","email"],["Phone","phone"]].map(([label,key])=>(
-                    <Grid key={key} item xs={12} md={6}><SmallTextField label={label} value={socials[key]||""} onChange={(e)=>setSocials((p)=>({...p,[key]:e.target.value}))} /></Grid>
+                  {[["GitHub", "github"], ["LinkedIn", "linkedin"], ["Email", "email"], ["Phone", "phone"]].map(([label, key]) => (
+                    <Grid key={key} item xs={12} md={6}><SmallTextField label={label} value={socials[key] || ""} onChange={(e) => setSocials((p) => ({ ...p, [key]: e.target.value }))} /></Grid>
                   ))}
-                  <Grid item xs={12}><SmallTextField label="Website" value={socials.website||""} onChange={(e)=>setSocials((p)=>({...p,website:e.target.value}))} /></Grid>
+                  <Grid item xs={12}><SmallTextField label="Website" value={socials.website || ""} onChange={(e) => setSocials((p) => ({ ...p, website: e.target.value }))} /></Grid>
                 </Grid>
               </Paper>
             </Box>
           )}
 
-          {/* ══════════════════════════════════════════════════════ RESUME */}
-          {active==="resume" && (
+          {active === "resume" && (
             <Box className="adm-page-enter">
               <SectionHeader
                 title="Resume Manager" subtitle="Upload, preview and set primary"
@@ -1406,17 +1377,16 @@ const openResumeMenu = (event, resume) => {
                     disabled={resumeUploading}
                   >
                     {resumeUploading ? "Uploading…" : "Upload Resume"}
-                    <input hidden type="file" accept="application/pdf" onChange={(e)=>e.target.files?.[0]&&onUploadResume(e.target.files[0])} />
+                    <input hidden type="file" accept="application/pdf" onChange={(e) => e.target.files?.[0] && onUploadResume(e.target.files[0])} />
                   </Button>
                 }
               />
 
-              {/* FIX 3: Upload progress bar */}
               {resumeUploading && (
                 <Box sx={{ mb: 2.5 }}>
                   <Paper
                     elevation={0}
-                    className={`adm-glass ${isDark?"":"adm-glass-light"}`}
+                    className={`adm-glass ${isDark ? "" : "adm-glass-light"}`}
                     sx={{ p: 2, borderRadius: "16px" }}
                   >
                     <Stack spacing={1}>
@@ -1454,100 +1424,93 @@ const openResumeMenu = (event, resume) => {
                 </Box>
               )}
 
-              {/* Current resume panel */}
-              <Paper elevation={0} className={`adm-glass adm-neon-top ${isDark?"":"adm-glass-light"}`} sx={{ p:{xs:2,md:2.5}, mb:2.5 }}>
+              <Paper elevation={0} className={`adm-glass adm-neon-top ${isDark ? "" : "adm-glass-light"}`} sx={{ p: { xs: 2, md: 2.5 }, mb: 2.5 }}>
                 <Stack direction="row" alignItems="center" justifyContent="space-between" flexWrap="wrap" gap={1.5}>
-                  <Typography sx={{ fontWeight:700, opacity:0.60, fontSize:"0.875rem" }}>Current Active Resume</Typography>
+                  <Typography sx={{ fontWeight: 700, opacity: 0.60, fontSize: "0.875rem" }}>Current Active Resume</Typography>
                   <OBtn startIcon={<MdVisibility />} onClick={previewCurrentResumeInline}>Preview Current</OBtn>
                 </Stack>
               </Paper>
 
-              {/* Resumes table */}
               <TableWrap>
                 <Table size="small">
-                  <THead cols={[{label:"#",sx:{width:50}},{label:"File"},{label:"Status",sx:{width:120}},{label:"Uploaded",sx:{width:140}},{label:"Actions",sx:{width:130,textAlign:"right"}}]} />
+                  <THead cols={[{ label: "S.No", sx: { width: 50 } }, { label: "File" }, { label: "Status", sx: { width: 120 } }, { label: "Uploaded", sx: { width: 140 } }, { label: "Actions", sx: { width: 130, textAlign: "right" } }]} />
                   <TableBody>
-                    {[...resumes].sort((a,b)=>(b.primary===true?1:0)-(a.primary===true?1:0)).map((r,idx)=>{
+                    {[...resumes].sort((a, b) => (b.primary === true ? 1 : 0) - (a.primary === true ? 1 : 0)).map((r, idx) => {
                       const isPrimary = Boolean(r.primary);
                       return (
-                        <TRow key={r.id||idx}>
-                          <TC sx={{opacity:0.55, fontWeight:600}}>{idx+1}</TC>
-                          <TC bold sx={{maxWidth:200,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r.fileName||"Resume.pdf"}</TC>
+                        <TRow key={r.id || idx}>
+                          <TC sx={{ opacity: 0.55, fontWeight: 600 }}>{idx + 1}</TC>
+                          <TC bold sx={{ maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.fileName || "Resume.pdf"}</TC>
                           <TC>
                             {isPrimary
-                              ? <Chip size="small" label="PRIMARY" icon={<MdStar style={{color:"#ff9800",fontSize:"0.85rem"}} />} className="adm-chip-primary" />
-                              : <Typography variant="caption" sx={{opacity:0.4}}>—</Typography>}
+                              ? <Chip size="small" label="PRIMARY" icon={<MdStar style={{ color: "#ff9800", fontSize: "0.85rem" }} />} className="adm-chip-primary" />
+                              : <Typography variant="caption" sx={{ opacity: 0.4 }}>—</Typography>}
                           </TC>
-                          <TC sx={{opacity:0.65, fontSize:"0.8rem"}}>{formatDate(r.uploadedAt)}</TC>
-                          <TC sx={{textAlign:"right"}}>
+                          <TC sx={{ opacity: 0.65, fontSize: "0.8rem" }}>{formatDate(r.uploadedAt)}</TC>
+                          <TC sx={{ textAlign: "right" }}>
                             <Stack direction="row" spacing={0.8} justifyContent="flex-end">
                               <Tooltip title="Push to Viewer">
-                                <IconButton size="small" className={`adm-icon-btn ${isDark?"":"adm-icon-btn-light"}`} onClick={()=>handlePushResume(r)}><MdUpload /></IconButton>
+                                <IconButton size="small" className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`} onClick={() => handlePushResume(r)}><MdUpload /></IconButton>
                               </Tooltip>
-                              {/* FIX 1: Pass event to openResumeMenu so anchor is set to the button */}
                               <Tooltip title="More">
-                                <IconButton size="small" className={`adm-icon-btn ${isDark?"":"adm-icon-btn-light"}`} onClick={(e)=>openResumeMenu(e,r)}><MdMoreHoriz /></IconButton>
+                                <IconButton size="small" className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`} onClick={(e) => openResumeMenu(e, r)}><MdMoreHoriz /></IconButton>
                               </Tooltip>
                             </Stack>
                           </TC>
                         </TRow>
                       );
                     })}
-                    {resumes.length===0 && <TRow><TC colSpan={5} sx={{opacity:0.55}}>No resumes uploaded.</TC></TRow>}
+                    {resumes.length === 0 && <TRow><TC colSpan={5} sx={{ opacity: 0.55 }}>No resumes uploaded.</TC></TRow>}
                   </TableBody>
                 </Table>
               </TableWrap>
 
-              {/* FIX 1: anchorEl is set to e.currentTarget so menu opens at the three-dot button */}
               <Menu
-  anchorEl={resumeMenuAnchor}
-  anchorReference="anchorPosition"
-  anchorPosition={
-    resumeMenuPosition
-      ? { top: resumeMenuPosition.top, left: resumeMenuPosition.left }
-      : undefined
-  }
-  open={Boolean(resumeMenuAnchor)}
-  onClose={closeResumeMenu}
->
-                <MenuItem onClick={previewSelectedResumeInline}><ListItemIcon sx={{minWidth:34}}><MdVisibility /></ListItemIcon>Preview</MenuItem>
-                <MenuItem onClick={makePrimaryResume}><ListItemIcon sx={{minWidth:34}}><MdStar /></ListItemIcon>Make Primary</MenuItem>
-                <Divider className={isDark?"adm-divider":"adm-divider-light"} />
-                <MenuItem onClick={deleteResume} sx={{color:"error.main"}}><ListItemIcon sx={{minWidth:34,color:"error.main"}}><MdDelete /></ListItemIcon>Delete</MenuItem>
+                anchorEl={resumeMenuAnchor}
+                anchorReference="anchorPosition"
+                anchorPosition={
+                  resumeMenuPosition
+                    ? { top: resumeMenuPosition.top, left: resumeMenuPosition.left }
+                    : undefined
+                }
+                open={Boolean(resumeMenuAnchor)}
+                onClose={closeResumeMenu}
+              >
+                <MenuItem onClick={previewSelectedResumeInline}><ListItemIcon sx={{ minWidth: 34 }}><MdVisibility /></ListItemIcon>Preview</MenuItem>
+                <MenuItem onClick={makePrimaryResume}><ListItemIcon sx={{ minWidth: 34 }}><MdStar /></ListItemIcon>Make Primary</MenuItem>
+                <Divider className={isDark ? "adm-divider" : "adm-divider-light"} />
+                <MenuItem onClick={deleteResume} sx={{ color: "error.main" }}><ListItemIcon sx={{ minWidth: 34, color: "error.main" }}><MdDelete /></ListItemIcon>Delete</MenuItem>
               </Menu>
 
               <ResumePreviewDialog open={resumePreviewOpen} title={resumePreviewTitle} onClose={closeResumePreview} url={viewResumeUrl()} blobUrl={resumePreviewBlobUrl} loading={resumePreviewLoading} />
 
-              {/* FIX 3: Upload success dialog with filename */}
               <ResumeUploadSuccessDialog
                 open={resumeUploadSuccess}
                 fileName={resumeUploadedName}
                 onClose={() => setResumeUploadSuccess(false)}
               />
 
-              {/* Push success dialog */}
-              <Dialog open={pushDialog.open} onClose={()=>setPushDialog({open:false,name:""})} className={isDark?"adm-dialog":"adm-dialog adm-dialog-light"}>
+              <Dialog open={pushDialog.open} onClose={() => setPushDialog({ open: false, name: "" })} className={isDark ? "adm-dialog" : "adm-dialog adm-dialog-light"}>
                 <DialogTitle className="adm-dialog-title">Resume Pushed ✓</DialogTitle>
                 <DialogContent>
-                  <Typography sx={{fontWeight:600,opacity:0.85}}>
+                  <Typography sx={{ fontWeight: 600, opacity: 0.85 }}>
                     "{pushDialog.name}" is now the active resume on the viewer page.
                   </Typography>
                 </DialogContent>
-                <DialogActions sx={{p:2}}>
-                  <Button className="adm-btn-primary" onClick={()=>setPushDialog({open:false,name:""})}>OK</Button>
+                <DialogActions sx={{ p: 2 }}>
+                  <Button className="adm-btn-primary" onClick={() => setPushDialog({ open: false, name: "" })}>OK</Button>
                 </DialogActions>
               </Dialog>
             </Box>
           )}
 
-          {/* Shared confirm dialog — used by ALL delete actions */}
           <ConfirmDialog
             open={confirmOpen}
             title={confirmPayload.title}
             description={confirmPayload.description}
             confirmText={confirmPayload.confirmText}
-            onClose={()=>setConfirmOpen(false)}
-            onConfirm={confirmPayload.onConfirm||(() =>setConfirmOpen(false))}
+            onClose={() => setConfirmOpen(false)}
+            onConfirm={confirmPayload.onConfirm || (() => setConfirmOpen(false))}
           />
 
         </Container>
