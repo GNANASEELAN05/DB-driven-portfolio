@@ -844,15 +844,29 @@
 .adm-divider-light { border-color: rgba(17,24,39,0.08) !important; }
 
 /* ============================================================
-   SCROLLBAR (thin red accent)
+   SCROLLBAR — hidden everywhere, scroll still works
    ============================================================ */
-.adm-scroll::-webkit-scrollbar { width: 4px; }
-.adm-scroll::-webkit-scrollbar-track { background: transparent; }
-.adm-scroll::-webkit-scrollbar-thumb {
-  background: rgba(241,48,36,0.32);
-  border-radius: 4px;
+
+/* Hide all scrollbars inside the admin root */
+.adm-root * {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }
-.adm-scroll::-webkit-scrollbar-thumb:hover { background: rgba(241,48,36,0.55); }
+.adm-root *::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* The .adm-scroll class (sidebar nav) also hidden */
+.adm-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+.adm-scroll::-webkit-scrollbar { display: none; }
+
+/* MUI dialog / menu scroll containers */
+.adm-dialog *::-webkit-scrollbar,
+.adm-menu *::-webkit-scrollbar { display: none !important; }
+.adm-dialog *,
+.adm-menu * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
 
 /* ============================================================
    RESPONSIVE

@@ -897,21 +897,95 @@ export default function AdminDashboard(props) {
                 title="Profile Details" subtitle="Shown publicly on the portfolio viewer"
                 right={<PBtn startIcon={<MdSave />} onClick={saveProfileNow}>Save Profile</PBtn>}
               />
-              <Paper elevation={0} className={`adm-glass adm-neon-top ${isDark?"":"adm-glass-light"}`} sx={{ p:{xs:2,md:3} }}>
-                <Grid container spacing={2.5}>
-                  {[["Name","name"],["Title","title"],["Tagline","tagline"],["Location","location"],["Public Email","emailPublic"],["Initials","initials"]].map(([label,key])=>(
-                    <Grid key={key} item xs={12} md={6}>
-                      <SmallTextField label={label} value={profile[key]||""} onChange={(e)=>setProfile((p)=>({...p,[key]:e.target.value}))} />
-                    </Grid>
-                  ))}
-                  <Grid item xs={12}>
-                    <SmallTextField
-                      label="About" value={profile.about||""} onChange={(e)=>setProfile((p)=>({...p,about:e.target.value}))}
-                      fullWidth multiline InputProps={{inputComponent:TextareaAutosize,inputProps:{minRows:2}}}
-                      sx={{ width:"100%","& .MuiInputBase-root":{width:"100%",alignItems:"flex-start"},"& textarea":{width:"100%",boxSizing:"border-box",resize:"none",overflow:"hidden",whiteSpace:"pre-wrap",overflowWrap:"break-word"} }}
+              <Paper
+                elevation={0}
+                className={`adm-glass adm-neon-top ${isDark?"":"adm-glass-light"}`}
+                sx={{ p:{xs:2,md:3}, width:"100%", boxSizing:"border-box" }}
+              >
+                {/* Desktop: side-by-side | Mobile: stacked */}
+                <Box sx={{
+                  display:"flex",
+                  flexDirection:{ xs:"column", md:"row" },
+                  gap:2.5,
+                  width:"100%",
+                  minHeight:{ md:360 },
+                }}>
+
+                  {/* LEFT — 6 small fields, fixed width on desktop */}
+                  <Box sx={{
+                    width:{ xs:"100%", md:"320px" },
+                    flexShrink:0,
+                    display:"flex",
+                    flexDirection:"column",
+                    gap:2,
+                  }}>
+                    {[["Name","name"],["Title","title"],["Tagline","tagline"],["Location","location"],["Public Email","emailPublic"],["Initials","initials"]].map(([label,key])=>(
+                      <SmallTextField
+                        key={key}
+                        label={label}
+                        value={profile[key]||""}
+                        onChange={(e)=>setProfile((p)=>({...p,[key]:e.target.value}))}
+                      />
+                    ))}
+                  </Box>
+
+                  {/* RIGHT — About textarea: fills height on desktop, auto on mobile */}
+                  <Box sx={{
+                    flex:{ xs:"unset", md:1 },
+                    minWidth:0,
+                    display:"flex",
+                    flexDirection:"column",
+                  }}>
+                    <TextField
+                      label="About"
+                      value={profile.about||""}
+                      onChange={(e)=>setProfile((p)=>({...p,about:e.target.value}))}
+                      fullWidth
+                      multiline
+                      variant="outlined"
+                      size="small"
+                      /* On mobile: grow with content (minRows). On desktop: fill column height */
+                      minRows={isMobile ? 6 : undefined}
+                      InputLabelProps={{ shrink: Boolean((profile.about||"").length) }}
+                      sx={{
+                        flex:{ xs:"unset", md:1 },
+                        display:"flex",
+                        flexDirection:"column",
+                        height:{ xs:"auto", md:"100%" },
+                        "& .MuiOutlinedInput-root":{
+                          flex:{ xs:"unset", md:1 },
+                          height:{ xs:"auto", md:"100%" },
+                          alignItems:"flex-start",
+                          borderRadius:"14px",
+                          background: isDark ? "rgba(255,255,255,0.04)" : "rgba(241,48,36,0.04)",
+                          "& .MuiOutlinedInput-notchedOutline":{
+                            borderColor: isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.12)",
+                          },
+                          "&:hover .MuiOutlinedInput-notchedOutline":{ borderColor:"#f13024" },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline":{ borderColor:"#f13024", borderWidth:"1.5px" },
+                        },
+                        "& .MuiInputBase-root":{ flex:{ xs:"unset", md:1 }, height:{ xs:"auto", md:"100%" }, alignItems:"flex-start" },
+                        "& .MuiInputBase-inputMultiline":{
+                          height:{ xs:"auto !important", md:"100% !important" },
+                          overflowY:{ xs:"visible", md:"auto !important" },
+                          resize:"none",
+                          padding:"12px 14px",
+                          fontSize:"14px",
+                          lineHeight:1.75,
+                          boxSizing:"border-box",
+                          whiteSpace:"pre-wrap",
+                          overflowWrap:"break-word",
+                          /* hide scrollbar but keep scrolling */
+                          scrollbarWidth:"none",
+                          msOverflowStyle:"none",
+                          "&::-webkit-scrollbar":{ display:"none" },
+                        },
+                        "& .MuiInputLabel-root.Mui-focused":{ color:"#f97316" },
+                      }}
                     />
-                  </Grid>
-                </Grid>
+                  </Box>
+
+                </Box>
               </Paper>
             </Box>
           )}
