@@ -217,7 +217,7 @@ button { font-family: inherit; }
   flex-direction: column;
   padding-left: 24px;
   /* FIXED: side nav is 60px + 16px from right edge = 76px, add 16px buffer = 92px */
-  padding-right: 92px;
+  padding-right: 72px;
 }
 
 .portfolio-topbar {
