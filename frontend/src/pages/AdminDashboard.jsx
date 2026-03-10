@@ -45,6 +45,7 @@ import {
   Alert,
   FormControl,
   InputLabel,
+  LinearProgress,
 } from "@mui/material";
 
 import {
@@ -73,6 +74,7 @@ import {
   MdClose,
   MdSchool,
   MdBadge,
+  MdCheckCircle,
 } from "react-icons/md";
 
 import {
@@ -339,10 +341,43 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   );
 }
 
+// ── ResumeUploadSuccessDialog ──────────────────────────────────────────────
+function ResumeUploadSuccessDialog({ open, fileName, onClose }) {
+  const theme  = useTheme();
+  const isDark = theme.palette.mode === "dark";
+  return (
+    <Dialog
+      open={open} onClose={onClose} fullWidth maxWidth="xs"
+      className={isDark ? "adm-dialog" : "adm-dialog adm-dialog-light"}
+    >
+      <DialogTitle className="adm-dialog-title">Upload Successful ✓</DialogTitle>
+      <DialogContent>
+        <Stack spacing={1.5} alignItems="center" sx={{ py: 1 }}>
+          <Box sx={{
+            width: 56, height: 56, borderRadius: "50%",
+            background: "linear-gradient(135deg,rgba(34,197,94,0.18),rgba(34,197,94,0.08))",
+            border: "1.5px solid rgba(34,197,94,0.32)",
+            display: "grid", placeItems: "center",
+          }}>
+            <MdCheckCircle style={{ fontSize: "1.8rem", color: "#86efac" }} />
+          </Box>
+          <Typography sx={{ fontWeight: 700, opacity: 0.90, textAlign: "center" }}>
+            "{fileName}" has been successfully uploaded.
+          </Typography>
+          <Typography variant="body2" sx={{ opacity: 0.55, textAlign: "center" }}>
+            You can now set it as the primary resume from the list below.
+          </Typography>
+        </Stack>
+      </DialogContent>
+      <DialogActions sx={{ p: 2 }}>
+        <Button className="adm-btn-primary" onClick={onClose}>OK</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // MAIN EXPORT — AdminDashboard
-// ALL state, hooks, handlers, API calls: 100 % UNCHANGED
-// Only JSX markup gets new className props
 // ═══════════════════════════════════════════════════════════════════════════
 export default function AdminDashboard(props) {
   React.useEffect(() => { document.title = "Gnanaseelan Admin Panel"; }, []);
@@ -378,6 +413,7 @@ export default function AdminDashboard(props) {
   const [projDlgMode,    setProjDlgMode]    = useState("add");
   const [projDlgInitial, setProjDlgInitial] = useState(null);
 
+  // ── FIX 2: Unified confirm dialog state ──────────────────────────────────
   const [confirmOpen,   setConfirmOpen]   = useState(false);
   const [confirmPayload,setConfirmPayload] = useState({ title:"",description:"",confirmText:"",onConfirm:null });
 
@@ -405,9 +441,14 @@ export default function AdminDashboard(props) {
   const [resumePreviewBlobUrl, setResumePreviewBlobUrl] = useState("");
   const [resumePreviewLoading, setResumePreviewLoading] = useState(false);
 
+  // ── FIX 3: Resume upload progress + success dialog ───────────────────────
+  const [resumeUploading,      setResumeUploading]      = useState(false);
+  const [resumeUploadSuccess,  setResumeUploadSuccess]  = useState(false);
+  const [resumeUploadedName,   setResumeUploadedName]   = useState("");
+
   const handleDrawerToggle = () => setMobileOpen((p) => !p);
 
-  // ── ALL HANDLERS (100 % unchanged) ──────────────────────────────────────
+  // ── ALL HANDLERS ──────────────────────────────────────────────────────────
 
   const fetchAllAdmin = async () => {
     try {
@@ -468,7 +509,16 @@ export default function AdminDashboard(props) {
   };
 
   const addSkill    = () => { if(!skillInput.trim()) return; setSkillTable(p=>[...p,{category:skillCategory,name:skillInput.trim()}]); setSkillInput(""); };
-  const deleteSkill = (index) => setSkillTable(p=>p.filter((_,i)=>i!==index));
+  const deleteSkill = (index) => {
+    // FIX 2: confirm before deleting skill
+    setConfirmPayload({
+      title: "Delete Skill?",
+      description: `Remove "${skillTable[index]?.name}" from skills?`,
+      confirmText: "Delete",
+      onConfirm: () => { setConfirmOpen(false); setSkillTable(p=>p.filter((_,i)=>i!==index)); },
+    });
+    setConfirmOpen(true);
+  };
   const startEditSkill = (i) => { setEditIndex(i); setEditValue(skillTable[i].name); };
   const saveEditSkill  = (i) => { setSkillTable(p=>p.map((x,idx)=>(idx===i?{...x,name:editValue}:x))); setEditIndex(null); };
 
@@ -504,7 +554,19 @@ export default function AdminDashboard(props) {
 
   const openAchAdd  = () => { setAchEditingId(null); setAchForm({title:"",issuer:"",year:"",link:""}); setAchDlgOpen(true); };
   const openAchEdit = (a)  => { setAchEditingId(a.id); setAchForm({title:a.title||"",issuer:a.issuer||"",year:a.year||"",link:a.link||""}); setAchDlgOpen(true); };
-  const deleteAchLocal = (id)=> setAchievements((p)=>p.filter((x)=>x.id!==id));
+  
+  // FIX 2: Confirm before deleting achievement
+  const deleteAchLocal = (id) => {
+    const ach = achievements.find(x => x.id === id);
+    setConfirmPayload({
+      title: "Delete Achievement?",
+      description: `Remove "${ach?.title || "this achievement"}" permanently?`,
+      confirmText: "Delete",
+      onConfirm: () => { setConfirmOpen(false); setAchievements((p)=>p.filter((x)=>x.id!==id)); },
+    });
+    setConfirmOpen(true);
+  };
+
   const saveAchLocal = () => {
     if(achEditingId) setAchievements((p)=>p.map((x)=>(x.id===achEditingId?{...x,...achForm}:x)));
     else setAchievements((p)=>[{...achForm,id:Date.now()},...p]);
@@ -517,7 +579,19 @@ export default function AdminDashboard(props) {
 
   const openLangAdd  = () => { setLangEditingId(null); setLangForm({language:"",level:"Beginner",years:1,notes:""}); setLangDlgOpen(true); };
   const openLangEdit = (l)  => { setLangEditingId(l.id); setLangForm({language:l.language||l.name||"",level:l.level||"Beginner",years:Number(l.years||1),notes:l.notes||""}); setLangDlgOpen(true); };
-  const deleteLangLocal = (id)=> setLanguages((p)=>p.filter((x)=>x.id!==id));
+  
+  // FIX 2: Confirm before deleting language
+  const deleteLangLocal = (id) => {
+    const lang = languages.find(x => x.id === id);
+    setConfirmPayload({
+      title: "Delete Language?",
+      description: `Remove "${lang?.language || lang?.name || "this language"}" permanently?`,
+      confirmText: "Delete",
+      onConfirm: () => { setConfirmOpen(false); setLanguages((p)=>p.filter((x)=>x.id!==id)); },
+    });
+    setConfirmOpen(true);
+  };
+
   const saveLangLocal = () => {
     if(langEditingId) setLanguages((p)=>p.map((x)=>(x.id===langEditingId?{...x,...langForm}:x)));
     else setLanguages((p)=>[{...langForm,id:Date.now()},...p]);
@@ -534,15 +608,26 @@ export default function AdminDashboard(props) {
   const openEduAdd  = () => { setEduEditingId(null); setEduForm({degree:"",institution:"",year:"",details:""}); setEduDlgOpen(true); };
   const openEduEdit = (e)  => { setEduEditingId(e.id); setEduForm({degree:e.degree||"",institution:e.institution||"",year:e.year||"",details:e.details||""}); setEduDlgOpen(true); };
 
+  // FIX 2: Confirm before deleting education
   const deleteEduLocal = async (id) => {
-    const prev = education; const next = prev.filter((x)=>x.id!==id); setEducation(next);
-    try{
-      setErr(""); setOk(""); setLoading(true);
-      let deleted = false;
-      try{ await http.delete(`/api/portfolio/education/${id}`); deleted=true; } catch{}
-      if(!deleted){ const payload = next.map(({id:_id,...rest})=>rest); await updateEducation(payload); }
-      setOk("Education deleted."); await fetchAllAdmin(); bumpContentVersion();
-    } catch{ setErr("Deleting education failed."); setEducation(prev); } finally{ setLoading(false); }
+    const edu = education.find(x => x.id === id);
+    setConfirmPayload({
+      title: "Delete Education?",
+      description: `Remove "${edu?.degree || "this education record"}" permanently?`,
+      confirmText: "Delete",
+      onConfirm: async () => {
+        setConfirmOpen(false);
+        const prev = education; const next = prev.filter((x)=>x.id!==id); setEducation(next);
+        try{
+          setErr(""); setOk(""); setLoading(true);
+          let deleted = false;
+          try{ await http.delete(`/api/portfolio/education/${id}`); deleted=true; } catch{}
+          if(!deleted){ const payload = next.map(({id:_id,...rest})=>rest); await updateEducation(payload); }
+          setOk("Education deleted."); await fetchAllAdmin(); bumpContentVersion();
+        } catch{ setErr("Deleting education failed."); setEducation(prev); } finally{ setLoading(false); }
+      },
+    });
+    setConfirmOpen(true);
   };
 
   const saveEduLocal = () => {
@@ -558,15 +643,26 @@ export default function AdminDashboard(props) {
   const openExpAdd  = () => { setExpEditingId(null); setExpForm({company:"",role:"",start:"",end:"",description:""}); setExpDlgOpen(true); };
   const openExpEdit = (e)  => { setExpEditingId(e.id); setExpForm({company:e.company||"",role:e.role||"",start:e.start||"",end:e.end||"",description:e.description||""}); setExpDlgOpen(true); };
 
+  // FIX 2: Confirm before deleting experience
   const deleteExpLocal = async (id) => {
-    const prev = experience; const next = prev.filter((x)=>x.id!==id); setExperience(next);
-    try{
-      setErr(""); setOk(""); setLoading(true);
-      let deleted = false;
-      try{ await http.delete(`/api/portfolio/experience/${id}`); deleted=true; } catch{}
-      if(!deleted){ const payload=next.map(({id:_id,...rest})=>rest); await updateExperience(payload); }
-      setOk("Experience deleted."); await fetchAllAdmin(); bumpContentVersion();
-    } catch{ setErr("Deleting experience failed."); setExperience(prev); } finally{ setLoading(false); }
+    const exp = experience.find(x => x.id === id);
+    setConfirmPayload({
+      title: "Delete Experience?",
+      description: `Remove "${exp?.company || "this experience record"}" permanently?`,
+      confirmText: "Delete",
+      onConfirm: async () => {
+        setConfirmOpen(false);
+        const prev = experience; const next = prev.filter((x)=>x.id!==id); setExperience(next);
+        try{
+          setErr(""); setOk(""); setLoading(true);
+          let deleted = false;
+          try{ await http.delete(`/api/portfolio/experience/${id}`); deleted=true; } catch{}
+          if(!deleted){ const payload=next.map(({id:_id,...rest})=>rest); await updateExperience(payload); }
+          setOk("Experience deleted."); await fetchAllAdmin(); bumpContentVersion();
+        } catch{ setErr("Deleting experience failed."); setExperience(prev); } finally{ setLoading(false); }
+      },
+    });
+    setConfirmOpen(true);
   };
 
   const saveExpLocal = () => {
@@ -579,9 +675,20 @@ export default function AdminDashboard(props) {
     catch{ setErr("Saving experience failed."); } finally{ setLoading(false); }
   };
 
+  // FIX 3: Upload resume with progress + success dialog
   const onUploadResume = async (file) => {
-    try{ setErr(""); setOk(""); setLoading(true); await uploadResume(file); const r=await listResumesAdmin(); if(r?.data && Array.isArray(r.data)) setResumes(r.data); setOk("Resume uploaded."); bumpContentVersion(); }
-    catch{ setErr("Resume upload failed."); } finally{ setLoading(false); }
+    try{
+      setErr(""); setOk("");
+      setResumeUploading(true);
+      setResumeUploadedName(file.name);
+      await uploadResume(file);
+      const r=await listResumesAdmin();
+      if(r?.data && Array.isArray(r.data)) setResumes(r.data);
+      bumpContentVersion();
+      setResumeUploadSuccess(true);
+    }
+    catch{ setErr("Resume upload failed."); }
+    finally{ setResumeUploading(false); }
   };
 
   const openResumePreviewInline = async (title, directUrl) => {
@@ -605,6 +712,7 @@ export default function AdminDashboard(props) {
     catch{ setErr("Failed to push resume to Viewer."); } finally{ setLoading(false); }
   };
 
+  // FIX 1: Store anchor element for three-dot menu so it anchors to the button
   const openResumeMenu = (e, item) => { setResumeMenuAnchor(e.currentTarget); setResumeMenuItem(item); };
   const closeResumeMenu = () => { setResumeMenuAnchor(null); setResumeMenuItem(null); };
 
@@ -614,10 +722,21 @@ export default function AdminDashboard(props) {
     try{ setErr(""); setOk(""); setLoading(true); await setPrimaryResume(item.id); setOk("Primary resume set."); await fetchAllAdmin(); bumpContentVersion(); }
     catch{ setErr("Failed to set primary."); } finally{ setLoading(false); }
   };
+
+  // FIX 2: Confirm before deleting resume
   const deleteResume = async () => {
     const item=resumeMenuItem; closeResumeMenu(); if(!item?.id) return;
-    try{ setErr(""); setOk(""); setLoading(true); await deleteResumeById(item.id); setOk("Resume deleted."); await fetchAllAdmin(); bumpContentVersion(); }
-    catch{ setErr("Failed to delete resume."); } finally{ setLoading(false); }
+    setConfirmPayload({
+      title: "Delete Resume?",
+      description: `Permanently delete "${item.fileName || "this resume"}"?`,
+      confirmText: "Delete",
+      onConfirm: async () => {
+        setConfirmOpen(false);
+        try{ setErr(""); setOk(""); setLoading(true); await deleteResumeById(item.id); setOk("Resume deleted."); await fetchAllAdmin(); bumpContentVersion(); }
+        catch{ setErr("Failed to delete resume."); } finally{ setLoading(false); }
+      },
+    });
+    setConfirmOpen(true);
   };
 
   // ── pageLabel map ─────────────────────────────────────────────────────────
@@ -1264,12 +1383,62 @@ export default function AdminDashboard(props) {
               <SectionHeader
                 title="Resume Manager" subtitle="Upload, preview and set primary"
                 right={
-                  <Button component="label" className="adm-btn-primary" size="small" startIcon={<MdUpload />} fullWidth={isMobile}>
-                    Upload Resume
+                  <Button
+                    component="label"
+                    className="adm-btn-primary"
+                    size="small"
+                    startIcon={resumeUploading ? null : <MdUpload />}
+                    fullWidth={isMobile}
+                    disabled={resumeUploading}
+                  >
+                    {resumeUploading ? "Uploading…" : "Upload Resume"}
                     <input hidden type="file" accept="application/pdf" onChange={(e)=>e.target.files?.[0]&&onUploadResume(e.target.files[0])} />
                   </Button>
                 }
               />
+
+              {/* FIX 3: Upload progress bar */}
+              {resumeUploading && (
+                <Box sx={{ mb: 2.5 }}>
+                  <Paper
+                    elevation={0}
+                    className={`adm-glass ${isDark?"":"adm-glass-light"}`}
+                    sx={{ p: 2, borderRadius: "16px" }}
+                  >
+                    <Stack spacing={1}>
+                      <Stack direction="row" alignItems="center" spacing={1.5}>
+                        <Box sx={{
+                          width: 36, height: 36, borderRadius: "10px",
+                          background: "linear-gradient(135deg,rgba(241,48,36,0.18),rgba(249,115,22,0.10))",
+                          border: "1px solid rgba(241,48,36,0.28)",
+                          display: "grid", placeItems: "center", flexShrink: 0,
+                        }}>
+                          <MdUpload style={{ color: "#f97316", fontSize: "1.1rem" }} />
+                        </Box>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                          <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", opacity: 0.90, mb: 0.3 }}>
+                            Uploading {resumeUploadedName}
+                          </Typography>
+                          <Typography sx={{ fontSize: "0.75rem", opacity: 0.50 }}>
+                            Please wait…
+                          </Typography>
+                        </Box>
+                      </Stack>
+                      <LinearProgress
+                        sx={{
+                          borderRadius: "999px",
+                          height: 5,
+                          backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.07)",
+                          "& .MuiLinearProgress-bar": {
+                            background: "linear-gradient(90deg,#f13024,#f97316)",
+                            borderRadius: "999px",
+                          },
+                        }}
+                      />
+                    </Stack>
+                  </Paper>
+                </Box>
+              )}
 
               {/* Current resume panel */}
               <Paper elevation={0} className={`adm-glass adm-neon-top ${isDark?"":"adm-glass-light"}`} sx={{ p:{xs:2,md:2.5}, mb:2.5 }}>
@@ -1301,6 +1470,7 @@ export default function AdminDashboard(props) {
                               <Tooltip title="Push to Viewer">
                                 <IconButton size="small" className={`adm-icon-btn ${isDark?"":"adm-icon-btn-light"}`} onClick={()=>handlePushResume(r)}><MdUpload /></IconButton>
                               </Tooltip>
+                              {/* FIX 1: Pass event to openResumeMenu so anchor is set to the button */}
                               <Tooltip title="More">
                                 <IconButton size="small" className={`adm-icon-btn ${isDark?"":"adm-icon-btn-light"}`} onClick={(e)=>openResumeMenu(e,r)}><MdMoreHoriz /></IconButton>
                               </Tooltip>
@@ -1314,8 +1484,15 @@ export default function AdminDashboard(props) {
                 </Table>
               </TableWrap>
 
-              {/* Resume context menu */}
-              <Menu anchorEl={resumeMenuAnchor} open={Boolean(resumeMenuAnchor)} onClose={closeResumeMenu} className="adm-menu">
+              {/* FIX 1: anchorEl is set to e.currentTarget so menu opens at the three-dot button */}
+              <Menu
+                anchorEl={resumeMenuAnchor}
+                open={Boolean(resumeMenuAnchor)}
+                onClose={closeResumeMenu}
+                className="adm-menu"
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                transformOrigin={{ vertical: "top", horizontal: "right" }}
+              >
                 <MenuItem onClick={previewSelectedResumeInline}><ListItemIcon sx={{minWidth:34}}><MdVisibility /></ListItemIcon>Preview</MenuItem>
                 <MenuItem onClick={makePrimaryResume}><ListItemIcon sx={{minWidth:34}}><MdStar /></ListItemIcon>Make Primary</MenuItem>
                 <Divider className={isDark?"adm-divider":"adm-divider-light"} />
@@ -1323,6 +1500,13 @@ export default function AdminDashboard(props) {
               </Menu>
 
               <ResumePreviewDialog open={resumePreviewOpen} title={resumePreviewTitle} onClose={closeResumePreview} url={viewResumeUrl()} blobUrl={resumePreviewBlobUrl} loading={resumePreviewLoading} />
+
+              {/* FIX 3: Upload success dialog with filename */}
+              <ResumeUploadSuccessDialog
+                open={resumeUploadSuccess}
+                fileName={resumeUploadedName}
+                onClose={() => setResumeUploadSuccess(false)}
+              />
 
               {/* Push success dialog */}
               <Dialog open={pushDialog.open} onClose={()=>setPushDialog({open:false,name:""})} className={isDark?"adm-dialog":"adm-dialog adm-dialog-light"}>
@@ -1339,7 +1523,7 @@ export default function AdminDashboard(props) {
             </Box>
           )}
 
-          {/* Shared confirm dialog */}
+          {/* Shared confirm dialog — used by ALL delete actions */}
           <ConfirmDialog
             open={confirmOpen}
             title={confirmPayload.title}
