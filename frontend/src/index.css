@@ -508,122 +508,272 @@ button { font-family: inherit; }
 }
 
 /* ==============================================
-   BLACK HOLE BADGE — spinning black hole wheel
-   Sits LEFT of the name and three text lines
+   GRAND LUXURY WHEEL BADGE
+   Aesthetic: Rolex bezel × Astronomical clock × Royal compass rose
+   Palette: 24K gold · deep obsidian · champagne · ivory
    ============================================== */
+
+/* ── Container ── */
 .hero-blackhole-badge {
-  width: clamp(100px, 10vw, 124px);
-  height: clamp(100px, 10vw, 124px);
+  width: clamp(100px, 10vw, 148px);
+  height: clamp(100px, 10vw, 148px);
   flex: 0 0 auto;
   align-self: center;
   position: relative;
   border-radius: 50%;
 }
 
-/* Dark gravitational core */
-.hero-blackhole-badge::before {
-  content: "";
+/* ── Outer ambient halo ── */
+.gw-halo {
   position: absolute;
-  inset: 22%;
-  border-radius: 50%;
-  background: radial-gradient(circle at 38% 38%, #1a0a0a 0%, #000000 55%, transparent 100%);
-  box-shadow: 0 0 0 2px rgba(241,48,36,0.18), 0 0 18px 6px rgba(0,0,0,0.9), 0 0 40px 14px rgba(0,0,0,0.7);
-  z-index: 3;
-  animation: bhCorePulse 5s ease-in-out infinite;
-}
-
-/* Accretion disk */
-.hero-blackhole-badge::after {
-  content: "";
-  position: absolute;
-  inset: 8%;
+  inset: -22%;
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
-    transparent 0%, rgba(241,48,36,0.08) 8%,
-    rgba(249,115,22,0.55) 18%, rgba(255,200,80,0.75) 25%,
-    rgba(249,115,22,0.55) 32%, rgba(241,48,36,0.08) 42%,
-    transparent 55%, rgba(241,48,36,0.04) 70%,
-    rgba(249,115,22,0.2) 80%, rgba(241,48,36,0.04) 90%,
-    transparent 100%
+    rgba(212,175,55,0.0),
+    rgba(212,175,55,0.18) 15%,
+    rgba(255,215,0,0.32) 30%,
+    rgba(212,175,55,0.14) 45%,
+    rgba(184,134,11,0.06) 55%,
+    rgba(255,200,60,0.22) 70%,
+    rgba(212,175,55,0.0) 85%,
+    rgba(212,175,55,0.0) 100%
   );
-  animation: bhDiskSpin 6s linear infinite;
-  z-index: 2;
-  filter: blur(1.5px);
-  mask-image: radial-gradient(circle at center, transparent 30%, black 48%, black 60%, transparent 75%);
-  -webkit-mask-image: radial-gradient(circle at center, transparent 30%, black 48%, black 60%, transparent 75%);
+  filter: blur(18px);
+  animation: gwHaloDrift 9s ease-in-out infinite;
+  z-index: 0;
+  pointer-events: none;
 }
 
-/* Photon ring */
-.bh-photon-ring {
+/* ── Bezel SVG — slow clockwise ── */
+.gw-bezel-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  animation: gwBezelSpin 28s linear infinite;
+}
+
+/* ── Gold conic outer ring ── */
+.gw-outer-ring {
+  position: absolute;
+  inset: 2%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    #b8860b 0%, #d4af37 8%, #ffd700 16%,
+    #ffe066 22%, #ffd700 28%, #c9a227 36%,
+    #8b6914 44%, #c9a227 52%, #ffd700 60%,
+    #ffe066 66%, #ffd700 72%, #d4af37 80%,
+    #b8860b 88%, #8b6914 94%, #b8860b 100%
+  );
+  animation: gwOuterSpin 6s linear infinite;
+  z-index: 3;
+  filter: brightness(1.15) saturate(1.2);
+  mask-image: radial-gradient(circle at center,
+    transparent 82%, black 86%, black 94%, transparent 97%);
+  -webkit-mask-image: radial-gradient(circle at center,
+    transparent 82%, black 86%, black 94%, transparent 97%);
+}
+
+/* ── Ornamental gear SVG — counter-clockwise ── */
+.gw-gear-svg {
+  position: absolute;
+  inset: 5%;
+  width: 90%;
+  height: 90%;
+  z-index: 4;
+  animation: gwGearSpin 12s linear infinite reverse;
+}
+
+/* ── Mid molten gold band ── */
+.gw-mid-band {
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 45deg,
+    #1a0a02 0%, #3d1f00 10%, #7a3800 18%,
+    #c17f24 25%, #e8a830 30%, #ffd700 35%,
+    #ffe066 38%, #ffd700 42%, #e8a830 47%,
+    #c17f24 52%, #7a3800 60%, #3d1f00 70%,
+    #1a0a02 78%, #7a3800 88%, #c17f24 96%,
+    #1a0a02 100%
+  );
+  animation: gwMidSpin 4s linear infinite;
+  z-index: 5;
+  filter: brightness(1.2) contrast(1.1);
+  mask-image: radial-gradient(circle at center,
+    transparent 60%, black 65%, black 78%, transparent 82%);
+  -webkit-mask-image: radial-gradient(circle at center,
+    transparent 60%, black 65%, black 78%, transparent 82%);
+}
+
+/* ── Compass rose SVG — slow clockwise ── */
+.gw-compass-svg {
+  position: absolute;
+  inset: 18%;
+  width: 64%;
+  height: 64%;
+  z-index: 6;
+  animation: gwCompassSpin 20s linear infinite;
+  opacity: 0.88;
+}
+
+/* ── Dark obsidian medallion ── */
+.gw-medallion {
+  position: absolute;
+  inset: 28%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 35%,
+    #1c0f00 0%, #0e0800 40%, #050200 80%, #000000 100%
+  );
+  box-shadow:
+    0 0 0 1.5px rgba(212,175,55,0.6),
+    0 0 0 3px rgba(139,105,20,0.25),
+    inset 0 0 16px rgba(0,0,0,0.95),
+    0 0 20px 4px rgba(212,175,55,0.18);
+  z-index: 7;
+  animation: gwMedallionPulse 4s ease-in-out infinite;
+}
+
+/* ── Cardinal glow jewel dots ── */
+.gw-cardinal {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: conic-gradient(
-    from 90deg,
-    rgba(241,48,36,0.0) 0%, rgba(249,115,22,0.7) 20%,
-    rgba(255,220,100,0.9) 35%, rgba(249,115,22,0.5) 50%,
-    rgba(241,48,36,0.0) 65%, rgba(241,48,36,0.3) 85%,
-    rgba(241,48,36,0.0) 100%
-  );
-  border: 1.5px solid transparent;
-  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: destination-out;
-  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  animation: bhPhotonSpin 3.5s linear infinite;
-  z-index: 4;
-  filter: blur(0.5px);
+  z-index: 8;
+  animation: gwCompassSpin 20s linear infinite;
 }
 
-/* Glowing initials */
-.bh-initials {
+.gw-cardinal::before,
+.gw-cardinal::after {
+  content: '';
+  position: absolute;
+  background: radial-gradient(circle, #ffd700 0%, #c9a227 60%, transparent 100%);
+  border-radius: 50%;
+  width: 5px;
+  height: 5px;
+  box-shadow: 0 0 6px 2px rgba(255,215,0,0.75), 0 0 14px 4px rgba(212,175,55,0.45);
+}
+
+.gw-cardinal::before { top: 6%;    left: 50%; transform: translateX(-50%); }
+.gw-cardinal::after  { bottom: 6%; left: 50%; transform: translateX(-50%); }
+
+.gw-cardinal-2 {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: 8;
+  animation: gwCompassSpin 20s linear infinite;
+}
+
+.gw-cardinal-2::before,
+.gw-cardinal-2::after {
+  content: '';
+  position: absolute;
+  background: radial-gradient(circle, #ffd700 0%, #c9a227 60%, transparent 100%);
+  border-radius: 50%;
+  width: 5px;
+  height: 5px;
+  box-shadow: 0 0 6px 2px rgba(255,215,0,0.75), 0 0 14px 4px rgba(212,175,55,0.45);
+}
+
+.gw-cardinal-2::before { top: 50%; left: 6%;   transform: translateY(-50%); }
+.gw-cardinal-2::after  { top: 50%; right: 6%;  transform: translateY(-50%); }
+
+/* ── Initials — Cinzel or serif fallback ── */
+.gw-initials {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 5;
-  font-size: 22px;
+  z-index: 10;
+  font-family: 'Cinzel', 'Cormorant Garamond', 'Times New Roman', serif;
+  font-size: clamp(16px, 1.5vw, 22px);
   font-weight: 900;
-  letter-spacing: -0.03em;
-  color: rgba(255,255,255,0.92);
-  text-shadow: 0 0 12px rgba(241,48,36,0.9), 0 0 28px rgba(249,115,22,0.6), 0 0 2px rgba(255,255,255,0.8);
+  letter-spacing: 0.05em;
+  color: #ffd700;
+  text-shadow:
+    0 0 4px rgba(255,255,255,0.9),
+    0 0 12px rgba(255,215,0,1),
+    0 0 28px rgba(212,175,55,0.85),
+    0 0 52px rgba(180,130,20,0.65);
+  animation: gwInitialsPulse 4s ease-in-out infinite;
 }
 
-/* Gravitational lensing haze */
-.bh-gravity-haze {
-  position: absolute;
-  inset: -12%;
-  border-radius: 50%;
-  background: radial-gradient(circle at center,
-    transparent 42%, rgba(241,48,36,0.06) 52%,
-    rgba(241,48,36,0.12) 58%, rgba(241,48,36,0.04) 65%,
-    transparent 75%
-  );
-  animation: bhGravityPulse 7s ease-in-out infinite;
-  z-index: 1;
-  pointer-events: none;
-}
-
-@keyframes bhDiskSpin {
+/* ============ KEYFRAMES ============ */
+@keyframes gwBezelSpin {
   from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  to   { transform: rotate(360deg); }
 }
 
-@keyframes bhPhotonSpin {
+@keyframes gwOuterSpin {
   from { transform: rotate(0deg); }
-  to { transform: rotate(-360deg); }
+  to   { transform: rotate(360deg); }
 }
 
-@keyframes bhCorePulse {
-  0%, 100% { box-shadow: 0 0 0 2px rgba(241,48,36,0.18), 0 0 18px 6px rgba(0,0,0,0.9), 0 0 40px 14px rgba(0,0,0,0.7); }
-  50% { box-shadow: 0 0 0 3px rgba(241,48,36,0.35), 0 0 24px 8px rgba(0,0,0,0.95), 0 0 52px 18px rgba(0,0,0,0.75); }
+@keyframes gwGearSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
-@keyframes bhGravityPulse {
-  0%, 100% { opacity: 0.6; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.06); }
+@keyframes gwMidSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes gwCompassSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes gwHaloDrift {
+  0%, 100% { opacity: 0.65; transform: scale(1)    rotate(0deg); }
+  50%       { opacity: 0.95; transform: scale(1.06) rotate(60deg); }
+}
+
+@keyframes gwMedallionPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1.5px rgba(212,175,55,0.6),
+      0 0 0 3px rgba(139,105,20,0.25),
+      inset 0 0 16px rgba(0,0,0,0.95),
+      0 0 20px 4px rgba(212,175,55,0.18);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(255,215,0,0.9),
+      0 0 0 4px rgba(212,175,55,0.38),
+      inset 0 0 18px rgba(0,0,0,0.98),
+      0 0 36px 10px rgba(212,175,55,0.38);
+  }
+}
+
+@keyframes gwInitialsPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 4px rgba(255,255,255,0.9),
+      0 0 12px rgba(255,215,0,1),
+      0 0 28px rgba(212,175,55,0.85),
+      0 0 52px rgba(180,130,20,0.65);
+  }
+  50% {
+    text-shadow:
+      0 0 6px rgba(255,255,255,1),
+      0 0 18px rgba(255,235,100,1),
+      0 0 42px rgba(255,200,30,0.98),
+      0 0 75px rgba(212,175,55,0.88);
+  }
+}
+
+/* ── Mobile scale ── */
+@media (max-width: 767px) {
+  .hero-blackhole-badge { width: 88px; height: 88px; }
+  .gw-initials { font-size: 16px; }
 }
 
 .hero-name-text-block {

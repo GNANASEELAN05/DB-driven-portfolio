@@ -211,11 +211,7 @@ function GlassPanel({ children, sx, className = "" }) {
 }
 
 // =============================================
-// PROFILE PHOTO — Large full-bleed, blends into bg
-// FIXED:
-//  - "See Original" button: ONLY shows on hover (hidden by default)
-//  - NO timer hint text shown anywhere
-//  - Click shows original, click again reverts, auto-reverts after 20s
+// PROFILE PHOTO
 // =============================================
 function ProfilePhotoCard() {
   const [showOriginal, setShowOriginal] = useState(false);
@@ -242,7 +238,6 @@ function ProfilePhotoCard() {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {/* Animated photo layer */}
       <Box
         className="profile-photo-layer"
         style={{ opacity: showOriginal ? 0 : 1, transition: "opacity 0.75s ease" }}
@@ -250,7 +245,6 @@ function ProfilePhotoCard() {
         <img src={AnimatedPhoto} alt="Animated profile" className="profile-photo-img" />
       </Box>
 
-      {/* Original photo layer */}
       <Box
         className="profile-photo-layer"
         style={{ opacity: showOriginal ? 1 : 0, transition: "opacity 0.75s ease" }}
@@ -258,7 +252,6 @@ function ProfilePhotoCard() {
         <img src={OriginalPhoto} alt="Original profile" className="profile-photo-img profile-photo-original" />
       </Box>
 
-      {/* "See Original" button — ONLY visible on hover when animated is showing. NO timer hint anywhere. */}
       <Box
         className="profile-photo-btn-wrap"
         style={{
@@ -277,27 +270,169 @@ function ProfilePhotoCard() {
 }
 
 // =============================================
-// BLACK HOLE BADGE — replaces MiniOrbitBadge spinner
-// Sits to the LEFT of the name and three text lines (role, location, email)
-// Uses CSS classes from index.css: hero-blackhole-badge, bh-photon-ring,
-// bh-initials, bh-gravity-haze and keyframes bhDiskSpin, bhPhotonSpin,
-// bhCorePulse, bhGravityPulse
+// GRAND LUXURY WHEEL BADGE
+// Rolex bezel × Astronomical clock × Royal compass rose
+// Palette: 24K gold · deep obsidian · champagne · ivory
 // =============================================
 function BlackholeBadge({ initials, name }) {
   const resolvedInitials =
     safeString(initials).trim() ||
-    safeString(name).split(" ").filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
+    safeString(name)
+      .split(" ")
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((w) => w[0].toUpperCase())
+      .join("");
 
   return (
     <Box className="hero-blackhole-badge" aria-hidden="true">
-      {/* Gravitational lensing haze — outermost glow, z-index 1 */}
-      <Box className="bh-gravity-haze" />
-      {/* Accretion disk rendered via ::after pseudo-element, z-index 2 */}
-      {/* Dark gravitational core rendered via ::before pseudo-element, z-index 3 */}
-      {/* Photon ring — spinning arc around the core, z-index 4 */}
-      <Box className="bh-photon-ring" />
-      {/* Glowing initials — centred on top of everything, z-index 5 */}
-      <Box className="bh-initials">{resolvedInitials || "?"}</Box>
+
+      {/* 1 — Ambient gold halo bloom */}
+      <Box className="gw-halo" />
+
+      {/* 2 — Outer bezel ring: 60 tick marks + diamond markers (slow clockwise) */}
+      <svg
+        className="gw-bezel-svg"
+        viewBox="0 0 148 148"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%"   stopColor="#8b6914" />
+            <stop offset="25%"  stopColor="#d4af37" />
+            <stop offset="50%"  stopColor="#ffd700" />
+            <stop offset="75%"  stopColor="#d4af37" />
+            <stop offset="100%" stopColor="#8b6914" />
+          </linearGradient>
+          <filter id="goldGlow">
+            <feGaussianBlur stdDeviation="1.2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        {/* Outer border rings */}
+        <circle cx="74" cy="74" r="71" stroke="url(#goldGrad)" strokeWidth="1.5" opacity="0.7" />
+        <circle cx="74" cy="74" r="68" stroke="url(#goldGrad)" strokeWidth="0.6" opacity="0.4" />
+
+        {/* 12 major tick marks every 30° */}
+        <g filter="url(#goldGlow)">
+          {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg) => (
+            <line key={deg} x1="74" y1="4" x2="74" y2="16"
+              stroke="#ffd700" strokeWidth="2.2"
+              transform={`rotate(${deg} 74 74)`} opacity="0.95" />
+          ))}
+          {/* Minor ticks every 6°, skip the 12 major positions */}
+          {[6,12,18,24,36,42,48,54,66,72,78,84,
+            96,102,108,114,126,132,138,144,
+            156,162,168,174,186,192,198,204,
+            216,222,228,234,246,252,258,264,
+            276,282,288,294,306,312,318,324,
+            336,342,348,354].map((deg) => (
+            <line key={deg} x1="74" y1="5" x2="74" y2="11"
+              stroke="#c9a227" strokeWidth="1"
+              transform={`rotate(${deg} 74 74)`} opacity="0.6" />
+          ))}
+        </g>
+
+        {/* Diamond markers at N / E / S / W */}
+        {[0,90,180,270].map((deg) => (
+          <polygon key={deg}
+            points="74,2 76.5,7 74,12 71.5,7"
+            fill="#ffd700" opacity="0.9"
+            transform={`rotate(${deg} 74 74)`}
+            filter="url(#goldGlow)" />
+        ))}
+      </svg>
+
+      {/* 3 — Gold conic outer spinning ring (CSS class handles animation) */}
+      <Box className="gw-outer-ring" />
+
+      {/* 4 — Ornamental gear ring (counter-clockwise) */}
+      <svg
+        className="gw-gear-svg"
+        viewBox="0 0 148 148"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <filter id="gearGlow">
+            <feGaussianBlur stdDeviation="1.5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#gearGlow)" opacity="0.75">
+          <circle cx="74" cy="74" r="60" stroke="#c9a227" strokeWidth="0.8"
+            fill="none" strokeDasharray="2 2" opacity="0.5" />
+          <circle cx="74" cy="74" r="55" stroke="#d4af37" strokeWidth="1.2"
+            fill="none" opacity="0.4" />
+          {/* 16 gear teeth */}
+          {[0,22.5,45,67.5,90,112.5,135,157.5,180,202.5,225,247.5,270,292.5,315,337.5].map((deg) => (
+            <rect key={deg} x="71" y="13" width="6" height="9" rx="1.5"
+              fill="#c9a227" transform={`rotate(${deg} 74 74)`} opacity="0.8" />
+          ))}
+        </g>
+      </svg>
+
+      {/* 5 — Mid molten gold conic band */}
+      <Box className="gw-mid-band" />
+
+      {/* 6 — Compass rose (slow clockwise) */}
+      <svg
+        className="gw-compass-svg"
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <defs>
+          <linearGradient id="spireGold" x1="50%" y1="0%" x2="50%" y2="100%">
+            <stop offset="0%"   stopColor="#ffd700" />
+            <stop offset="50%"  stopColor="#ffe066" />
+            <stop offset="100%" stopColor="#c9a227" />
+          </linearGradient>
+          <filter id="spireGlow">
+            <feGaussianBlur stdDeviation="1" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+        <g filter="url(#spireGlow)">
+          {/* Cardinal spires N S E W */}
+          <polygon points="50,8 53,42 50,48 47,42"  fill="url(#spireGold)" opacity="0.9" />
+          <polygon points="50,92 53,58 50,52 47,58" fill="url(#spireGold)" opacity="0.7" />
+          <polygon points="92,50 58,47 52,50 58,53" fill="url(#spireGold)" opacity="0.7" />
+          <polygon points="8,50 42,47 48,50 42,53"  fill="url(#spireGold)" opacity="0.7" />
+          {/* Intercardinal spires NE SW NW SE */}
+          <polygon points="78,22 55,44 50,50 48,44" fill="#d4af37" opacity="0.55" />
+          <polygon points="22,78 45,56 50,50 56,45" fill="#d4af37" opacity="0.55" />
+          <polygon points="22,22 45,44 50,50 44,45" fill="#d4af37" opacity="0.55" />
+          <polygon points="78,78 55,56 50,50 56,55" fill="#d4af37" opacity="0.55" />
+        </g>
+        {/* Centre jewel */}
+        <circle cx="50" cy="50" r="5"   fill="#ffd700" opacity="0.9" filter="url(#spireGlow)" />
+        <circle cx="50" cy="50" r="2.5" fill="#fff8dc" opacity="0.95" />
+      </svg>
+
+      {/* 7 — Dark obsidian centre medallion */}
+      <Box className="gw-medallion" />
+
+      {/* 8 — Cardinal jewel dots N / S / E / W */}
+      <Box className="gw-cardinal" />
+      <Box className="gw-cardinal-2" />
+
+      {/* 9 — Glowing initials */}
+      <Box className="gw-initials">
+        {resolvedInitials || "?"}
+      </Box>
+
     </Box>
   );
 }
@@ -402,15 +537,15 @@ export default function Home({ toggleTheme }) {
   const rootRef = useRef(null);
 
   const sectionIds = useMemo(() => [
-    { id: "home", label: "Home", icon: MdHome },
-    { id: "about", label: "About", icon: MdPerson },
-    { id: "skills", label: "Skills", icon: MdCode },
-    { id: "projects", label: "Work", icon: MdWork },
-    { id: "experience", label: "Experience", icon: MdTimeline },
-    { id: "education", label: "Education", icon: MdSchool },
-    { id: "achievements", label: "Achievements", icon: MdEmojiEvents },
-    { id: "languages", label: "Programming Languages", icon: MdTerminal },
-    { id: "contact", label: "Contact", icon: MdContacts },
+    { id: "home",         label: "Home",                  icon: MdHome },
+    { id: "about",        label: "About",                 icon: MdPerson },
+    { id: "skills",       label: "Skills",                icon: MdCode },
+    { id: "projects",     label: "Work",                  icon: MdWork },
+    { id: "experience",   label: "Experience",            icon: MdTimeline },
+    { id: "education",    label: "Education",             icon: MdSchool },
+    { id: "achievements", label: "Achievements",          icon: MdEmojiEvents },
+    { id: "languages",    label: "Programming Languages", icon: MdTerminal },
+    { id: "contact",      label: "Contact",               icon: MdContacts },
   ], []);
 
   const sectionIndexMap = useMemo(() => {
@@ -419,13 +554,13 @@ export default function Home({ toggleTheme }) {
     return map;
   }, [sectionIds]);
 
-  const name = safeString(profile?.name) || "Your Name";
+  const name          = safeString(profile?.name)       || "Your Name";
   const profileInitials = safeString(profile?.initials) || "";
-  const title = safeString(profile?.title) || "Full Stack Developer";
-  const tagline = safeString(profile?.tagline) || "Transforming Ideas Into Digital Reality";
-  const about = safeString(profile?.about) || "Add your about content from admin.";
-  const location = safeString(profile?.location) || "";
-  const emailPublic = safeString(profile?.emailPublic) || "";
+  const title         = safeString(profile?.title)      || "Full Stack Developer";
+  const tagline       = safeString(profile?.tagline)    || "Transforming Ideas Into Digital Reality";
+  const about         = safeString(profile?.about)      || "Add your about content from admin.";
+  const location      = safeString(profile?.location)   || "";
+  const emailPublic   = safeString(profile?.emailPublic)|| "";
 
   const contactEmail = useMemo(() => {
     const ep = safeString(emailPublic).trim();
@@ -436,7 +571,7 @@ export default function Home({ toggleTheme }) {
   const reload = () => setReloadTick((x) => x + 1);
   const contentVersion = useMemo(() => localStorage.getItem("content_version") || "0", [reloadTick]);
   const resumeDownloadBase = useMemo(() => downloadResumeUrl(), []);
-  const resumeViewBase = useMemo(() => viewResumeUrl(), []);
+  const resumeViewBase     = useMemo(() => viewResumeUrl(), []);
 
   const resumeDownloadUrlBusted = useMemo(() => {
     const joiner = resumeDownloadBase.includes("?") ? "&" : "?";
@@ -452,9 +587,9 @@ export default function Home({ toggleTheme }) {
     const s = skills || {};
     return [
       { category: "Frontend", value: splitCSV(s.frontend).join(", ") || "—" },
-      { category: "Backend", value: splitCSV(s.backend).join(", ") || "—" },
+      { category: "Backend",  value: splitCSV(s.backend).join(", ")  || "—" },
       { category: "Database", value: splitCSV(s.database).join(", ") || "—" },
-      { category: "Tools", value: splitCSV(s.tools).join(", ") || "—" },
+      { category: "Tools",    value: splitCSV(s.tools).join(", ")    || "—" },
     ];
   }, [skills]);
 
@@ -464,8 +599,10 @@ export default function Home({ toggleTheme }) {
       try {
         setLoading(true);
         const [profRes, skillsRes, projRes, expRes, eduRes, socRes, achRes, langRes] =
-          await Promise.all([getProfile(), getSkills(), getFeaturedProjects(), getExperience(),
-            getEducation(), getSocials(), getAchievements(), getLanguageExperience()]);
+          await Promise.all([
+            getProfile(), getSkills(), getFeaturedProjects(), getExperience(),
+            getEducation(), getSocials(), getAchievements(), getLanguageExperience(),
+          ]);
         if (!alive) return;
         const nextProfile = profRes?.data || {};
         setProfile(nextProfile);
@@ -478,8 +615,12 @@ export default function Home({ toggleTheme }) {
         setLanguages(Array.isArray(langRes?.data) ? langRes.data : []);
         const localName = localStorage.getItem("active_resume_file_name") || localStorage.getItem("resume_file_name") || "";
         if (localName) { setResumeName(localName); }
-        else { const pn = safeString(nextProfile?.name) || "Resume"; setResumeName(`${pn.replace(/\s+/g, "_")}_Resume.pdf`); }
-      } catch {} finally { if (alive) setLoading(false); }
+        else {
+          const pn = safeString(nextProfile?.name) || "Resume";
+          setResumeName(`${pn.replace(/\s+/g, "_")}_Resume.pdf`);
+        }
+      } catch {}
+      finally { if (alive) setLoading(false); }
     };
     load();
     return () => { alive = false; };
@@ -507,26 +648,26 @@ export default function Home({ toggleTheme }) {
     if (!target) return;
     const updateMouseVars = (event) => {
       const rect = target.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * 100;
-      const y = ((event.clientY - rect.top) / rect.height) * 100;
-      const rx = ((event.clientY - rect.top) / rect.height - 0.5) * 12;
-      const ry = ((event.clientX - rect.left) / rect.width - 0.5) * 12;
-      target.style.setProperty("--mouse-x", `${x}%`);
-      target.style.setProperty("--mouse-y", `${y}%`);
+      const x  = ((event.clientX - rect.left) / rect.width)  * 100;
+      const y  = ((event.clientY - rect.top)  / rect.height) * 100;
+      const rx = ((event.clientY - rect.top)  / rect.height - 0.5) * 12;
+      const ry = ((event.clientX - rect.left) / rect.width  - 0.5) * 12;
+      target.style.setProperty("--mouse-x",  `${x}%`);
+      target.style.setProperty("--mouse-y",  `${y}%`);
       target.style.setProperty("--mouse-rx", `${rx.toFixed(2)}deg`);
       target.style.setProperty("--mouse-ry", `${ry.toFixed(2)}deg`);
     };
     const resetMouseVars = () => {
-      target.style.setProperty("--mouse-x", "50%");
-      target.style.setProperty("--mouse-y", "50%");
+      target.style.setProperty("--mouse-x",  "50%");
+      target.style.setProperty("--mouse-y",  "50%");
       target.style.setProperty("--mouse-rx", "0deg");
       target.style.setProperty("--mouse-ry", "0deg");
     };
     resetMouseVars();
-    window.addEventListener("mousemove", updateMouseVars, { passive: true });
+    window.addEventListener("mousemove",  updateMouseVars, { passive: true });
     window.addEventListener("mouseleave", resetMouseVars);
     return () => {
-      window.removeEventListener("mousemove", updateMouseVars);
+      window.removeEventListener("mousemove",  updateMouseVars);
       window.removeEventListener("mouseleave", resetMouseVars);
     };
   }, []);
@@ -534,7 +675,7 @@ export default function Home({ toggleTheme }) {
   const jumpTo = (id) => {
     if (!sectionIndexMap[id] && sectionIndexMap[id] !== 0) return;
     const currentIndex = sectionIndexMap[activeSection] ?? 0;
-    const nextIndex = sectionIndexMap[id] ?? 0;
+    const nextIndex    = sectionIndexMap[id] ?? 0;
     setNavDirection(nextIndex >= currentIndex ? 1 : -1);
     setActiveSection(id);
   };
@@ -555,7 +696,7 @@ export default function Home({ toggleTheme }) {
       const blob = await res.blob();
       setResumePreviewBlobUrl(URL.createObjectURL(new Blob([blob], { type: "application/pdf" })));
     } catch { setResumePreviewBlobUrl(""); }
-    finally { setResumePreviewLoading(false); }
+    finally  { setResumePreviewLoading(false); }
   };
 
   const onDownloadResume = async () => {
@@ -571,6 +712,7 @@ export default function Home({ toggleTheme }) {
 
   const renderSection = () => {
     switch (activeSection) {
+
       case "home":
         return (
           <MotionBox key="home" custom={navDirection} variants={pageVariants}
@@ -583,7 +725,7 @@ export default function Home({ toggleTheme }) {
                   <Box className="hero-left hero-left-expanded">
                     <MotionBox variants={fadeUp}>
                       <Box className="hero-name-row">
-                        {/* BLACK HOLE BADGE — left side of name and three text lines */}
+                        {/* GRAND LUXURY WHEEL BADGE */}
                         <BlackholeBadge initials={profileInitials} name={name} />
                         <Box className="hero-name-text-block">
                           <Typography className="hero-name hero-name-display">{name}</Typography>
@@ -620,25 +762,40 @@ export default function Home({ toggleTheme }) {
 
                       <Stack className="hero-social-row" direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
                         {socials?.github ? (
-                          <IconButton className="hero-social-btn" onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}><FaGithub /></IconButton>
+                          <IconButton className="hero-social-btn"
+                            onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>
+                            <FaGithub />
+                          </IconButton>
                         ) : null}
                         {socials?.linkedin ? (
-                          <IconButton className="hero-social-btn" onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}><FaLinkedin /></IconButton>
+                          <IconButton className="hero-social-btn"
+                            onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>
+                            <FaLinkedin />
+                          </IconButton>
                         ) : null}
                         {contactEmail ? (
-                          <IconButton className="hero-social-btn" onClick={() => window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")}><MdEmail /></IconButton>
+                          <IconButton className="hero-social-btn"
+                            onClick={() => window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")}>
+                            <MdEmail />
+                          </IconButton>
                         ) : null}
                         {socials?.phone ? (
-                          <IconButton className="hero-social-btn" onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")}><MdPhone /></IconButton>
+                          <IconButton className="hero-social-btn"
+                            onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")}>
+                            <MdPhone />
+                          </IconButton>
                         ) : null}
                         {socials?.website ? (
-                          <IconButton className="hero-social-btn" onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}><MdLink /></IconButton>
+                          <IconButton className="hero-social-btn"
+                            onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>
+                            <MdLink />
+                          </IconButton>
                         ) : null}
                       </Stack>
                     </MotionBox>
                   </Box>
 
-                  {/* RIGHT COLUMN — large blended photo, fills full column height */}
+                  {/* RIGHT COLUMN — large blended photo */}
                   <Box className="hero-right">
                     <ProfilePhotoCard />
                   </Box>
@@ -786,8 +943,11 @@ export default function Home({ toggleTheme }) {
                         <Typography className="timeline-subtitle">{safeString(item?.issuer) || ""}</Typography>
                         <Typography className="timeline-meta">{safeString(item?.year) || ""}</Typography>
                         {safeString(item?.link) ? (
-                          <Button variant="outlined" startIcon={<MdLink />} sx={{ mt: 2, borderRadius: 999, fontWeight: 700 }}
-                            onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}>View</Button>
+                          <Button variant="outlined" startIcon={<MdLink />}
+                            sx={{ mt: 2, borderRadius: 999, fontWeight: 700 }}
+                            onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}>
+                            View
+                          </Button>
                         ) : null}
                       </GlassPanel>
                     ))
@@ -843,15 +1003,18 @@ export default function Home({ toggleTheme }) {
                   </Stack>
                   <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
                     {socials?.github ? (
-                      <Button variant="outlined" startIcon={<FaGithub />} sx={{ borderRadius: 999, fontWeight: 700 }}
+                      <Button variant="outlined" startIcon={<FaGithub />}
+                        sx={{ borderRadius: 999, fontWeight: 700 }}
                         onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>GitHub</Button>
                     ) : null}
                     {socials?.linkedin ? (
-                      <Button variant="outlined" startIcon={<FaLinkedin />} sx={{ borderRadius: 999, fontWeight: 700 }}
+                      <Button variant="outlined" startIcon={<FaLinkedin />}
+                        sx={{ borderRadius: 999, fontWeight: 700 }}
                         onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>LinkedIn</Button>
                     ) : null}
                     {socials?.website ? (
-                      <Button variant="outlined" startIcon={<MdLink />} sx={{ borderRadius: 999, fontWeight: 700 }}
+                      <Button variant="outlined" startIcon={<MdLink />}
+                        sx={{ borderRadius: 999, fontWeight: 700 }}
                         onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>Website</Button>
                     ) : null}
                   </Stack>
@@ -930,12 +1093,12 @@ function NetworkCanvas({ mode }) {
     let animationId;
     let nodes = [];
     const NODE_COUNT = 55;
-    const MAX_DIST = 160;
+    const MAX_DIST   = 160;
     const isDark = mode === "dark";
-    const nodeColor = isDark ? "rgba(255,255,255,0.55)" : "rgba(17,24,39,0.45)";
-    const lineColor = isDark ? "rgba(255,255,255,0.09)" : "rgba(17,24,39,0.08)";
+    const nodeColor      = isDark ? "rgba(255,255,255,0.55)"    : "rgba(17,24,39,0.45)";
+    const lineColor      = isDark ? "rgba(255,255,255,0.09)"    : "rgba(17,24,39,0.08)";
     const accentNodeColor = "rgba(241,48,36,0.7)";
-    const accentLineColor = isDark ? "rgba(241,48,36,0.18)" : "rgba(241,48,36,0.12)";
+    const accentLineColor = isDark ? "rgba(241,48,36,0.18)"     : "rgba(241,48,36,0.12)";
     const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
     const initNodes = () => {
       nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
@@ -943,7 +1106,7 @@ function NetworkCanvas({ mode }) {
         y: Math.random() * canvas.height,
         vx: (Math.random() - 0.5) * 0.38,
         vy: (Math.random() - 0.5) * 0.38,
-        r: Math.random() * 2.2 + 1.2,
+        r:  Math.random() * 2.2 + 1.2,
         accent: i < 6,
       }));
     };
@@ -951,16 +1114,16 @@ function NetworkCanvas({ mode }) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       nodes.forEach((n) => {
         n.x += n.vx; n.y += n.vy;
-        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+        if (n.x < 0 || n.x > canvas.width)  n.vx *= -1;
         if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
       });
       for (let i = 0; i < nodes.length; i++) {
         for (let j = i + 1; j < nodes.length; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
+          const dx   = nodes[i].x - nodes[j].x;
+          const dy   = nodes[i].y - nodes[j].y;
           const dist = Math.sqrt(dx * dx + dy * dy);
           if (dist < MAX_DIST) {
-            const alpha = 1 - dist / MAX_DIST;
+            const alpha    = 1 - dist / MAX_DIST;
             const isAccent = nodes[i].accent || nodes[j].accent;
             ctx.beginPath();
             ctx.moveTo(nodes[i].x, nodes[i].y);
