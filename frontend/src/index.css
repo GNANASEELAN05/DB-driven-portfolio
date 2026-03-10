@@ -391,8 +391,8 @@ button { font-family: inherit; }
 .profile-photo-img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  object-fit: contain;
+  object-position: center center;
   display: block;
   mix-blend-mode: lighten;
   /* Fade bottom edge into bg */
