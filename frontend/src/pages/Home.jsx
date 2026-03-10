@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import {
   Box,
   Button,
@@ -132,6 +132,57 @@ async function blobDownload(url) {
   return filename;
 }
 
+// =============================================
+// TYPEWRITER HOOK
+// =============================================
+function useTypewriter(text, speed = 45, startDelay = 600) {
+  const [displayed, setDisplayed] = useState("");
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    setDisplayed("");
+    setDone(false);
+    if (!text) return;
+    let i = 0;
+    const timeout = setTimeout(() => {
+      const interval = setInterval(() => {
+        i++;
+        setDisplayed(text.slice(0, i));
+        if (i >= text.length) {
+          clearInterval(interval);
+          setDone(true);
+        }
+      }, speed);
+      return () => clearInterval(interval);
+    }, startDelay);
+    return () => clearTimeout(timeout);
+  }, [text, speed, startDelay]);
+  return { displayed, done };
+}
+
+// =============================================
+// CURSOR SPOTLIGHT
+// =============================================
+function CursorSpotlight() {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const move = (e) => {
+      el.style.left = `${e.clientX}px`;
+      el.style.top = `${e.clientY}px`;
+      el.style.opacity = "1";
+    };
+    const leave = () => { el.style.opacity = "0"; };
+    window.addEventListener("mousemove", move, { passive: true });
+    window.addEventListener("mouseleave", leave);
+    return () => {
+      window.removeEventListener("mousemove", move);
+      window.removeEventListener("mouseleave", leave);
+    };
+  }, []);
+  return <div ref={ref} className="cursor-spotlight" aria-hidden="true" />;
+}
+
 function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   const src = blobUrl || url;
   return (
@@ -151,25 +202,25 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
         <Button
-  onClick={onClose}
-  variant="contained"
-  startIcon={<MdClose />}
-  sx={{
-    background: "linear-gradient(135deg, #f13024, #f97316)",
-    color: "white",
-    borderRadius: 999,
-    fontWeight: 800,
-    textTransform: "none",
-    px: 3,
-    boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
-    "&:hover": {
-      background: "linear-gradient(135deg, #d42a1e, #e8650a)",
-      boxShadow: "0 10px 28px rgba(241,48,36,0.45)",
-    },
-  }}
->
-  Close
-</Button>
+          onClick={onClose}
+          variant="contained"
+          startIcon={<MdClose />}
+          sx={{
+            background: "linear-gradient(135deg, #f13024, #f97316)",
+            color: "white",
+            borderRadius: 999,
+            fontWeight: 800,
+            textTransform: "none",
+            px: 3,
+            boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
+            "&:hover": {
+              background: "linear-gradient(135deg, #d42a1e, #e8650a)",
+              boxShadow: "0 10px 28px rgba(241,48,36,0.45)",
+            },
+          }}
+        >
+          Close
+        </Button>
       </DialogActions>
     </Dialog>
   );
@@ -217,7 +268,7 @@ function HeroActionButton({ children, ...props }) {
 function SectionHeading({ title, subtitle }) {
   return (
     <Stack spacing={1.1} sx={{ mb: 3 }}>
-      <Typography className="section-title">{title}</Typography>
+      <Typography className="section-title gradient-text">{title}</Typography>
       {subtitle ? <Typography className="section-subtitle">{subtitle}</Typography> : null}
     </Stack>
   );
@@ -225,7 +276,42 @@ function SectionHeading({ title, subtitle }) {
 
 function GlassPanel({ children, sx, className = "" }) {
   return (
-    <Paper className={`glass-panel ${className}`.trim()} sx={sx}>{children}</Paper>
+    <Paper className={`glass-panel shimmer-panel ${className}`.trim()} sx={sx}>{children}</Paper>
+  );
+}
+
+// =============================================
+// 3D TILT CARD WRAPPER
+// =============================================
+function TiltCard({ children, className = "", sx }) {
+  const ref = useRef(null);
+  const handleMouseMove = useCallback((e) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotX = ((y - cy) / cy) * -10;
+    const rotY = ((x - cx) / cx) * 10;
+    el.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(8px)`;
+  }, []);
+  const handleMouseLeave = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
+  }, []);
+  return (
+    <Paper
+      ref={ref}
+      className={`glass-panel shimmer-panel tilt-card ${className}`.trim()}
+      sx={sx}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {children}
+    </Paper>
   );
 }
 
@@ -290,8 +376,6 @@ function ProfilePhotoCard() {
 
 // =============================================
 // GRAND LUXURY WHEEL BADGE
-// Rolex bezel × Astronomical clock × Royal compass rose
-// Palette: 24K gold · deep obsidian · champagne · ivory
 // =============================================
 function BlackholeBadge({ initials, name }) {
   const resolvedInitials =
@@ -305,17 +389,8 @@ function BlackholeBadge({ initials, name }) {
 
   return (
     <Box className="hero-blackhole-badge" aria-hidden="true">
-
-      {/* 1 — Ambient gold halo bloom */}
       <Box className="gw-halo" />
-
-      {/* 2 — Outer bezel ring: 60 tick marks + diamond markers (slow clockwise) */}
-      <svg
-        className="gw-bezel-svg"
-        viewBox="0 0 148 148"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg className="gw-bezel-svg" viewBox="0 0 148 148" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%"   stopColor="#8b6914" />
@@ -326,89 +401,47 @@ function BlackholeBadge({ initials, name }) {
           </linearGradient>
           <filter id="goldGlow">
             <feGaussianBlur stdDeviation="1.2" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
-
-        {/* Outer border rings */}
         <circle cx="74" cy="74" r="71" stroke="url(#goldGrad)" strokeWidth="1.5" opacity="0.7" />
         <circle cx="74" cy="74" r="68" stroke="url(#goldGrad)" strokeWidth="0.6" opacity="0.4" />
-
-        {/* 12 major tick marks every 30° */}
         <g filter="url(#goldGlow)">
           {[0,30,60,90,120,150,180,210,240,270,300,330].map((deg) => (
-            <line key={deg} x1="74" y1="4" x2="74" y2="16"
-              stroke="#ffd700" strokeWidth="2.2"
+            <line key={deg} x1="74" y1="4" x2="74" y2="16" stroke="#ffd700" strokeWidth="2.2"
               transform={`rotate(${deg} 74 74)`} opacity="0.95" />
           ))}
-          {/* Minor ticks every 6°, skip the 12 major positions */}
-          {[6,12,18,24,36,42,48,54,66,72,78,84,
-            96,102,108,114,126,132,138,144,
-            156,162,168,174,186,192,198,204,
-            216,222,228,234,246,252,258,264,
-            276,282,288,294,306,312,318,324,
-            336,342,348,354].map((deg) => (
-            <line key={deg} x1="74" y1="5" x2="74" y2="11"
-              stroke="#c9a227" strokeWidth="1"
+          {[6,12,18,24,36,42,48,54,66,72,78,84,96,102,108,114,126,132,138,144,
+            156,162,168,174,186,192,198,204,216,222,228,234,246,252,258,264,
+            276,282,288,294,306,312,318,324,336,342,348,354].map((deg) => (
+            <line key={deg} x1="74" y1="5" x2="74" y2="11" stroke="#c9a227" strokeWidth="1"
               transform={`rotate(${deg} 74 74)`} opacity="0.6" />
           ))}
         </g>
-
-        {/* Diamond markers at N / E / S / W */}
         {[0,90,180,270].map((deg) => (
-          <polygon key={deg}
-            points="74,2 76.5,7 74,12 71.5,7"
-            fill="#ffd700" opacity="0.9"
-            transform={`rotate(${deg} 74 74)`}
-            filter="url(#goldGlow)" />
+          <polygon key={deg} points="74,2 76.5,7 74,12 71.5,7" fill="#ffd700" opacity="0.9"
+            transform={`rotate(${deg} 74 74)`} filter="url(#goldGlow)" />
         ))}
       </svg>
-
-      {/* 3 — Gold conic outer spinning ring (CSS class handles animation) */}
       <Box className="gw-outer-ring" />
-
-      {/* 4 — Ornamental gear ring (counter-clockwise) */}
-      <svg
-        className="gw-gear-svg"
-        viewBox="0 0 148 148"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg className="gw-gear-svg" viewBox="0 0 148 148" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <filter id="gearGlow">
             <feGaussianBlur stdDeviation="1.5" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
         <g filter="url(#gearGlow)" opacity="0.75">
-          <circle cx="74" cy="74" r="60" stroke="#c9a227" strokeWidth="0.8"
-            fill="none" strokeDasharray="2 2" opacity="0.5" />
-          <circle cx="74" cy="74" r="55" stroke="#d4af37" strokeWidth="1.2"
-            fill="none" opacity="0.4" />
-          {/* 16 gear teeth */}
+          <circle cx="74" cy="74" r="60" stroke="#c9a227" strokeWidth="0.8" fill="none" strokeDasharray="2 2" opacity="0.5" />
+          <circle cx="74" cy="74" r="55" stroke="#d4af37" strokeWidth="1.2" fill="none" opacity="0.4" />
           {[0,22.5,45,67.5,90,112.5,135,157.5,180,202.5,225,247.5,270,292.5,315,337.5].map((deg) => (
-            <rect key={deg} x="71" y="13" width="6" height="9" rx="1.5"
-              fill="#c9a227" transform={`rotate(${deg} 74 74)`} opacity="0.8" />
+            <rect key={deg} x="71" y="13" width="6" height="9" rx="1.5" fill="#c9a227"
+              transform={`rotate(${deg} 74 74)`} opacity="0.8" />
           ))}
         </g>
       </svg>
-
-      {/* 5 — Mid molten gold conic band */}
       <Box className="gw-mid-band" />
-
-      {/* 6 — Compass rose (slow clockwise) */}
-      <svg
-        className="gw-compass-svg"
-        viewBox="0 0 100 100"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
+      <svg className="gw-compass-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="spireGold" x1="50%" y1="0%" x2="50%" y2="100%">
             <stop offset="0%"   stopColor="#ffd700" />
@@ -417,53 +450,68 @@ function BlackholeBadge({ initials, name }) {
           </linearGradient>
           <filter id="spireGlow">
             <feGaussianBlur stdDeviation="1" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
         </defs>
         <g filter="url(#spireGlow)">
-          {/* Cardinal spires N S E W */}
           <polygon points="50,8 53,42 50,48 47,42"  fill="url(#spireGold)" opacity="0.9" />
           <polygon points="50,92 53,58 50,52 47,58" fill="url(#spireGold)" opacity="0.7" />
           <polygon points="92,50 58,47 52,50 58,53" fill="url(#spireGold)" opacity="0.7" />
           <polygon points="8,50 42,47 48,50 42,53"  fill="url(#spireGold)" opacity="0.7" />
-          {/* Intercardinal spires NE SW NW SE */}
           <polygon points="78,22 55,44 50,50 48,44" fill="#d4af37" opacity="0.55" />
           <polygon points="22,78 45,56 50,50 56,45" fill="#d4af37" opacity="0.55" />
           <polygon points="22,22 45,44 50,50 44,45" fill="#d4af37" opacity="0.55" />
           <polygon points="78,78 55,56 50,50 56,55" fill="#d4af37" opacity="0.55" />
         </g>
-        {/* Centre jewel */}
         <circle cx="50" cy="50" r="5"   fill="#ffd700" opacity="0.9" filter="url(#spireGlow)" />
         <circle cx="50" cy="50" r="2.5" fill="#fff8dc" opacity="0.95" />
       </svg>
-
-      {/* 7 — Dark obsidian centre medallion */}
       <Box className="gw-medallion" />
-
-      {/* 8 — Cardinal jewel dots N / S / E / W */}
       <Box className="gw-cardinal" />
       <Box className="gw-cardinal-2" />
-
-      {/* 9 — Glowing initials */}
-      <Box className="gw-initials">
-        {resolvedInitials || "?"}
-      </Box>
-
+      <Box className="gw-initials">{resolvedInitials || "?"}</Box>
     </Box>
   );
 }
 
+// =============================================
+// PROJECT CARD — with neon border + 3D tilt
+// =============================================
 function ProjectCard({ project }) {
   const title = safeString(project?.title) || "Untitled Project";
   const description = safeString(project?.description);
   const techList = splitCSV(project?.tech);
   const repoUrl = safeString(project?.repoUrl);
   const liveUrl = safeString(project?.liveUrl);
+  const ref = useRef(null);
+
+  const handleMouseMove = useCallback((e) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const cx = rect.width / 2;
+    const cy = rect.height / 2;
+    const rotX = ((y - cy) / cy) * -8;
+    const rotY = ((x - cx) / cx) * 8;
+    el.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(10px) translateY(-4px)`;
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px) translateY(0px)";
+  }, []);
+
   return (
-    <MotionPaper variants={fadeUp} className="project-card" whileHover={{ y: -8 }}>
+    <MotionPaper
+      ref={ref}
+      variants={fadeUp}
+      className="project-card neon-card"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
       <Typography className="project-title">{title}</Typography>
       <Typography className="project-description">{description || "No description added yet."}</Typography>
       {techList.length ? (
@@ -580,6 +628,11 @@ export default function Home({ toggleTheme }) {
   const about         = safeString(profile?.about)      || "Add your about content from admin.";
   const location      = safeString(profile?.location)   || "";
   const emailPublic   = safeString(profile?.emailPublic)|| "";
+
+  // Typewriter for tagline (only on hero)
+  const { displayed: typewriterText, done: typewriterDone } = useTypewriter(
+    activeSection === "home" ? tagline : "", 45, 800
+  );
 
   const contactEmail = useMemo(() => {
     const ep = safeString(emailPublic).trim();
@@ -744,7 +797,6 @@ export default function Home({ toggleTheme }) {
                   <Box className="hero-left hero-left-expanded">
                     <MotionBox variants={fadeUp}>
                       <Box className="hero-name-row">
-                        {/* GRAND LUXURY WHEEL BADGE */}
                         <BlackholeBadge initials={profileInitials} name={name} />
                         <Box className="hero-name-text-block">
                           <Typography className="hero-name hero-name-display">{name}</Typography>
@@ -764,59 +816,63 @@ export default function Home({ toggleTheme }) {
                         </Box>
                       </Box>
 
-                      <Typography className="hero-title">{tagline}</Typography>
+                      {/* TYPEWRITER TAGLINE */}
+                      <Typography className="hero-title">
+                        {typewriterText}
+                        <span className={`typewriter-cursor ${typewriterDone ? "cursor-blink" : ""}`}>|</span>
+                      </Typography>
                       <Typography className="hero-description">{about}</Typography>
 
                       <Stack className="hero-action-buttons" direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
-<HeroActionButton
-  variant="contained"
-  startIcon={<MdArrowOutward />}
-  onClick={() => jumpTo("projects")}
-  sx={{
-    background: "linear-gradient(135deg, #f13024, #f97316) !important",
-    color: "white !important",
-    border: "none !important",
-    boxShadow: "0 8px 24px rgba(241,48,36,0.35) !important",
-    "&:hover": {
-      background: "linear-gradient(135deg, #d42a1e, #e8650a) !important",
-      boxShadow: "0 12px 32px rgba(241,48,36,0.5) !important",
-      transform: "translateY(-2px)",
-    },
-  }}
->
-  View Work
-</HeroActionButton>
-<HeroActionButton
-  variant="outlined"
-  startIcon={<MdDownload />}
-  onClick={onDownloadResume}
-  disabled={downloading}
-  sx={{
-    borderColor: "rgba(241,48,36,0.5) !important",
-    color: "#f13024 !important",
-    "&:hover": {
-      borderColor: "#f13024 !important",
-      background: "rgba(241,48,36,0.08) !important",
-    },
-  }}
->
-  {downloading ? "Downloading..." : "Download Resume"}
-</HeroActionButton>
-<HeroActionButton
-  variant="outlined"
-  startIcon={<MdVisibility />}
-  onClick={onPreviewResume}
-  sx={{
-    borderColor: "rgba(241,48,36,0.5) !important",
-    color: "#f13024 !important",
-    "&:hover": {
-      borderColor: "#f13024 !important",
-      background: "rgba(241,48,36,0.08) !important",
-    },
-  }}
->
-  Preview Resume
-</HeroActionButton>
+                        <HeroActionButton
+                          variant="contained"
+                          startIcon={<MdArrowOutward />}
+                          onClick={() => jumpTo("projects")}
+                          sx={{
+                            background: "linear-gradient(135deg, #f13024, #f97316) !important",
+                            color: "white !important",
+                            border: "none !important",
+                            boxShadow: "0 8px 24px rgba(241,48,36,0.35) !important",
+                            "&:hover": {
+                              background: "linear-gradient(135deg, #d42a1e, #e8650a) !important",
+                              boxShadow: "0 12px 32px rgba(241,48,36,0.5) !important",
+                              transform: "translateY(-2px)",
+                            },
+                          }}
+                        >
+                          View Work
+                        </HeroActionButton>
+                        <HeroActionButton
+                          variant="outlined"
+                          startIcon={<MdDownload />}
+                          onClick={onDownloadResume}
+                          disabled={downloading}
+                          sx={{
+                            borderColor: "rgba(241,48,36,0.5) !important",
+                            color: "#f13024 !important",
+                            "&:hover": {
+                              borderColor: "#f13024 !important",
+                              background: "rgba(241,48,36,0.08) !important",
+                            },
+                          }}
+                        >
+                          {downloading ? "Downloading..." : "Download Resume"}
+                        </HeroActionButton>
+                        <HeroActionButton
+                          variant="outlined"
+                          startIcon={<MdVisibility />}
+                          onClick={onPreviewResume}
+                          sx={{
+                            borderColor: "rgba(241,48,36,0.5) !important",
+                            color: "#f13024 !important",
+                            "&:hover": {
+                              borderColor: "#f13024 !important",
+                              background: "rgba(241,48,36,0.08) !important",
+                            },
+                          }}
+                        >
+                          Preview Resume
+                        </HeroActionButton>
                       </Stack>
 
                       <Stack className="hero-social-row" direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
@@ -854,7 +910,7 @@ export default function Home({ toggleTheme }) {
                     </MotionBox>
                   </Box>
 
-                  {/* RIGHT COLUMN — large blended photo */}
+                  {/* RIGHT COLUMN */}
                   <Box className="hero-right">
                     <ProfilePhotoCard />
                   </Box>
@@ -1093,6 +1149,9 @@ export default function Home({ toggleTheme }) {
 
   return (
     <Box ref={rootRef} className={`portfolio-root ${mode === "dark" ? "mode-dark" : "mode-light"}`}>
+      {/* CURSOR SPOTLIGHT */}
+      <CursorSpotlight />
+
       <Box className="portfolio-bg">
         <span className="portfolio-orb orb-one" />
         <span className="portfolio-orb orb-two" />

@@ -48,6 +48,217 @@ body { overflow-x: hidden; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; }
 
+/* ==============================================
+   CURSOR SPOTLIGHT
+   ============================================== */
+.cursor-spotlight {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle at center,
+    rgba(241, 48, 36, 0.10) 0%,
+    rgba(249, 115, 22, 0.06) 30%,
+    transparent 70%
+  );
+  transition: opacity 0.3s ease;
+  mix-blend-mode: screen;
+}
+
+.mode-light .cursor-spotlight {
+  background: radial-gradient(
+    circle at center,
+    rgba(241, 48, 36, 0.08) 0%,
+    rgba(249, 115, 22, 0.04) 30%,
+    transparent 70%
+  );
+  mix-blend-mode: multiply;
+}
+
+/* ==============================================
+   TYPEWRITER CURSOR
+   ============================================== */
+.typewriter-cursor {
+  display: inline-block;
+  color: #f13024;
+  font-weight: 900;
+  margin-left: 2px;
+  opacity: 1;
+  animation: none;
+  text-shadow: 0 0 12px rgba(241, 48, 36, 0.8);
+}
+
+.typewriter-cursor.cursor-blink {
+  animation: cursorFadeOut 0.6s ease forwards;
+}
+
+@keyframes cursorFadeOut {
+  0%   { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ==============================================
+   GRADIENT TEXT — section headings
+   ============================================== */
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    #f13024 0%,
+    #f97316 35%,
+    #ffffff 60%,
+    #f97316 80%,
+    #f13024 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s linear infinite;
+}
+
+.mode-light .gradient-text {
+  background: linear-gradient(
+    135deg,
+    #f13024 0%,
+    #f97316 35%,
+    #111827 60%,
+    #f97316 80%,
+    #f13024 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 4s linear infinite;
+}
+
+@keyframes gradientShift {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* ==============================================
+   SHIMMER PANEL — glass panels get a sweep shine
+   ============================================== */
+.shimmer-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.07) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  background-position: -100% 0;
+  pointer-events: none;
+  border-radius: inherit;
+  animation: shimmerSweep 4.5s ease-in-out infinite;
+}
+
+.mode-light .shimmer-panel::after {
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  background-position: -100% 0;
+  animation: shimmerSweep 4.5s ease-in-out infinite;
+}
+
+@keyframes shimmerSweep {
+  0%   { background-position: -100% 0; opacity: 0; }
+  10%  { opacity: 1; }
+  50%  { background-position: 100% 0; opacity: 1; }
+  60%  { opacity: 0; }
+  100% { background-position: 100% 0; opacity: 0; }
+}
+
+/* ==============================================
+   NEON CARD — project cards get animated border glow
+   ============================================== */
+.neon-card {
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+
+.mode-dark .neon-card {
+  box-shadow:
+    0 0 0 1px rgba(241, 48, 36, 0.0),
+    0 18px 60px rgba(0, 0, 0, 0.2) !important;
+  animation: neonPulse 3s ease-in-out infinite;
+}
+
+.mode-light .neon-card {
+  box-shadow:
+    0 0 0 1px rgba(241, 48, 36, 0.0),
+    0 10px 40px rgba(0, 0, 0, 0.08) !important;
+  animation: neonPulsLight 3s ease-in-out infinite;
+}
+
+.neon-card:hover {
+  box-shadow:
+    0 0 0 1.5px rgba(241, 48, 36, 0.7),
+    0 0 24px rgba(241, 48, 36, 0.35),
+    0 0 60px rgba(249, 115, 22, 0.18),
+    0 24px 60px rgba(0, 0, 0, 0.22) !important;
+}
+
+@keyframes neonPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(241, 48, 36, 0.12),
+      0 18px 60px rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(241, 48, 36, 0.28),
+      0 0 18px rgba(241, 48, 36, 0.14),
+      0 18px 60px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes neonPulsLight {
+  0%, 100% {
+    box-shadow:
+      0 0 0 1px rgba(241, 48, 36, 0.1),
+      0 10px 40px rgba(0, 0, 0, 0.08);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px rgba(241, 48, 36, 0.22),
+      0 0 14px rgba(241, 48, 36, 0.10),
+      0 10px 40px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* ==============================================
+   TILT CARD — smooth 3D perspective on hover
+   ============================================== */
+.tilt-card {
+  transition: transform 0.15s ease, box-shadow 0.25s ease !important;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+
+/* ==============================================
+   PORTFOLIO ROOT
+   ============================================== */
 .portfolio-root {
   position: relative;
   min-height: 100vh;
@@ -202,28 +413,22 @@ button { font-family: inherit; }
   50% { transform: translate3d(0, -18px, 0) scale(1.06); }
 }
 
-/* ==============================================
-   SHELL — right padding accounts for side nav (60px wide + 16px gap each side = ~92px)
-   Bottom padding ensures social icons are NEVER cut off
-   ============================================== */
 .portfolio-shell {
   position: relative;
   z-index: 2;
   height: 100vh;
   padding-top: 10px;
-  /* FIXED: enough bottom padding so social icons are fully visible */
   padding-bottom: 48px;
   display: flex;
   flex-direction: column;
   padding-left: 24px;
-  /* FIXED: side nav is 60px + 16px from right edge = 76px, add 16px buffer = 92px */
   padding-right: 260px;
 }
 
 .portfolio-topbar {
   position: fixed;
   top: 10px;
-  right: 20px; /* clears the side nav (60px wide + 16px gap) */
+  right: 20px;
   z-index: 25;
   display: flex;
   justify-content: flex-end;
@@ -238,7 +443,6 @@ button { font-family: inherit; }
   flex-shrink: 0;
 }
 
-/* On mobile, revert to sticky inside the flow */
 @media (max-width: 899px) {
   .portfolio-topbar {
     position: sticky;
@@ -310,7 +514,6 @@ button { font-family: inherit; }
 
 .section-scroll-area::-webkit-scrollbar { width: 0; height: 0; }
 
-/* Home section does NOT scroll — photo fills the full height */
 .home-scroll-area { overflow-y: hidden; }
 
 @media (max-width: 899px) {
@@ -349,18 +552,12 @@ button { font-family: inherit; }
 
 .hero-section { padding-top: 4px; padding-bottom: 0; }
 
-/* ==============================================
-   HERO TWO-COLUMN LAYOUT
-   Left: all text content
-   Right: large blended photo — fills full height
-   ============================================== */
 .hero-layout {
   display: grid;
   gap: 0;
   align-items: stretch;
 }
 
-/* Left takes free space; right column is fixed width for the photo */
 .hero-layout-two-col {
   grid-template-columns: 1fr 380px;
   align-items: stretch;
@@ -377,9 +574,6 @@ button { font-family: inherit; }
   overflow: hidden;
 }
 
-/* ==============================================
-   PROFILE PHOTO — keep same size feel, no right cut
-   ============================================== */
 .profile-photo-wrap {
   position: relative;
   width: 100%;
@@ -422,7 +616,6 @@ button { font-family: inherit; }
   );
 }
 
-/* Animated photo */
 .profile-photo-img {
   object-fit: contain;
   object-position: center bottom;
@@ -430,7 +623,6 @@ button { font-family: inherit; }
   transform: scale(1);
 }
 
-/* Original photo — make same visible size as animated */
 .profile-photo-original {
   object-fit: contain;
   object-position: center bottom;
@@ -438,16 +630,15 @@ button { font-family: inherit; }
   transform: scale(1.4);
   transform-origin: center bottom;
 }
-/* Animated photo */
+
 .profile-photo-img {
   mix-blend-mode: lighten;
 }
 
-/* Original photo */
 .profile-photo-original {
   mix-blend-mode: normal;
 }
-/* Mobile override — same for both */
+
 @media (max-width: 899px) {
   .profile-photo-img,
   .profile-photo-original {
@@ -457,11 +648,6 @@ button { font-family: inherit; }
   }
 }
 
-
-/* "See Original" button:
-   - opacity is controlled by JS (hovered && !showOriginal)
-   - never visible by default
-   - transition is smooth */
 .profile-photo-btn-wrap {
   position: absolute;
   bottom: 32px;
@@ -497,9 +683,6 @@ button { font-family: inherit; }
   box-shadow: 0 12px 36px rgba(249, 115, 22, 0.45);
 }
 
-/* ==============================================
-   HERO NAME ROW — black hole badge + name/meta
-   ============================================== */
 .hero-name-row {
   display: flex;
   align-items: flex-start;
@@ -509,11 +692,7 @@ button { font-family: inherit; }
 
 /* ==============================================
    GRAND LUXURY WHEEL BADGE
-   Aesthetic: Rolex bezel × Astronomical clock × Royal compass rose
-   Palette: 24K gold · deep obsidian · champagne · ivory
    ============================================== */
-
-/* ── Container ── */
 .hero-blackhole-badge {
   width: clamp(100px, 10vw, 148px);
   height: clamp(100px, 10vw, 148px);
@@ -523,7 +702,6 @@ button { font-family: inherit; }
   border-radius: 50%;
 }
 
-/* ── Outer ambient halo ── */
 .gw-halo {
   position: absolute;
   inset: -22%;
@@ -545,7 +723,6 @@ button { font-family: inherit; }
   pointer-events: none;
 }
 
-/* ── Bezel SVG — slow clockwise ── */
 .gw-bezel-svg {
   position: absolute;
   inset: 0;
@@ -555,7 +732,6 @@ button { font-family: inherit; }
   animation: gwBezelSpin 28s linear infinite;
 }
 
-/* ── Gold conic outer ring ── */
 .gw-outer-ring {
   position: absolute;
   inset: 2%;
@@ -577,7 +753,6 @@ button { font-family: inherit; }
     transparent 82%, black 86%, black 94%, transparent 97%);
 }
 
-/* ── Ornamental gear SVG — counter-clockwise ── */
 .gw-gear-svg {
   position: absolute;
   inset: 5%;
@@ -587,7 +762,6 @@ button { font-family: inherit; }
   animation: gwGearSpin 12s linear infinite reverse;
 }
 
-/* ── Mid molten gold band ── */
 .gw-mid-band {
   position: absolute;
   inset: 14%;
@@ -610,7 +784,6 @@ button { font-family: inherit; }
     transparent 60%, black 65%, black 78%, transparent 82%);
 }
 
-/* ── Compass rose SVG — slow clockwise ── */
 .gw-compass-svg {
   position: absolute;
   inset: 18%;
@@ -621,7 +794,6 @@ button { font-family: inherit; }
   opacity: 0.88;
 }
 
-/* ── Dark obsidian medallion ── */
 .gw-medallion {
   position: absolute;
   inset: 28%;
@@ -639,7 +811,6 @@ button { font-family: inherit; }
   animation: gwMedallionPulse 4s ease-in-out infinite;
 }
 
-/* ── Cardinal glow jewel dots ── */
 .gw-cardinal {
   position: absolute;
   inset: 0;
@@ -684,7 +855,6 @@ button { font-family: inherit; }
 .gw-cardinal-2::before { top: 50%; left: 6%;   transform: translateY(-50%); }
 .gw-cardinal-2::after  { top: 50%; right: 6%;  transform: translateY(-50%); }
 
-/* ── Initials — Cinzel or serif fallback ── */
 .gw-initials {
   position: absolute;
   inset: 0;
@@ -705,7 +875,6 @@ button { font-family: inherit; }
   animation: gwInitialsPulse 4s ease-in-out infinite;
 }
 
-/* ============ KEYFRAMES ============ */
 @keyframes gwBezelSpin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
@@ -770,7 +939,6 @@ button { font-family: inherit; }
   }
 }
 
-/* ── Mobile scale ── */
 @media (max-width: 767px) {
   .hero-blackhole-badge { width: 88px; height: 88px; }
   .gw-initials { font-size: 16px; }
@@ -1005,7 +1173,7 @@ button { font-family: inherit; }
 .portfolio-footer { padding: 24px 0 10px; text-align: center; opacity: 0.7; }
 
 /* ==============================================
-   SIDEBAR NAV — fixed right side, centered vertically
+   SIDEBAR NAV
    ============================================== */
 .portfolio-side-nav {
   position: fixed;
@@ -1095,20 +1263,18 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 }
 
 /* ==============================================
-   RESPONSIVE — 899px and below (mobile/tablet)
+   RESPONSIVE — 899px and below
    ============================================== */
 @media (max-width: 899px) {
   .portfolio-shell {
     padding-top: 10px;
     padding-right: 16px;
     padding-left: 16px;
-    /* Bottom padding = nav bar height + safe gap */
     padding-bottom: calc(var(--side-nav-mobile-space) + 24px);
   }
 
   .portfolio-topbar { border-radius: 24px; padding: 10px; top: 10px; }
 
-  /* Nav moves to bottom bar on mobile */
   .portfolio-side-nav {
     top: auto;
     left: 14px;
@@ -1125,7 +1291,6 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
   .portfolio-section { padding: 26px 0; }
 
-  /* Stack to single column: photo on top, content below */
   .hero-layout-two-col {
     grid-template-columns: 1fr;
     grid-template-rows: 280px auto;
@@ -1133,7 +1298,6 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
     max-height: none;
   }
 
-  /* Photo column: fixed height on mobile, on top */
   .hero-right {
     order: -1;
     height: 280px;
@@ -1145,7 +1309,6 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
     height: 280px;
   }
 
-  /* On mobile: contain so full figure is visible without cropping */
   .profile-photo-img {
     object-fit: contain;
     object-position: bottom center;
@@ -1157,7 +1320,6 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
     overflow: visible;
   }
 
-  /* Center everything on mobile */
   .hero-section .hero-name-row,
   .hero-section .hero-meta-stack,
   .hero-section .hero-title,
@@ -1177,7 +1339,6 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .hero-section .hero-detail-line { justify-content: center; }
 
   .hero-action-buttons { align-items: center !important; justify-content: center !important; }
-  /* Social icons row: make sure it never clips into nav */
   .hero-social-row { justify-content: center !important; padding-bottom: 8px; }
 
   .section-static:not(.about-section-plain) .body-copy,
@@ -1195,7 +1356,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 }
 
 /* ==============================================
-   RESPONSIVE — 767px and below (small phones)
+   RESPONSIVE — 767px and below
    ============================================== */
 @media (max-width: 767px) {
   .portfolio-section { min-height: 100%; padding: 24px 0; }
@@ -1212,4 +1373,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .hero-layout-two-col { grid-template-rows: 220px auto; }
   .hero-right { height: 220px; }
   .profile-photo-wrap { height: 220px; }
+
+  /* Disable cursor spotlight on touch devices */
+  .cursor-spotlight { display: none; }
 }
