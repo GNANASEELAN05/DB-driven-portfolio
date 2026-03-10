@@ -221,8 +221,9 @@ button { font-family: inherit; }
 }
 
 .portfolio-topbar {
-  position: sticky;
+  position: fixed;
   top: 10px;
+  right: 20px; /* clears the side nav (60px wide + 16px gap) */
   z-index: 25;
   display: flex;
   justify-content: flex-end;
@@ -234,8 +235,20 @@ button { font-family: inherit; }
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
   width: fit-content;
-  margin-left: auto;
   flex-shrink: 0;
+}
+
+/* On mobile, revert to sticky inside the flow */
+@media (max-width: 899px) {
+  .portfolio-topbar {
+    position: sticky;
+    top: 10px;
+    right: auto;
+    align-self: flex-end;
+    margin-left: auto;
+    border-radius: 24px;
+    padding: 10px;
+  }
 }
 
 .mode-dark .portfolio-topbar {
@@ -304,6 +317,22 @@ button { font-family: inherit; }
   .home-scroll-area { overflow-y: auto; }
 }
 
+@media (max-width: 899px) {
+  .profile-photo-img,
+  .profile-photo-original {
+    object-fit: contain;
+    object-position: bottom center;
+  }
+}
+
+@media (max-width: 899px) {
+  .profile-photo-original {
+    height: 100%;
+    object-fit: contain;
+    object-position: bottom center;
+  }
+}
+
 .portfolio-section {
   min-height: 100%;
   display: flex;
@@ -333,109 +362,101 @@ button { font-family: inherit; }
 
 /* Left takes free space; right column is fixed width for the photo */
 .hero-layout-two-col {
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: 1fr 380px;
   align-items: stretch;
-  /* Fill available height so photo can be tall */
   height: calc(100vh - 120px);
   max-height: calc(100vh - 120px);
 }
 
-.hero-layout-single {
-  grid-template-columns: 1fr;
-}
-
-.hero-left-expanded {
-  max-width: 100%;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding-right: 28px;
-  /* Ensure content does not overflow vertically */
-  overflow: hidden;
-}
-
-/* RIGHT COLUMN — full bleed photo fills entire height, no card */
 .hero-right {
   position: relative;
   display: flex;
   align-items: stretch;
   justify-content: center;
-  /* Clip so photo never bleeds outside column */
+  padding-right: 0;
   overflow: hidden;
 }
 
 /* ==============================================
-   PROFILE PHOTO — Large, full-column, blends into bg
-   No border-radius, no box, no background color
+   PROFILE PHOTO — keep same size feel, no right cut
    ============================================== */
 .profile-photo-wrap {
   position: relative;
   width: 100%;
   height: 100%;
   cursor: pointer;
-  /* NO border-radius, NO box-shadow, NO background */
   overflow: hidden;
 }
 
-/* Each layer: absolute, fills full wrap */
 .profile-photo-layer {
   position: absolute;
   inset: 0;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
 }
 
-/* Animated photo: lighten blend fades dark PNG bg into portfolio bg */
-.profile-photo-img {
+.profile-photo-img,
+.profile-photo-original {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: top center;
   display: block;
-  mix-blend-mode: lighten;
-  /* Fade bottom edge into bg */
-  mask-image: linear-gradient(
-    to bottom,
-    black 0%,
-    black 55%,
-    rgba(0,0,0,0.75) 72%,
-    rgba(0,0,0,0.25) 88%,
-    transparent 100%
-  );
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    black 0%,
-    black 55%,
-    rgba(0,0,0,0.75) 72%,
-    rgba(0,0,0,0.25) 88%,
-    transparent 100%
-  );
+  flex-shrink: 0;
   user-select: none;
   pointer-events: none;
-}
-
-/* Original photo: normal blend, still fade bottom */
-.profile-photo-original {
-  mix-blend-mode: normal;
   mask-image: linear-gradient(
     to bottom,
     black 0%,
-    black 50%,
-    rgba(0,0,0,0.78) 68%,
-    rgba(0,0,0,0.28) 86%,
+    black 55%,
+    rgba(0, 0, 0, 0.75) 72%,
+    rgba(0, 0, 0, 0.25) 88%,
     transparent 100%
   );
   -webkit-mask-image: linear-gradient(
     to bottom,
     black 0%,
-    black 50%,
-    rgba(0,0,0,0.78) 68%,
-    rgba(0,0,0,0.28) 86%,
+    black 55%,
+    rgba(0, 0, 0, 0.75) 72%,
+    rgba(0, 0, 0, 0.25) 88%,
     transparent 100%
   );
 }
+
+/* Animated photo */
+.profile-photo-img {
+  object-fit: contain;
+  object-position: center bottom;
+  mix-blend-mode: lighten;
+  transform: scale(1);
+}
+
+/* Original photo — make same visible size as animated */
+.profile-photo-original {
+  object-fit: contain;
+  object-position: center bottom;
+  mix-blend-mode: normal;
+  transform: scale(1.4);
+  transform-origin: center bottom;
+}
+/* Animated photo */
+.profile-photo-img {
+  mix-blend-mode: lighten;
+}
+
+/* Original photo */
+.profile-photo-original {
+  mix-blend-mode: normal;
+}
+/* Mobile override — same for both */
+@media (max-width: 899px) {
+  .profile-photo-img,
+  .profile-photo-original {
+    transform: scale(1);
+    object-fit: contain;
+    object-position: bottom center;
+  }
+}
+
 
 /* "See Original" button:
    - opacity is controlled by JS (hovered && !showOriginal)
@@ -861,7 +882,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   }
 
   .hero-layout-two-col {
-    grid-template-columns: 1fr 300px;
+    grid-template-columns: 1fr 420px;
   }
 
   .project-grid, .achievement-grid, .lang-grid {
