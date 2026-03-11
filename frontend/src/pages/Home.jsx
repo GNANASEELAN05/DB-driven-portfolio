@@ -1250,9 +1250,9 @@ function ContactMessageCard({ contactEmail, name }) {
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
         {
-          name: senderName,
-          email: senderEmail,
-          message,
+          from_name: senderName,
+          from_email: senderEmail,
+          message: message,
           to_email: contactEmail || "",
           portfolio_name: name || "",
         },
