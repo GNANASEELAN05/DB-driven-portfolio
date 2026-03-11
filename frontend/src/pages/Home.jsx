@@ -1224,8 +1224,12 @@ case "contact":
 // =============================================
 // CONTACT MESSAGE CARD
 // =============================================
-function ContactMessageCard({ contactEmail, name }) {
-  const [msgForm, setMsgForm] = useState({ name: "", email: "", message: "" });
+function ContactMessageCard({ contactEmail, name: portfolioOwnerName }) {
+  const [msgForm, setMsgForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
   const [msgStatus, setMsgStatus] = useState(null);
   const [sending, setSending] = useState(false);
 
@@ -1235,9 +1239,11 @@ function ContactMessageCard({ contactEmail, name }) {
   };
 
   const handleSend = async () => {
-    const { name: senderName, email: senderEmail, message } = msgForm;
+    const senderName = msgForm.name.trim();
+    const senderEmail = msgForm.email.trim();
+    const senderMessage = msgForm.message.trim();
 
-    if (!senderName.trim() || !senderEmail.trim() || !message.trim()) {
+    if (!senderName || !senderEmail || !senderMessage) {
       setMsgStatus("error");
       return;
     }
@@ -1246,16 +1252,30 @@ function ContactMessageCard({ contactEmail, name }) {
       setSending(true);
       setMsgStatus(null);
 
+      const templateParams = {
+        // sender details
+        name: senderName,
+        from_name: senderName,
+        email: senderEmail,
+        from_email: senderEmail,
+        message: senderMessage,
+
+        // receiver / portfolio details
+        to_email: contactEmail || "",
+        portfolio_name: portfolioOwnerName || "",
+        title: senderName,
+
+        // optional extra values
+        reply_to: senderEmail,
+        time: new Date().toLocaleString(),
+      };
+
+      console.log("EmailJS template params:", templateParams);
+
       await emailjs.send(
         import.meta.env.VITE_EMAILJS_SERVICE_ID,
         import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        {
-          from_name: senderName,
-          from_email: senderEmail,
-          message: message,
-          to_email: contactEmail || "",
-          portfolio_name: name || "",
-        },
+        templateParams,
         {
           publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
         }
@@ -1296,7 +1316,14 @@ function ContactMessageCard({ contactEmail, name }) {
 
       <Stack spacing={2}>
         <Box>
-          <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, mb: 0.6, opacity: 0.75 }}>
+          <Typography
+            sx={{
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              mb: 0.6,
+              opacity: 0.75,
+            }}
+          >
             Your Name
           </Typography>
           <input
@@ -1306,12 +1333,21 @@ function ContactMessageCard({ contactEmail, name }) {
             placeholder="John Doe"
             style={inputSx}
             onFocus={(e) => (e.target.style.borderColor = "#f13024")}
-            onBlur={(e) => (e.target.style.borderColor = "rgba(241,48,36,0.25)")}
+            onBlur={(e) =>
+              (e.target.style.borderColor = "rgba(241,48,36,0.25)")
+            }
           />
         </Box>
 
         <Box>
-          <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, mb: 0.6, opacity: 0.75 }}>
+          <Typography
+            sx={{
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              mb: 0.6,
+              opacity: 0.75,
+            }}
+          >
             Your Email
           </Typography>
           <input
@@ -1322,12 +1358,21 @@ function ContactMessageCard({ contactEmail, name }) {
             placeholder="john@example.com"
             style={inputSx}
             onFocus={(e) => (e.target.style.borderColor = "#f13024")}
-            onBlur={(e) => (e.target.style.borderColor = "rgba(241,48,36,0.25)")}
+            onBlur={(e) =>
+              (e.target.style.borderColor = "rgba(241,48,36,0.25)")
+            }
           />
         </Box>
 
         <Box>
-          <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, mb: 0.6, opacity: 0.75 }}>
+          <Typography
+            sx={{
+              fontSize: "0.82rem",
+              fontWeight: 700,
+              mb: 0.6,
+              opacity: 0.75,
+            }}
+          >
             Message
           </Typography>
           <textarea
@@ -1338,24 +1383,32 @@ function ContactMessageCard({ contactEmail, name }) {
             rows={4}
             style={inputSx}
             onFocus={(e) => (e.target.style.borderColor = "#f13024")}
-            onBlur={(e) => (e.target.style.borderColor = "rgba(241,48,36,0.25)")}
+            onBlur={(e) =>
+              (e.target.style.borderColor = "rgba(241,48,36,0.25)")
+            }
           />
         </Box>
 
         {msgStatus === "error" && (
-          <Typography sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}>
+          <Typography
+            sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}
+          >
             Please fill in all fields before sending.
           </Typography>
         )}
 
         {msgStatus === "sent" && (
-          <Typography sx={{ color: "#22c55e", fontSize: "0.82rem", fontWeight: 600 }}>
+          <Typography
+            sx={{ color: "#22c55e", fontSize: "0.82rem", fontWeight: 600 }}
+          >
             ✓ Message sent successfully.
           </Typography>
         )}
 
         {msgStatus === "failed" && (
-          <Typography sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}>
+          <Typography
+            sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}
+          >
             Failed to send message. Please try again.
           </Typography>
         )}
@@ -1376,7 +1429,8 @@ function ContactMessageCard({ contactEmail, name }) {
             color: "white !important",
             boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
             "&:hover": {
-              background: "linear-gradient(135deg, #d42a1e, #e8650a) !important",
+              background:
+                "linear-gradient(135deg, #d42a1e, #e8650a) !important",
               boxShadow: "0 10px 28px rgba(241,48,36,0.45)",
               transform: "translateY(-1px)",
             },
