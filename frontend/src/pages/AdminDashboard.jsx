@@ -628,7 +628,7 @@ export default function AdminDashboard(props) {
         try {
           setErr(""); setOk(""); setLoading(true);
           let deleted = false;
-          try { await http.delete(`/api/portfolio/education/${id}`); deleted = true; } catch {}
+          try { await http.delete(`/portfolio/education/${id}`); deleted = true; } catch {}
           if (!deleted) { const payload = next.map(({ id: _id, ...rest }) => rest); await updateEducation(payload); }
           setOk("Education deleted."); await fetchAllAdmin(); bumpContentVersion();
         } catch { setErr("Deleting education failed."); setEducation(prev); } finally { setLoading(false); }
@@ -662,7 +662,7 @@ export default function AdminDashboard(props) {
         try {
           setErr(""); setOk(""); setLoading(true);
           let deleted = false;
-          try { await http.delete(`/api/portfolio/experience/${id}`); deleted = true; } catch {}
+          try { await http.delete(`/portfolio/experience/${id}`); deleted = true; } catch {}
           if (!deleted) { const payload = next.map(({ id: _id, ...rest }) => rest); await updateExperience(payload); }
           setOk("Experience deleted."); await fetchAllAdmin(); bumpContentVersion();
         } catch { setErr("Deleting experience failed."); setExperience(prev); } finally { setLoading(false); }
@@ -781,7 +781,7 @@ export default function AdminDashboard(props) {
       setCertUploading(achId);
       const formData = new FormData();
       formData.append("file", file);
-      await http.post(`/api/portfolio/achievements/${achId}/certificate`, formData, {
+      await http.post(`/portfolio/achievements/${achId}/certificate`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setOk("Certificate uploaded successfully.");
@@ -800,7 +800,7 @@ export default function AdminDashboard(props) {
         setConfirmOpen(false);
         try {
           setErr(""); setOk(""); setLoading(true);
-          await http.delete(`/api/portfolio/achievements/${achId}/certificate`);
+          await http.delete(`/portfolio/achievements/${achId}/certificate`);
           setOk("Certificate deleted.");
           await fetchAllAdmin();
           bumpContentVersion();
@@ -817,7 +817,7 @@ export default function AdminDashboard(props) {
   // ── Profile Image handlers ────────────────────────────────────────────────
   const fetchProfileImages = async () => {
     try {
-      const res = await http.get("/api/profile-image/list");
+      const res = await http.get("/profile-image/list");
       setProfileImages(Array.isArray(res.data) ? res.data : []);
     } catch {}
   };
@@ -836,7 +836,7 @@ export default function AdminDashboard(props) {
       setImgUploadType(type);
       const formData = new FormData();
       formData.append("file", file);
-      await http.post(`/api/profile-image/upload/${type}`, formData, {
+      await http.post(`/profile-image/upload/${type}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setOk(`${type === "original" ? "Original" : "Animated"} image uploaded.`);
@@ -855,7 +855,7 @@ export default function AdminDashboard(props) {
         setConfirmOpen(false);
         try {
           setErr(""); setOk(""); setLoading(true);
-          await http.delete(`/api/profile-image/${id}`);
+          await http.delete(`/profile-image/${id}`);
           setOk("Image deleted.");
           await fetchProfileImages();
           bumpContentVersion();
