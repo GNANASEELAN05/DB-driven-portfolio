@@ -2762,8 +2762,10 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 .sbb-btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 7px;
   padding: 9px 20px;
+  min-width: 160px;
   border-radius: 999px;
   font-family: "Inter", sans-serif;
   font-weight: 700;
