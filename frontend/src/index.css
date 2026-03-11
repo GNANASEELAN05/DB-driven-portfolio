@@ -1800,3 +1800,262 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
     scroll-behavior: auto !important;
   }
 }
+
+
+/* ==============================================
+   SKILLS LOGO GRID — append this to your
+   existing portfolio CSS file
+   ============================================== */
+
+/* Category group wrapper */
+.skill-category-group {
+  margin-bottom: 4px;
+}
+
+/* Header row: badge + line + count */
+.skill-category-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.skill-category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+  backdrop-filter: blur(10px);
+}
+
+.skill-category-emoji {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.skill-category-title {
+  font-family: "Inter", sans-serif !important;
+  font-weight: 800 !important;
+  font-size: 0.80rem !important;
+  letter-spacing: 0.10em !important;
+  text-transform: uppercase !important;
+}
+
+.skill-category-line {
+  flex: 1;
+  height: 1px;
+  border-radius: 2px;
+  min-width: 20px;
+}
+
+.skill-category-count {
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+  opacity: 0.38 !important;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Logo grid — wrapping flex */
+.skill-logo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+/* ── Individual skill card ── */
+.skill-logo-card {
+  position: relative;
+  width: 92px;
+  cursor: default;
+  animation: skillCardIn 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes skillCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.88);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+.skill-logo-card:hover {
+  transform: translateY(-8px) scale(1.06);
+}
+
+/* Inner container */
+.skill-logo-card-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 9px;
+  padding: 16px 8px 13px;
+  border-radius: 20px;
+  backdrop-filter: blur(16px);
+  position: relative;
+  overflow: hidden;
+  transition:
+    background 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
+}
+
+.mode-dark .skill-logo-card-inner {
+  background: rgba(22, 24, 46, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.mode-light .skill-logo-card-inner {
+  background: rgba(255, 255, 255, 0.80);
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.mode-dark .skill-logo-card:hover .skill-logo-card-inner {
+  background: rgba(28, 30, 58, 0.82);
+  border-color: rgba(241, 48, 36, 0.40);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(241, 48, 36, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.mode-light .skill-logo-card:hover .skill-logo-card-inner {
+  background: rgba(255, 255, 255, 0.97);
+  border-color: rgba(241, 48, 36, 0.30);
+  box-shadow:
+    0 10px 32px rgba(0, 0, 0, 0.10),
+    0 0 0 1px rgba(241, 48, 36, 0.16);
+}
+
+/* Neon glow ring — appears on hover */
+.skill-logo-glow-ring {
+  position: absolute;
+  inset: -1px;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #f13024, #f97316, transparent, transparent);
+  opacity: 0;
+  transition: opacity 0.28s ease;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.skill-logo-card:hover .skill-logo-glow-ring {
+  opacity: 0.50;
+}
+
+/* Icon wrapper */
+.skill-logo-icon-wrap {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  transition:
+    background 0.22s ease,
+    transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  flex-shrink: 0;
+}
+
+.mode-dark .skill-logo-icon-wrap {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.mode-light .skill-logo-icon-wrap {
+  background: rgba(17, 24, 39, 0.04);
+}
+
+.skill-logo-card:hover .skill-logo-icon-wrap {
+  background: rgba(241, 48, 36, 0.09);
+  transform: rotate(-6deg) scale(1.12);
+}
+
+/* The SVG logo image */
+.skill-logo-img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.28));
+  transition: filter 0.28s ease;
+  user-select: none;
+  pointer-events: none;
+}
+
+.skill-logo-card:hover .skill-logo-img {
+  filter: drop-shadow(0 4px 12px rgba(241, 48, 36, 0.38));
+}
+
+/* Fallback — 3-letter initials with gradient */
+.skill-logo-fallback {
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Inter", sans-serif;
+  font-weight: 900;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  background: linear-gradient(135deg, #f13024, #f97316);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Skill label */
+.skill-logo-name {
+  font-family: "Inter", sans-serif !important;
+  font-weight: 700 !important;
+  font-size: 0.68rem !important;
+  text-align: center !important;
+  letter-spacing: 0.01em !important;
+  line-height: 1.2 !important;
+  word-break: break-word;
+  max-width: 76px;
+  transition: color 0.22s ease;
+}
+
+.mode-dark .skill-logo-name {
+  color: rgba(255, 255, 255, 0.60) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.60) !important;
+}
+
+.mode-light .skill-logo-name {
+  color: rgba(17, 24, 39, 0.60) !important;
+  -webkit-text-fill-color: rgba(17, 24, 39, 0.60) !important;
+}
+
+.mode-dark .skill-logo-card:hover .skill-logo-name {
+  color: rgba(255, 255, 255, 0.95) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.mode-light .skill-logo-card:hover .skill-logo-name {
+  color: rgba(17, 24, 39, 0.95) !important;
+  -webkit-text-fill-color: rgba(17, 24, 39, 0.95) !important;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+  .skill-logo-card        { width: 76px; }
+  .skill-logo-card-inner  { padding: 13px 7px 11px; border-radius: 16px; gap: 7px; }
+  .skill-logo-icon-wrap   { width: 42px; height: 42px; border-radius: 11px; }
+  .skill-logo-img         { width: 28px; height: 28px; }
+  .skill-logo-name        { font-size: 0.62rem !important; }
+  .skill-logo-grid        { gap: 9px; }
+}

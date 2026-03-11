@@ -12,12 +12,6 @@ import {
   Paper,
   Skeleton,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   Tooltip,
   Typography,
   useTheme,
@@ -131,6 +125,164 @@ async function blobDownload(url) {
   document.body.appendChild(a); a.click(); a.remove();
   URL.revokeObjectURL(objUrl);
   return filename;
+}
+
+// =============================================
+// SKILL LOGOS MAP
+// =============================================
+const SKILL_LOGOS = {
+  "html5":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+  "html":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
+  "css3":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
+  "css":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
+  "react":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+  "react.js":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+  "reactjs":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+  "tailwind":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
+  "tailwindcss":"https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
+  "vue":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg",
+  "vue.js":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg",
+  "angular":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg",
+  "next.js":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
+  "nextjs":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
+  "typescript": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+  "ts":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
+  "javascript": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+  "javascript (js)": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+  "js":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
+  "bootstrap":  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg",
+  "sass":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sass/sass-original.svg",
+  "figma":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
+  "flutter":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg",
+  "node.js":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+  "nodejs":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+  "node":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+  "python":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+  "java":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+  "php":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
+  "express":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg",
+  "express.js": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg",
+  "django":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg",
+  "fastapi":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg",
+  "spring":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg",
+  "go":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original-wordmark.svg",
+  "rust":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rust/rust-original.svg",
+  "c":          "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg",
+  "c++":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
+  "c#":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg",
+  "ruby":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ruby/ruby-original.svg",
+  "kotlin":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg",
+  "swift":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/swift/swift-original.svg",
+  "mysql":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+  "postgresql": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+  "postgres":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
+  "sql":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+  "mongodb":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
+  "firebase":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg",
+  "redis":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
+  "sqlite":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg",
+  "supabase":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg",
+  "oracle":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg",
+  "git":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
+  "github":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",
+  "docker":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
+  "kubernetes": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg",
+  "aws":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg",
+  "gcp":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg",
+  "google cloud":"https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg",
+  "azure":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg",
+  "linux":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg",
+  "nginx":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg",
+  "vs":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
+  "vscode":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
+  "vs code":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
+  "android studio": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/androidstudio/androidstudio-original.svg",
+  "postman":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postman/postman-original.svg",
+  "webpack":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/webpack/webpack-original.svg",
+  "vite":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg",
+  "graphql":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg",
+  "solidity":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/solidity/solidity-original.svg",
+};
+
+function resolveSkillLogo(name) {
+  const key = safeString(name).trim().toLowerCase();
+  return SKILL_LOGOS[key] || null;
+}
+
+// =============================================
+// SKILL LOGO CARD
+// =============================================
+function SkillLogoCard({ name, index }) {
+  const logoUrl = resolveSkillLogo(name);
+  const [imgError, setImgError] = useState(false);
+  const initials = safeString(name).slice(0, 3).toUpperCase();
+
+  return (
+    <Box
+      className="skill-logo-card"
+      style={{ animationDelay: `${index * 0.04}s` }}
+      title={name}
+    >
+      <Box className="skill-logo-card-inner">
+        <Box className="skill-logo-glow-ring" />
+        <Box className="skill-logo-icon-wrap">
+          {logoUrl && !imgError ? (
+            <img
+              src={logoUrl}
+              alt={name}
+              className="skill-logo-img"
+              onError={() => setImgError(true)}
+              loading="lazy"
+            />
+          ) : (
+            <Box className="skill-logo-fallback">{initials}</Box>
+          )}
+        </Box>
+        <Typography className="skill-logo-name">{name}</Typography>
+      </Box>
+    </Box>
+  );
+}
+
+// =============================================
+// SKILL CATEGORY GROUP
+// =============================================
+function SkillCategoryGroup({ category, skills: skillList }) {
+  if (!skillList?.length) return null;
+
+  const categoryMeta = {
+    Frontend: { emoji: "🎨", color: "#f13024" },
+    Backend:  { emoji: "⚙️", color: "#f97316" },
+    Database: { emoji: "🗄️", color: "#3b82f6" },
+    Tools:    { emoji: "🛠️", color: "#a855f7" },
+  };
+  const meta = categoryMeta[category] || { emoji: "💡", color: "#f13024" };
+
+  return (
+    <Box className="skill-category-group">
+      <Box className="skill-category-header">
+        <Box
+          className="skill-category-badge"
+          style={{ background: `${meta.color}22`, borderColor: `${meta.color}44` }}
+        >
+          <span className="skill-category-emoji">{meta.emoji}</span>
+          <Typography
+            className="skill-category-title"
+            style={{ color: meta.color }}
+          >
+            {category}
+          </Typography>
+        </Box>
+        <Box className="skill-category-line" style={{ background: `linear-gradient(90deg, ${meta.color}55, transparent)` }} />
+        <Typography className="skill-category-count">{skillList.length} skills</Typography>
+      </Box>
+      <Box className="skill-logo-grid">
+        {skillList.map((skill, i) => (
+          <SkillLogoCard key={`${skill}-${i}`} name={skill} index={i} />
+        ))}
+      </Box>
+    </Box>
+  );
 }
 
 // =============================================
@@ -521,27 +673,27 @@ function ProjectCard({ project }) {
         </Stack>
       ) : null}
       <Stack direction={{ xs: "column", sm: "row" }} sx={{ mt: 3, gap: 1.2 }}>
-{repoUrl ? (
-  <Button variant="outlined" startIcon={<MdLink />}
-    onClick={() => window.open(repoUrl, "_blank", "noopener,noreferrer")}
-    sx={{
-      borderRadius: 999, fontWeight: 700,
-      borderColor: "rgba(241,48,36,0.5) !important",
-      color: "#f13024 !important",
-      "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" },
-    }}>Repository</Button>
-) : null}
-{liveUrl ? (
-  <Button variant="contained" startIcon={<MdArrowOutward />}
-    onClick={() => window.open(liveUrl, "_blank", "noopener,noreferrer")}
-    sx={{
-      borderRadius: 999, fontWeight: 700,
-      background: "linear-gradient(135deg, #f13024, #f97316) !important",
-      color: "white !important",
-      boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
-      "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important" },
-    }}>Live Preview</Button>
-) : null}
+        {repoUrl ? (
+          <Button variant="outlined" startIcon={<MdLink />}
+            onClick={() => window.open(repoUrl, "_blank", "noopener,noreferrer")}
+            sx={{
+              borderRadius: 999, fontWeight: 700,
+              borderColor: "rgba(241,48,36,0.5) !important",
+              color: "#f13024 !important",
+              "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" },
+            }}>Repository</Button>
+        ) : null}
+        {liveUrl ? (
+          <Button variant="contained" startIcon={<MdArrowOutward />}
+            onClick={() => window.open(liveUrl, "_blank", "noopener,noreferrer")}
+            sx={{
+              borderRadius: 999, fontWeight: 700,
+              background: "linear-gradient(135deg, #f13024, #f97316) !important",
+              color: "white !important",
+              boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
+              "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important" },
+            }}>Live Preview</Button>
+        ) : null}
       </Stack>
     </MotionPaper>
   );
@@ -586,6 +738,103 @@ function LanguageYearsBar({ years }) {
   );
 }
 
+// =============================================
+// CONTACT MESSAGE CARD
+// =============================================
+function ContactMessageCard({ contactEmail, name: portfolioOwnerName }) {
+  const [msgForm, setMsgForm] = useState({ name: "", email: "", message: "" });
+  const [msgStatus, setMsgStatus] = useState(null);
+  const [sending, setSending] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setMsgForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSend = async () => {
+    const senderName = msgForm.name.trim();
+    const senderEmail = msgForm.email.trim();
+    const senderMessage = msgForm.message.trim();
+    if (!senderName || !senderEmail || !senderMessage) { setMsgStatus("error"); return; }
+    try {
+      setSending(true);
+      setMsgStatus(null);
+      const templateParams = {
+        name: senderName, from_name: senderName,
+        email: senderEmail, from_email: senderEmail,
+        message: senderMessage,
+        to_email: contactEmail || "", portfolio_name: portfolioOwnerName || "",
+        title: senderName, reply_to: senderEmail,
+        time: new Date().toLocaleString(),
+      };
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        templateParams,
+        { publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY }
+      );
+      setMsgStatus("sent");
+      setMsgForm({ name: "", email: "", message: "" });
+      setTimeout(() => setMsgStatus(null), 4000);
+    } catch (error) {
+      console.error("EmailJS send failed:", error);
+      setMsgStatus("failed");
+    } finally { setSending(false); }
+  };
+
+  const inputSx = {
+    width: "100%", padding: "10px 14px", borderRadius: "12px",
+    border: "1.5px solid rgba(241,48,36,0.25)", background: "rgba(255,255,255,0.04)",
+    color: "inherit", fontFamily: "inherit", fontSize: "0.93rem",
+    outline: "none", transition: "border-color 0.2s", resize: "none", boxSizing: "border-box",
+  };
+
+  return (
+    <Box>
+      <Typography className="timeline-title" sx={{ mb: 2 }}>Send a Message</Typography>
+      <Stack spacing={2}>
+        <Box>
+          <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, mb: 0.6, opacity: 0.75 }}>Your Name</Typography>
+          <input name="name" value={msgForm.name} onChange={handleChange} placeholder="John Doe" style={inputSx}
+            onFocus={(e) => (e.target.style.borderColor = "#f13024")}
+            onBlur={(e) => (e.target.style.borderColor = "rgba(241,48,36,0.25)")} />
+        </Box>
+        <Box>
+          <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, mb: 0.6, opacity: 0.75 }}>Your Email</Typography>
+          <input name="email" type="email" value={msgForm.email} onChange={handleChange} placeholder="john@example.com" style={inputSx}
+            onFocus={(e) => (e.target.style.borderColor = "#f13024")}
+            onBlur={(e) => (e.target.style.borderColor = "rgba(241,48,36,0.25)")} />
+        </Box>
+        <Box>
+          <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, mb: 0.6, opacity: 0.75 }}>Message</Typography>
+          <textarea name="message" value={msgForm.message} onChange={handleChange}
+            placeholder="Write your message here…" rows={4} style={inputSx}
+            onFocus={(e) => (e.target.style.borderColor = "#f13024")}
+            onBlur={(e) => (e.target.style.borderColor = "rgba(241,48,36,0.25)")} />
+        </Box>
+        {msgStatus === "error" && <Typography sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}>Please fill in all fields before sending.</Typography>}
+        {msgStatus === "sent"  && <Typography sx={{ color: "#22c55e", fontSize: "0.82rem", fontWeight: 600 }}>✓ Message sent successfully.</Typography>}
+        {msgStatus === "failed"&& <Typography sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}>Failed to send message. Please try again.</Typography>}
+        <Button variant="contained" startIcon={<MdEmail />} onClick={handleSend} disabled={sending}
+          sx={{
+            alignSelf: "flex-start", borderRadius: 999, px: 3, py: 1.2,
+            fontWeight: 800, textTransform: "none",
+            background: "linear-gradient(135deg, #f13024, #f97316) !important",
+            color: "white !important", boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
+            "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important", boxShadow: "0 10px 28px rgba(241,48,36,0.45)", transform: "translateY(-1px)" },
+            "&.Mui-disabled": { color: "rgba(255,255,255,0.7) !important", background: "rgba(241,48,36,0.45) !important" },
+          }}
+        >
+          {sending ? "Sending..." : "Send Message"}
+        </Button>
+      </Stack>
+    </Box>
+  );
+}
+
+// =============================================
+// MAIN HOME COMPONENT
+// =============================================
 export default function Home({ toggleTheme }) {
   useEffect(() => { document.title = "Gnanaseelan V Portfolio"; }, []);
 
@@ -633,15 +882,14 @@ export default function Home({ toggleTheme }) {
     return map;
   }, [sectionIds]);
 
-  const name          = safeString(profile?.name)       || "Your Name";
-  const profileInitials = safeString(profile?.initials) || "";
-  const title         = safeString(profile?.title)      || "Full Stack Developer";
-  const tagline       = safeString(profile?.tagline)    || "Transforming Ideas Into Digital Reality";
-  const about         = safeString(profile?.about)      || "Add your about content from admin.";
-  const location      = safeString(profile?.location)   || "";
-  const emailPublic   = safeString(profile?.emailPublic)|| "";
+  const name            = safeString(profile?.name)        || "Your Name";
+  const profileInitials = safeString(profile?.initials)    || "";
+  const title           = safeString(profile?.title)       || "Full Stack Developer";
+  const tagline         = safeString(profile?.tagline)     || "Transforming Ideas Into Digital Reality";
+  const about           = safeString(profile?.about)       || "Add your about content from admin.";
+  const location        = safeString(profile?.location)    || "";
+  const emailPublic     = safeString(profile?.emailPublic) || "";
 
-  // Typewriter for tagline (only on hero)
   const { displayed: typewriterText, done: typewriterDone } = useTypewriter(
     activeSection === "home" ? tagline : "", 45, 800
   );
@@ -667,14 +915,15 @@ export default function Home({ toggleTheme }) {
     return `${resumeViewBase}${joiner}v=${encodeURIComponent(contentVersion)}&t=${Date.now()}`;
   }, [resumeViewBase, contentVersion]);
 
-  const skillRows = useMemo(() => {
+  // Skills grouped for logo grid
+  const skillGroups = useMemo(() => {
     const s = skills || {};
     return [
-      { category: "Frontend", value: splitCSV(s.frontend).join(", ") || "—" },
-      { category: "Backend",  value: splitCSV(s.backend).join(", ")  || "—" },
-      { category: "Database", value: splitCSV(s.database).join(", ") || "—" },
-      { category: "Tools",    value: splitCSV(s.tools).join(", ")    || "—" },
-    ];
+      { category: "Frontend", items: splitCSV(s.frontend) },
+      { category: "Backend",  items: splitCSV(s.backend)  },
+      { category: "Database", items: splitCSV(s.database) },
+      { category: "Tools",    items: splitCSV(s.tools)    },
+    ].filter((g) => g.items.length > 0);
   }, [skills]);
 
   useEffect(() => {
@@ -804,8 +1053,6 @@ export default function Home({ toggleTheme }) {
             <Box className="section-scroll-area home-scroll-area">
               <MotionBox className="portfolio-section hero-section" initial="hidden" animate="show" variants={fadeUp}>
                 <Box className="hero-layout hero-layout-two-col">
-
-                  {/* LEFT COLUMN */}
                   <Box className="hero-left hero-left-expanded">
                     <MotionBox variants={fadeUp}>
                       <Box className="hero-name-row">
@@ -827,106 +1074,37 @@ export default function Home({ toggleTheme }) {
                           </Stack>
                         </Box>
                       </Box>
-
-                      {/* TYPEWRITER TAGLINE */}
                       <Typography className="hero-title">
                         {typewriterText}
                         <span className={`typewriter-cursor ${typewriterDone ? "cursor-blink" : ""}`}>|</span>
                       </Typography>
                       <Typography className="hero-description">{about}</Typography>
-
                       <Stack className="hero-action-buttons" direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
-                        <HeroActionButton
-                          variant="contained"
-                          startIcon={<MdArrowOutward />}
-                          onClick={() => jumpTo("projects")}
-                          sx={{
-                            background: "linear-gradient(135deg, #f13024, #f97316) !important",
-                            color: "white !important",
-                            border: "none !important",
-                            boxShadow: "0 8px 24px rgba(241,48,36,0.35) !important",
-                            "&:hover": {
-                              background: "linear-gradient(135deg, #d42a1e, #e8650a) !important",
-                              boxShadow: "0 12px 32px rgba(241,48,36,0.5) !important",
-                              transform: "translateY(-2px)",
-                            },
-                          }}
-                        >
+                        <HeroActionButton variant="contained" startIcon={<MdArrowOutward />} onClick={() => jumpTo("projects")}
+                          sx={{ background: "linear-gradient(135deg, #f13024, #f97316) !important", color: "white !important", border: "none !important", boxShadow: "0 8px 24px rgba(241,48,36,0.35) !important", "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important", boxShadow: "0 12px 32px rgba(241,48,36,0.5) !important", transform: "translateY(-2px)" } }}>
                           View Work
                         </HeroActionButton>
-                        <HeroActionButton
-                          variant="outlined"
-                          startIcon={<MdDownload />}
-                          onClick={onDownloadResume}
-                          disabled={downloading}
-                          sx={{
-                            borderColor: "rgba(241,48,36,0.5) !important",
-                            color: "#f13024 !important",
-                            "&:hover": {
-                              borderColor: "#f13024 !important",
-                              background: "rgba(241,48,36,0.08) !important",
-                            },
-                          }}
-                        >
+                        <HeroActionButton variant="outlined" startIcon={<MdDownload />} onClick={onDownloadResume} disabled={downloading}
+                          sx={{ borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}>
                           {downloading ? "Downloading..." : "Download Resume"}
                         </HeroActionButton>
-                        <HeroActionButton
-                          variant="outlined"
-                          startIcon={<MdVisibility />}
-                          onClick={onPreviewResume}
-                          sx={{
-                            borderColor: "rgba(241,48,36,0.5) !important",
-                            color: "#f13024 !important",
-                            "&:hover": {
-                              borderColor: "#f13024 !important",
-                              background: "rgba(241,48,36,0.08) !important",
-                            },
-                          }}
-                        >
+                        <HeroActionButton variant="outlined" startIcon={<MdVisibility />} onClick={onPreviewResume}
+                          sx={{ borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}>
                           Preview Resume
                         </HeroActionButton>
                       </Stack>
-
                       <Stack className="hero-social-row" direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
-                        {socials?.github ? (
-                          <IconButton className="hero-social-btn"
-                            onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>
-                            <FaGithub />
-                          </IconButton>
-                        ) : null}
-                        {socials?.linkedin ? (
-                          <IconButton className="hero-social-btn"
-                            onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>
-                            <FaLinkedin />
-                          </IconButton>
-                        ) : null}
-                        {contactEmail ? (
-                          <IconButton className="hero-social-btn"
-                            onClick={() => window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")}>
-                            <MdEmail />
-                          </IconButton>
-                        ) : null}
-                        {socials?.phone ? (
-                          <IconButton className="hero-social-btn"
-                            onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")}>
-                            <MdPhone />
-                          </IconButton>
-                        ) : null}
-                        {socials?.website ? (
-                          <IconButton className="hero-social-btn"
-                            onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>
-                            <MdLink />
-                          </IconButton>
-                        ) : null}
+                        {socials?.github   && <IconButton className="hero-social-btn" onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}><FaGithub /></IconButton>}
+                        {socials?.linkedin && <IconButton className="hero-social-btn" onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}><FaLinkedin /></IconButton>}
+                        {contactEmail     && <IconButton className="hero-social-btn" onClick={() => window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")}><MdEmail /></IconButton>}
+                        {socials?.phone   && <IconButton className="hero-social-btn" onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")}><MdPhone /></IconButton>}
+                        {socials?.website && <IconButton className="hero-social-btn" onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}><MdLink /></IconButton>}
                       </Stack>
                     </MotionBox>
                   </Box>
-
-                  {/* RIGHT COLUMN */}
                   <Box className="hero-right">
                     <ProfilePhotoCard />
                   </Box>
-
                 </Box>
               </MotionBox>
             </Box>
@@ -946,35 +1124,34 @@ export default function Home({ toggleTheme }) {
           </MotionBox>
         );
 
+      // =============================================
+      // SKILLS — LOGO GRID (replaces old table)
+      // =============================================
       case "skills":
         return (
           <MotionBox key="skills" custom={navDirection} variants={pageVariants}
             initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
             <Box className="section-scroll-area">
               <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Skills" subtitle="Tech stack grouped the same way your backend already returns it." />
-                <GlassPanel sx={{ p: { xs: 2, md: 3 } }}>
-                  {loading ? <Skeleton height={220} /> : (
-                    <TableContainer>
-                      <Table size="small">
-                        <TableHead>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: 800 }}>Category</TableCell>
-                            <TableCell sx={{ fontWeight: 800 }}>Skills</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {skillRows.map((row, idx) => (
-                            <TableRow key={idx}>
-                              <TableCell sx={{ fontWeight: 700 }}>{row.category}</TableCell>
-                              <TableCell>{row.value}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  )}
-                </GlassPanel>
+                <SectionHeading title="Skills" subtitle="Technologies I build with, at a glance." />
+                {loading ? (
+                  <Stack spacing={3}>
+                    <Skeleton height={60} sx={{ borderRadius: 3 }} />
+                    <Skeleton height={160} sx={{ borderRadius: 3 }} />
+                    <Skeleton height={60} sx={{ borderRadius: 3 }} />
+                    <Skeleton height={160} sx={{ borderRadius: 3 }} />
+                  </Stack>
+                ) : skillGroups.length > 0 ? (
+                  <Stack spacing={4}>
+                    {skillGroups.map((g) => (
+                      <SkillCategoryGroup key={g.category} category={g.category} skills={g.items} />
+                    ))}
+                  </Stack>
+                ) : (
+                  <GlassPanel sx={{ p: 3 }}>
+                    <Typography>No skills added yet. Add them in Admin → Skills.</Typography>
+                  </GlassPanel>
+                )}
               </MotionBox>
             </Box>
           </MotionBox>
@@ -1114,338 +1291,54 @@ export default function Home({ toggleTheme }) {
           </MotionBox>
         );
 
-case "contact":
-  return (
-    <MotionBox key="contact" custom={navDirection} variants={pageVariants}
-      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-      <Box className="section-scroll-area">
-        <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-          <SectionHeading title="Contact" subtitle="Let's build something great together." />
-
-          {/* ── Single combined card: info left + form right ── */}
-          <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 }, mb: 3 }}>
-            <Box sx={{
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              gap: { xs: 3, md: 4 },
-            }}>
-
-              {/* LEFT: Get in touch info */}
-              <Box sx={{ flex: "0 0 auto", minWidth: 0, width: { xs: "100%", md: "38%" } }}>
-                <Typography className="timeline-title" sx={{ mb: 2 }}>Get in touch</Typography>
-                <Stack spacing={1.6}>
-                  {contactEmail ? (
-                    <Typography className="contact-line">
-                      <MdEmail style={{ marginRight: 10 }} />{contactEmail}
-                    </Typography>
-                  ) : null}
-                  {socials?.phone ? (
-                    <Typography className="contact-line">
-                      <MdPhone style={{ marginRight: 10 }} />{safeString(socials.phone)}
-                    </Typography>
-                  ) : null}
-                  {location ? (
-                    <Typography className="contact-line">
-                      <MdLocationOn style={{ marginRight: 10 }} />{location}
-                    </Typography>
-                  ) : null}
-                </Stack>
-                <Stack direction="row" flexWrap="wrap" sx={{ mt: 3, gap: 1.2 }}>
-                  {socials?.github ? (
-                    <Button variant="outlined" startIcon={<FaGithub />}
-                      sx={{
-                        borderRadius: 999, fontWeight: 700,
-                        borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important",
-                        "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" }
-                      }}
-                      onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>
-                      GitHub
-                    </Button>
-                  ) : null}
-                  {socials?.linkedin ? (
-                    <Button variant="outlined" startIcon={<FaLinkedin />}
-                      sx={{
-                        borderRadius: 999, fontWeight: 700,
-                        borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important",
-                        "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" }
-                      }}
-                      onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>
-                      LinkedIn
-                    </Button>
-                  ) : null}
-                  {socials?.website ? (
-                    <Button variant="outlined" startIcon={<MdLink />}
-                      sx={{
-                        borderRadius: 999, fontWeight: 700,
-                        borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important",
-                        "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" }
-                      }}
-                      onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>
-                      Website
-                    </Button>
-                  ) : null}
-                </Stack>
-              </Box>
-
-              {/* DIVIDER — vertical on desktop, horizontal on mobile */}
-              <Box sx={{
-                display: { xs: "none", md: "block" },
-                width: "1px",
-                background: "rgba(241,48,36,0.18)",
-                borderRadius: 4,
-                flexShrink: 0,
-              }} />
-              <Box sx={{
-                display: { xs: "block", md: "none" },
-                height: "1px",
-                background: "rgba(241,48,36,0.18)",
-                borderRadius: 4,
-              }} />
-
-              {/* RIGHT: Send a Message form */}
-              <Box sx={{ flex: 1, minWidth: 0 }}>
-                <ContactMessageCard contactEmail={contactEmail} name={name} />
-              </Box>
-
+      case "contact":
+        return (
+          <MotionBox key="contact" custom={navDirection} variants={pageVariants}
+            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+            <Box className="section-scroll-area">
+              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+                <SectionHeading title="Contact" subtitle="Let's build something great together." />
+                <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 }, mb: 3 }}>
+                  <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 3, md: 4 } }}>
+                    <Box sx={{ flex: "0 0 auto", minWidth: 0, width: { xs: "100%", md: "38%" } }}>
+                      <Typography className="timeline-title" sx={{ mb: 2 }}>Get in touch</Typography>
+                      <Stack spacing={1.6}>
+                        {contactEmail && <Typography className="contact-line"><MdEmail style={{ marginRight: 10 }} />{contactEmail}</Typography>}
+                        {socials?.phone && <Typography className="contact-line"><MdPhone style={{ marginRight: 10 }} />{safeString(socials.phone)}</Typography>}
+                        {location && <Typography className="contact-line"><MdLocationOn style={{ marginRight: 10 }} />{location}</Typography>}
+                      </Stack>
+                      <Stack direction="row" flexWrap="wrap" sx={{ mt: 3, gap: 1.2 }}>
+                        {socials?.github && (
+                          <Button variant="outlined" startIcon={<FaGithub />}
+                            sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
+                            onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>GitHub</Button>
+                        )}
+                        {socials?.linkedin && (
+                          <Button variant="outlined" startIcon={<FaLinkedin />}
+                            sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
+                            onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>LinkedIn</Button>
+                        )}
+                        {socials?.website && (
+                          <Button variant="outlined" startIcon={<MdLink />}
+                            sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
+                            onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>Website</Button>
+                        )}
+                      </Stack>
+                    </Box>
+                    <Box sx={{ display: { xs: "none", md: "block" }, width: "1px", background: "rgba(241,48,36,0.18)", borderRadius: 4, flexShrink: 0 }} />
+                    <Box sx={{ display: { xs: "block", md: "none" }, height: "1px", background: "rgba(241,48,36,0.18)", borderRadius: 4 }} />
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
+                      <ContactMessageCard contactEmail={contactEmail} name={name} />
+                    </Box>
+                  </Box>
+                </GlassPanel>
+                <Box className="portfolio-footer">
+                  <Typography>© {new Date().getFullYear()} {name}. All rights reserved.</Typography>
+                </Box>
+              </MotionBox>
             </Box>
-          </GlassPanel>
-
-          <Box className="portfolio-footer">
-            <Typography>© {new Date().getFullYear()} {name}. All rights reserved.</Typography>
-          </Box>
-        </MotionBox>
-      </Box>
-    </MotionBox>
-  );
-
-
-
-
-// =============================================
-// CONTACT MESSAGE CARD
-// =============================================
-function ContactMessageCard({ contactEmail, name: portfolioOwnerName }) {
-  const [msgForm, setMsgForm] = useState({
-    name: "",
-    email: "",
-    message: "",
-  });
-  const [msgStatus, setMsgStatus] = useState(null);
-  const [sending, setSending] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setMsgForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSend = async () => {
-    const senderName = msgForm.name.trim();
-    const senderEmail = msgForm.email.trim();
-    const senderMessage = msgForm.message.trim();
-
-    if (!senderName || !senderEmail || !senderMessage) {
-      setMsgStatus("error");
-      return;
-    }
-
-    try {
-      setSending(true);
-      setMsgStatus(null);
-
-      const templateParams = {
-        // sender details
-        name: senderName,
-        from_name: senderName,
-        email: senderEmail,
-        from_email: senderEmail,
-        message: senderMessage,
-
-        // receiver / portfolio details
-        to_email: contactEmail || "",
-        portfolio_name: portfolioOwnerName || "",
-        title: senderName,
-
-        // optional extra values
-        reply_to: senderEmail,
-        time: new Date().toLocaleString(),
-      };
-
-      console.log("EmailJS template params:", templateParams);
-
-      await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-        templateParams,
-        {
-          publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
-        }
-      );
-
-      setMsgStatus("sent");
-      setMsgForm({ name: "", email: "", message: "" });
-
-      setTimeout(() => setMsgStatus(null), 4000);
-    } catch (error) {
-      console.error("EmailJS send failed:", error);
-      setMsgStatus("failed");
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const inputSx = {
-    width: "100%",
-    padding: "10px 14px",
-    borderRadius: "12px",
-    border: "1.5px solid rgba(241,48,36,0.25)",
-    background: "rgba(255,255,255,0.04)",
-    color: "inherit",
-    fontFamily: "inherit",
-    fontSize: "0.93rem",
-    outline: "none",
-    transition: "border-color 0.2s",
-    resize: "none",
-    boxSizing: "border-box",
-  };
-
-  return (
-    <Box>
-      <Typography className="timeline-title" sx={{ mb: 2 }}>
-        Send a Message
-      </Typography>
-
-      <Stack spacing={2}>
-        <Box>
-          <Typography
-            sx={{
-              fontSize: "0.82rem",
-              fontWeight: 700,
-              mb: 0.6,
-              opacity: 0.75,
-            }}
-          >
-            Your Name
-          </Typography>
-          <input
-            name="name"
-            value={msgForm.name}
-            onChange={handleChange}
-            placeholder="John Doe"
-            style={inputSx}
-            onFocus={(e) => (e.target.style.borderColor = "#f13024")}
-            onBlur={(e) =>
-              (e.target.style.borderColor = "rgba(241,48,36,0.25)")
-            }
-          />
-        </Box>
-
-        <Box>
-          <Typography
-            sx={{
-              fontSize: "0.82rem",
-              fontWeight: 700,
-              mb: 0.6,
-              opacity: 0.75,
-            }}
-          >
-            Your Email
-          </Typography>
-          <input
-            name="email"
-            type="email"
-            value={msgForm.email}
-            onChange={handleChange}
-            placeholder="john@example.com"
-            style={inputSx}
-            onFocus={(e) => (e.target.style.borderColor = "#f13024")}
-            onBlur={(e) =>
-              (e.target.style.borderColor = "rgba(241,48,36,0.25)")
-            }
-          />
-        </Box>
-
-        <Box>
-          <Typography
-            sx={{
-              fontSize: "0.82rem",
-              fontWeight: 700,
-              mb: 0.6,
-              opacity: 0.75,
-            }}
-          >
-            Message
-          </Typography>
-          <textarea
-            name="message"
-            value={msgForm.message}
-            onChange={handleChange}
-            placeholder="Write your message here…"
-            rows={4}
-            style={inputSx}
-            onFocus={(e) => (e.target.style.borderColor = "#f13024")}
-            onBlur={(e) =>
-              (e.target.style.borderColor = "rgba(241,48,36,0.25)")
-            }
-          />
-        </Box>
-
-        {msgStatus === "error" && (
-          <Typography
-            sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}
-          >
-            Please fill in all fields before sending.
-          </Typography>
-        )}
-
-        {msgStatus === "sent" && (
-          <Typography
-            sx={{ color: "#22c55e", fontSize: "0.82rem", fontWeight: 600 }}
-          >
-            ✓ Message sent successfully.
-          </Typography>
-        )}
-
-        {msgStatus === "failed" && (
-          <Typography
-            sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}
-          >
-            Failed to send message. Please try again.
-          </Typography>
-        )}
-
-        <Button
-          variant="contained"
-          startIcon={<MdEmail />}
-          onClick={handleSend}
-          disabled={sending}
-          sx={{
-            alignSelf: "flex-start",
-            borderRadius: 999,
-            px: 3,
-            py: 1.2,
-            fontWeight: 800,
-            textTransform: "none",
-            background: "linear-gradient(135deg, #f13024, #f97316) !important",
-            color: "white !important",
-            boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
-            "&:hover": {
-              background:
-                "linear-gradient(135deg, #d42a1e, #e8650a) !important",
-              boxShadow: "0 10px 28px rgba(241,48,36,0.45)",
-              transform: "translateY(-1px)",
-            },
-            "&.Mui-disabled": {
-              color: "rgba(255,255,255,0.7) !important",
-              background: "rgba(241,48,36,0.45) !important",
-            },
-          }}
-        >
-          {sending ? "Sending..." : "Send Message"}
-        </Button>
-      </Stack>
-    </Box>
-  );
-}
+          </MotionBox>
+        );
 
       default:
         return null;
@@ -1454,9 +1347,7 @@ function ContactMessageCard({ contactEmail, name: portfolioOwnerName }) {
 
   return (
     <Box ref={rootRef} className={`portfolio-root ${mode === "dark" ? "mode-dark" : "mode-light"}`}>
-      {/* CURSOR SPOTLIGHT */}
       <CursorSpotlight />
-
       <Box className="portfolio-bg">
         <span className="portfolio-orb orb-one" />
         <span className="portfolio-orb orb-two" />
@@ -1466,9 +1357,7 @@ function ContactMessageCard({ contactEmail, name: portfolioOwnerName }) {
         <span className="portfolio-mesh-lines" />
         <NetworkCanvas mode={mode} />
       </Box>
-
       <VerticalNav items={sectionIds} activeId={activeSection} onJump={jumpTo} />
-
       <Box className="portfolio-shell">
         <Box className="portfolio-topbar">
           <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: "auto" }}>
@@ -1487,14 +1376,12 @@ function ContactMessageCard({ contactEmail, name: portfolioOwnerName }) {
             </Tooltip>
           </Stack>
         </Box>
-
         <Box className="portfolio-page-stage">
           <AnimatePresence mode="wait" custom={navDirection}>
             {renderSection()}
           </AnimatePresence>
         </Box>
       </Box>
-
       <ResumePreviewDialog
         open={resumePreviewOpen}
         title={resumePreviewTitle}
@@ -1518,10 +1405,10 @@ function NetworkCanvas({ mode }) {
     const NODE_COUNT = 55;
     const MAX_DIST   = 160;
     const isDark = mode === "dark";
-    const nodeColor      = isDark ? "rgba(255,255,255,0.55)"    : "rgba(17,24,39,0.45)";
-    const lineColor      = isDark ? "rgba(255,255,255,0.09)"    : "rgba(17,24,39,0.08)";
+    const nodeColor       = isDark ? "rgba(255,255,255,0.55)"  : "rgba(17,24,39,0.45)";
+    const lineColor       = isDark ? "rgba(255,255,255,0.09)"  : "rgba(17,24,39,0.08)";
     const accentNodeColor = "rgba(241,48,36,0.7)";
-    const accentLineColor = isDark ? "rgba(241,48,36,0.18)"     : "rgba(241,48,36,0.12)";
+    const accentLineColor = isDark ? "rgba(241,48,36,0.18)"    : "rgba(241,48,36,0.12)";
     const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
     const initNodes = () => {
       nodes = Array.from({ length: NODE_COUNT }, (_, i) => ({
