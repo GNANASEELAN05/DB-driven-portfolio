@@ -1776,7 +1776,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .profile-photo-wrap { height: 220px; }
 
   .hero-title::after,
-  .section-title::after {
+  .hero-section .section-title::after,
+  .about-section-plain .section-title::after {
     margin-left: auto;
     margin-right: auto;
   }

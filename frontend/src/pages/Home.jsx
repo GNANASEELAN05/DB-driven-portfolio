@@ -519,17 +519,28 @@ function ProjectCard({ project }) {
           {techList.map((tech, i) => <Chip key={`${tech}-${i}`} label={tech} size="small" className="project-chip" />)}
         </Stack>
       ) : null}
-      <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
-        {repoUrl ? (
-          <Button variant="outlined" startIcon={<MdLink />}
-            onClick={() => window.open(repoUrl, "_blank", "noopener,noreferrer")}
-            sx={{ borderRadius: 999, fontWeight: 700 }}>Repository</Button>
-        ) : null}
-        {liveUrl ? (
-          <Button variant="contained" startIcon={<MdArrowOutward />}
-            onClick={() => window.open(liveUrl, "_blank", "noopener,noreferrer")}
-            sx={{ borderRadius: 999, fontWeight: 700 }}>Live Preview</Button>
-        ) : null}
+      <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap", rowGap: "10px" }}>
+{repoUrl ? (
+  <Button variant="outlined" startIcon={<MdLink />}
+    onClick={() => window.open(repoUrl, "_blank", "noopener,noreferrer")}
+    sx={{
+      borderRadius: 999, fontWeight: 700,
+      borderColor: "rgba(241,48,36,0.5) !important",
+      color: "#f13024 !important",
+      "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" },
+    }}>Repository</Button>
+) : null}
+{liveUrl ? (
+  <Button variant="contained" startIcon={<MdArrowOutward />}
+    onClick={() => window.open(liveUrl, "_blank", "noopener,noreferrer")}
+    sx={{
+      borderRadius: 999, fontWeight: 700,
+      background: "linear-gradient(135deg, #f13024, #f97316) !important",
+      color: "white !important",
+      boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
+      "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important" },
+    }}>Live Preview</Button>
+) : null}
       </Stack>
     </MotionPaper>
   );
@@ -1116,22 +1127,22 @@ export default function Home({ toggleTheme }) {
                     {socials?.phone ? <Typography className="contact-line"><MdPhone style={{ marginRight: 10 }} />{safeString(socials.phone)}</Typography> : null}
                     {location ? <Typography className="contact-line"><MdLocationOn style={{ marginRight: 10 }} />{location}</Typography> : null}
                   </Stack>
-                  <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
-                    {socials?.github ? (
-                      <Button variant="outlined" startIcon={<FaGithub />}
-                        sx={{ borderRadius: 999, fontWeight: 700 }}
-                        onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>GitHub</Button>
-                    ) : null}
-                    {socials?.linkedin ? (
-                      <Button variant="outlined" startIcon={<FaLinkedin />}
-                        sx={{ borderRadius: 999, fontWeight: 700 }}
-                        onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>LinkedIn</Button>
-                    ) : null}
-                    {socials?.website ? (
-                      <Button variant="outlined" startIcon={<MdLink />}
-                        sx={{ borderRadius: 999, fontWeight: 700 }}
-                        onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>Website</Button>
-                    ) : null}
+                  <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap", rowGap: "10px" }}>
+{socials?.github ? (
+  <Button variant="outlined" startIcon={<FaGithub />}
+    sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
+    onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>GitHub</Button>
+) : null}
+{socials?.linkedin ? (
+  <Button variant="outlined" startIcon={<FaLinkedin />}
+    sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
+    onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>LinkedIn</Button>
+) : null}
+{socials?.website ? (
+  <Button variant="outlined" startIcon={<MdLink />}
+    sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
+    onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>Website</Button>
+) : null}
                   </Stack>
                 </GlassPanel>
                 <Box className="portfolio-footer">
