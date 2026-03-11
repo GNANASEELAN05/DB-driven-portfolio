@@ -2463,7 +2463,9 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   align-items: center;
   gap: 14px;
   flex-shrink: 0;
-  min-width: 0;
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
 }
 
 .langrow-logo-ring {
@@ -2534,7 +2536,10 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   display: flex;
   flex-direction: column;
   gap: 5px;
-  min-width: 80px;
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+  flex-shrink: 0;
 }
 
 .langrow-name {
@@ -2711,7 +2716,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
     gap: 14px;
     padding: 14px 16px 14px 44px;
   }
-  .langrow-name-block { min-width: 64px; }
+  .langrow-name-block { width: 96px; min-width: 96px; max-width: 96px; }
   .langrow-logo-ring { width: 44px; height: 44px; border-radius: 12px; }
   .langrow-logo-img { width: 26px; height: 26px; }
 }
@@ -2727,4 +2732,340 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .langrow-logo-img { width: 24px; height: 24px; }
   .langrow-name { font-size: 0.84rem !important; }
   .langrow-dot-seg { width: 22px; }
+  .langrow-name-block { width: 80px; min-width: 80px; max-width: 80px; }
+  .langrow-left { width: auto; min-width: auto; max-width: none; }
+}
+
+
+
+/* ==============================================
+   SKILLS BUCKET — Append to your main CSS file
+   ============================================== */
+
+/* Root wrapper */
+.skillsbucket-root {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+/* Top bar */
+.skillsbucket-topbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Action buttons */
+.sbb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  border-radius: 999px;
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  border: 1.5px solid transparent;
+}
+
+.mode-dark .sbb-btn {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.75);
+}
+
+.mode-light .sbb-btn {
+  background: rgba(17,24,39,0.05);
+  border-color: rgba(17,24,39,0.12);
+  color: rgba(17,24,39,0.75);
+}
+
+.sbb-btn:hover {
+  transform: translateY(-2px);
+  border-color: #f13024 !important;
+  color: #f13024 !important;
+  background: rgba(241,48,36,0.08) !important;
+}
+
+.sbb-btn-active {
+  background: linear-gradient(135deg, #f13024, #f97316) !important;
+  border-color: transparent !important;
+  color: white !important;
+  box-shadow: 0 6px 20px rgba(241,48,36,0.32);
+}
+
+.sbb-hint {
+  font-size: 0.74rem !important;
+  opacity: 0.45 !important;
+  font-style: italic;
+  margin-left: 6px;
+}
+
+/* Canvas area */
+.skillsbucket-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.mode-dark .skillsbucket-canvas-wrap {
+  background: rgba(10,12,28,0.55);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.mode-light .skillsbucket-canvas-wrap {
+  background: rgba(245,247,252,0.80);
+  border: 1px solid rgba(17,24,39,0.08);
+}
+
+.skillsbucket-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+/* Legend */
+.skillsbucket-legend {
+  position: absolute;
+  bottom: 14px;
+  left: 18px;
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  pointer-events: none;
+}
+
+.sbb-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.70rem;
+  font-weight: 700;
+  opacity: 0.65;
+  font-family: "Inter", sans-serif;
+}
+
+.sbb-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.mode-dark .sbb-legend-label { color: rgba(255,255,255,0.7); }
+.mode-light .sbb-legend-label { color: rgba(17,24,39,0.7); }
+
+/* Arranged layout */
+.skillsbucket-arranged {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Category box card */
+.skillbox-card {
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  backdrop-filter: blur(18px);
+  animation: skillboxIn 0.45s cubic-bezier(0.34,1.56,0.64,1) both;
+}
+
+@keyframes skillboxIn {
+  from { opacity:0; transform: translateY(22px) scale(0.97); filter: blur(4px); }
+  to   { opacity:1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+.mode-dark .skillbox-card {
+  background: rgba(18,20,42,0.65);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 6px 28px rgba(0,0,0,0.22);
+}
+
+.mode-light .skillbox-card {
+  background: rgba(255,255,255,0.84);
+  border: 1px solid rgba(17,24,39,0.09);
+  box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+}
+
+/* Header */
+.skillbox-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid;
+  position: relative;
+}
+
+.mode-dark .skillbox-header { border-bottom-color: rgba(255,255,255,0.06); }
+.mode-light .skillbox-header { border-bottom-color: rgba(17,24,39,0.07); }
+
+.skillbox-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skillbox-title {
+  font-family: "Inter", sans-serif !important;
+  font-weight: 900 !important;
+  font-size: 0.82rem !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+}
+
+.skillbox-count {
+  font-size: 0.68rem !important;
+  opacity: 0.38 !important;
+  font-weight: 600 !important;
+  margin-left: auto !important;
+  font-family: "Inter", sans-serif !important;
+}
+
+/* Arrange button */
+.skillbox-arrange-btn {
+  margin-left: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1.5px solid;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-family: "Inter", sans-serif;
+}
+
+.skillbox-arrange-btn:hover {
+  transform: scale(1.12) rotate(-4deg);
+  background: rgba(241,48,36,0.10) !important;
+}
+
+/* Canvas inside box */
+.skillbox-body {
+  width: 100%;
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+}
+
+.skillbox-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+/* Grid arranged items */
+.skillbox-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 14px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  align-content: start;
+  scrollbar-width: none;
+}
+
+.skillbox-grid::-webkit-scrollbar { display: none; }
+
+.skillbox-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 8px;
+  border-radius: 14px;
+  animation: skillItemPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+  transition: transform 0.22s ease;
+  cursor: default;
+}
+
+@keyframes skillItemPop {
+  from { opacity:0; transform: scale(0.7) rotate(-4deg); }
+  to   { opacity:1; transform: scale(1) rotate(0deg); }
+}
+
+.skillbox-item:hover { transform: translateY(-4px) scale(1.05); }
+
+.mode-dark .skillbox-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); }
+.mode-light .skillbox-item { background: rgba(17,24,39,0.04); border: 1px solid rgba(17,24,39,0.08); }
+
+.skillbox-item-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: 1.5px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.skillbox-item-name {
+  font-family: "Inter", sans-serif !important;
+  font-size: 0.60rem !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  letter-spacing: 0.01em !important;
+  word-break: break-word;
+  max-width: 64px;
+  line-height: 1.2 !important;
+}
+
+.mode-dark .skillbox-item-name { color: rgba(255,255,255,0.72) !important; -webkit-text-fill-color: rgba(255,255,255,0.72) !important; }
+.mode-light .skillbox-item-name { color: rgba(17,24,39,0.72) !important; -webkit-text-fill-color: rgba(17,24,39,0.72) !important; }
+
+/* Physics mode names row */
+.skillbox-names {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 14px 14px;
+}
+
+.skillbox-name-chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  border: 1px solid;
+  font-family: "Inter", sans-serif;
+  opacity: 0.75;
+}
+
+/* Responsive */
+@media (max-width: 899px) {
+  .skillsbucket-canvas-wrap { height: 380px; }
+  .skillbox-body { height: 180px; }
+  .skillbox-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 600px) {
+  .skillsbucket-canvas-wrap { height: 300px; }
+  .skillbox-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; }
+  .skillbox-item { padding: 9px 5px; border-radius: 11px; }
+  .skillbox-item-logo { width: 36px; height: 36px; border-radius: 9px; }
+  .skillbox-item-name { font-size: 0.55rem !important; max-width: 52px; }
+  .sbb-hint { display: none; }
 }

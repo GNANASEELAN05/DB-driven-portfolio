@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import emailjs from "@emailjs/browser";
+import SkillsBucketSection from "../components/SkillsBucket";
 import {
   Box,
   Button,
@@ -1293,35 +1294,18 @@ export default function Home({ toggleTheme }) {
           </MotionBox>
         );
 
-      case "skills":
-        return (
-          <MotionBox key="skills" custom={navDirection} variants={pageVariants}
-            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-            <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Skills" subtitle="Technologies I build with, at a glance." />
-                {loading ? (
-                  <Stack spacing={3}>
-                    <Skeleton height={60} sx={{ borderRadius: 3 }} />
-                    <Skeleton height={160} sx={{ borderRadius: 3 }} />
-                    <Skeleton height={60} sx={{ borderRadius: 3 }} />
-                    <Skeleton height={160} sx={{ borderRadius: 3 }} />
-                  </Stack>
-                ) : skillGroups.length > 0 ? (
-                  <Stack spacing={4}>
-                    {skillGroups.map((g) => (
-                      <SkillCategoryGroup key={g.category} category={g.category} skills={g.items} />
-                    ))}
-                  </Stack>
-                ) : (
-                  <GlassPanel sx={{ p: 3 }}>
-                    <Typography>No skills added yet. Add them in Admin → Skills.</Typography>
-                  </GlassPanel>
-                )}
-              </MotionBox>
-            </Box>
-          </MotionBox>
-        );
+case "skills":
+  return (
+    <MotionBox key="skills" custom={navDirection} variants={pageVariants}
+      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+      <Box className="section-scroll-area">
+        <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+          <SectionHeading title="Skills" subtitle="Technologies I build with — toss 'em in the bucket or arrange by category." />
+          <SkillsBucketSection skills={skills} loading={loading} />
+        </MotionBox>
+      </Box>
+    </MotionBox>
+  );
 
       case "projects":
         return (
