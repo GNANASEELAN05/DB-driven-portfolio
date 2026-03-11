@@ -2,8 +2,10 @@ package com.portfolio.backend.controller;
 
 import com.portfolio.backend.model.*;
 import com.portfolio.backend.repository.*;
+import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -121,7 +123,7 @@ public class PortfolioController {
         return skillsRepo.save(skills);
     }
 
-    // ====================== SOCIALS (FIXED) ======================
+    // ====================== SOCIALS ======================
 
     @PutMapping("/socials")
     @Transactional
@@ -171,9 +173,36 @@ public class PortfolioController {
     @PutMapping("/achievements")
     @Transactional
     public List<AchievementItem> saveAchievements(@RequestBody List<AchievementItem> items) {
+        // We use a replace-all strategy but PRESERVE certificate data for existing records
+        if (items == null) {
+            achievementRepo.deleteAll();
+            return List.of();
+        }
+
+        List<AchievementItem> existing = achievementRepo.findAll();
+        Map<Long, AchievementItem> existingMap = new HashMap<>();
+        for (AchievementItem e : existing) {
+            existingMap.put(e.getId(), e);
+        }
+
         achievementRepo.deleteAll();
-        if (items == null) return List.of();
-        return achievementRepo.saveAll(items);
+
+        List<AchievementItem> toSave = new ArrayList<>();
+        for (AchievementItem item : items) {
+            // Preserve certificate binary data if not re-uploaded
+            if (item.getId() != null && existingMap.containsKey(item.getId())) {
+                AchievementItem old = existingMap.get(item.getId());
+                if (item.getCertificateData() == null && old.getCertificateData() != null) {
+                    item.setCertificateData(old.getCertificateData());
+                    item.setCertificateContentType(old.getCertificateContentType());
+                    item.setCertificateFileName(old.getCertificateFileName());
+                }
+            }
+            item.setId(null); // let DB assign new ID after deleteAll
+            toSave.add(item);
+        }
+
+        return achievementRepo.saveAll(toSave);
     }
 
     // ====================== LANGUAGES ======================
@@ -184,5 +213,90 @@ public class PortfolioController {
         languageRepo.deleteAll();
         if (items == null) return List.of();
         return languageRepo.saveAll(items);
+    }
+
+    // ====================== CERTIFICATE UPLOAD ======================
+
+    /**
+     * Upload a certificate file (PDF / JPEG / PNG) for a specific achievement.
+     * ADMIN only (secured via SecurityConfig).
+     */
+    @PostMapping(value = "/achievements/{id}/certificate", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadCertificate(
+            @PathVariable Long id,
+            @RequestPart("file") MultipartFile file) {
+
+        Optional<AchievementItem> opt = achievementRepo.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        String contentType = file.getContentType();
+        if (contentType == null ||
+            (!contentType.equals("application/pdf") &&
+             !contentType.startsWith("image/jpeg") &&
+             !contentType.startsWith("image/jpg") &&
+             !contentType.startsWith("image/png"))) {
+            return ResponseEntity.badRequest()
+                    .body("Only PDF, JPEG, and PNG files are allowed for certificates.");
+        }
+
+        try {
+            AchievementItem item = opt.get();
+            item.setCertificateData(file.getBytes());
+            item.setCertificateContentType(contentType);
+            item.setCertificateFileName(file.getOriginalFilename());
+            achievementRepo.save(item);
+            return ResponseEntity.ok("Certificate uploaded successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Upload failed: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Download/view the certificate for a specific achievement.
+     * PUBLIC so the viewer page can display it.
+     */
+    @GetMapping("/achievements/{id}/certificate")
+    public ResponseEntity<byte[]> getCertificate(@PathVariable Long id) {
+
+        Optional<AchievementItem> opt = achievementRepo.findById(id);
+        if (opt.isEmpty() || opt.get().getCertificateData() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        AchievementItem item = opt.get();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.parseMediaType(
+                item.getCertificateContentType() != null ? item.getCertificateContentType() : "application/octet-stream"
+        ));
+        headers.setContentDisposition(
+                ContentDisposition.inline()
+                        .filename(item.getCertificateFileName() != null ? item.getCertificateFileName() : "certificate")
+                        .build()
+        );
+
+        return new ResponseEntity<>(item.getCertificateData(), headers, HttpStatus.OK);
+    }
+
+    /**
+     * Delete certificate from a specific achievement.
+     * ADMIN only.
+     */
+    @DeleteMapping("/achievements/{id}/certificate")
+    public ResponseEntity<?> deleteCertificate(@PathVariable Long id) {
+
+        Optional<AchievementItem> opt = achievementRepo.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        AchievementItem item = opt.get();
+        item.setCertificateData(null);
+        item.setCertificateContentType(null);
+        item.setCertificateFileName(null);
+        achievementRepo.save(item);
+        return ResponseEntity.ok("Certificate deleted");
     }
 }

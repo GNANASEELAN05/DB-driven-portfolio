@@ -75,7 +75,9 @@ import {
   MdSchool,
   MdBadge,
   MdCheckCircle,
+  MdImage,
 } from "react-icons/md";
+
 
 import {
   getAllProjectsAdmin,
@@ -449,6 +451,12 @@ export default function AdminDashboard(props) {
   const [resumeUploadSuccess, setResumeUploadSuccess] = useState(false);
   const [resumeUploadedName, setResumeUploadedName] = useState("");
 
+
+  const [certUploading, setCertUploading] = useState(null);
+  const [profileImages, setProfileImages] = useState([]);
+  const [imgUploading, setImgUploading] = useState(false);
+  const [imgUploadType, setImgUploadType] = useState("");
+
   const handleDrawerToggle = () => setMobileOpen((p) => !p);
 
   // ── ALL HANDLERS ──────────────────────────────────────────────────────────
@@ -759,10 +767,113 @@ export default function AdminDashboard(props) {
     setConfirmOpen(true);
   };
 
+
+  // ── Certificate upload handlers ───────────────────────────────────────────
+  const onUploadCertificate = async (achId, file) => {
+    if (!file) return;
+    const allowed = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
+    if (!allowed.includes(file.type)) {
+      setErr("Only PDF, JPEG, and PNG files are allowed for certificates.");
+      return;
+    }
+    try {
+      setErr(""); setOk("");
+      setCertUploading(achId);
+      const formData = new FormData();
+      formData.append("file", file);
+      await http.post(`/api/portfolio/achievements/${achId}/certificate`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setOk("Certificate uploaded successfully.");
+      await fetchAllAdmin();
+      bumpContentVersion();
+    } catch { setErr("Certificate upload failed."); }
+    finally { setCertUploading(null); }
+  };
+
+  const onDeleteCertificate = async (achId) => {
+    setConfirmPayload({
+      title: "Delete Certificate?",
+      description: "This will permanently remove the certificate file.",
+      confirmText: "Delete",
+      onConfirm: async () => {
+        setConfirmOpen(false);
+        try {
+          setErr(""); setOk(""); setLoading(true);
+          await http.delete(`/api/portfolio/achievements/${achId}/certificate`);
+          setOk("Certificate deleted.");
+          await fetchAllAdmin();
+          bumpContentVersion();
+        } catch { setErr("Failed to delete certificate."); }
+        finally { setLoading(false); }
+      },
+    });
+    setConfirmOpen(true);
+  };
+
+  const certViewUrl = (achId) =>
+    `${import.meta.env.VITE_API_BASE || ""}/api/portfolio/achievements/${achId}/certificate`;
+
+  // ── Profile Image handlers ────────────────────────────────────────────────
+  const fetchProfileImages = async () => {
+    try {
+      const res = await http.get("/api/profile-image/list");
+      setProfileImages(Array.isArray(res.data) ? res.data : []);
+    } catch {}
+  };
+
+  React.useEffect(() => { fetchProfileImages(); }, []); // eslint-disable-line
+
+  const onUploadProfileImage = async (type, file) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setErr("Only image files are allowed (JPEG, PNG, GIF, WebP).");
+      return;
+    }
+    try {
+      setErr(""); setOk("");
+      setImgUploading(true);
+      setImgUploadType(type);
+      const formData = new FormData();
+      formData.append("file", file);
+      await http.post(`/api/profile-image/upload/${type}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setOk(`${type === "original" ? "Original" : "Animated"} image uploaded.`);
+      await fetchProfileImages();
+      bumpContentVersion();
+    } catch { setErr("Image upload failed."); }
+    finally { setImgUploading(false); setImgUploadType(""); }
+  };
+
+  const onDeleteProfileImage = async (id, type) => {
+    setConfirmPayload({
+      title: "Delete Image?",
+      description: `Permanently remove this ${type} image?`,
+      confirmText: "Delete",
+      onConfirm: async () => {
+        setConfirmOpen(false);
+        try {
+          setErr(""); setOk(""); setLoading(true);
+          await http.delete(`/api/profile-image/${id}`);
+          setOk("Image deleted.");
+          await fetchProfileImages();
+          bumpContentVersion();
+        } catch { setErr("Failed to delete image."); }
+        finally { setLoading(false); }
+      },
+    });
+    setConfirmOpen(true);
+  };
+
+  const profileImgUrl = (type) =>
+    `${import.meta.env.VITE_API_BASE || ""}/api/profile-image/${type}?t=${Date.now()}`;
+
   const pageLabel = {
     dashboard: "Dashboard", about: "About Me", skills: "Skills", projects: "Projects",
     achievements: "Achievements", languages: "Languages Experience", education: "Education",
     experience: "Experience", contact: "Contact / Links", resume: "Resume",
+    "profile-image": "Profile Image",
   };
 
   const navItems = [
@@ -776,6 +887,7 @@ export default function AdminDashboard(props) {
     { id: "experience", label: "Experience", icon: <MdBadge /> },
     { id: "contact", label: "Contact / Links", icon: <MdLink /> },
     { id: "resume", label: "Resume", icon: <MdDescription /> },
+    { id: "profile-image", label: "Profile Image", icon: <MdImage /> },
   ];
 
   const PBtn = ({ children, ...p }) => <Button size="small" className="adm-btn-primary" fullWidth={isMobile} {...p}>{children}</Button>;
@@ -966,6 +1078,7 @@ export default function AdminDashboard(props) {
               {active === "experience" && "Career and internship timeline"}
               {active === "contact" && "Social links and contact information shown in viewer"}
               {active === "resume" && "Upload, preview, and set the primary resume for download"}
+              {active === "profile-image" && "Upload your original and animated profile images"}
             </Typography>
           </Box>
 
@@ -1191,22 +1304,62 @@ export default function AdminDashboard(props) {
             </Box>
           )}
 
-          {active === "achievements" && (
+{active === "achievements" && (
             <Box className="adm-page-enter">
               <SectionHeader
-                title="Achievements" subtitle="Add / edit / delete then Save to DB"
+                title="Achievements" subtitle="Add / edit / delete then Save to DB. Upload certificate per achievement after saving."
                 right={<Stack direction="row" spacing={1}><OBtn startIcon={<MdAdd />} onClick={openAchAdd}>Add</OBtn><PBtn startIcon={<MdSave />} onClick={persistAchievements}>Save to DB</PBtn></Stack>}
               />
               <TableWrap>
                 <Table>
-                  <THead cols={[{ label: "Title" }, { label: "Issuer" }, { label: "Year" }, { label: "Link" }, { label: "Actions", sx: { width: 110 } }]} />
+                  <THead cols={[{ label: "Title" }, { label: "Issuer" }, { label: "Year" }, { label: "Certificate" }, { label: "Actions", sx: { width: 160 } }]} />
                   <TableBody>
                     {achievements.map((a) => (
                       <TRow key={a.id || a.title}>
                         <TC bold>{a.title}</TC>
                         <TC sx={{ opacity: 0.80 }}>{a.issuer}</TC>
                         <TC sx={{ opacity: 0.80 }}>{a.year}</TC>
-                        <TC sx={{ opacity: 0.80 }}>{a.link}</TC>
+                        <TC>
+                          {a.certificateFileName ? (
+                            <Stack direction="row" spacing={0.8} alignItems="center">
+                              <Chip
+                                size="small"
+                                label={a.certificateFileName.length > 16 ? a.certificateFileName.slice(0, 14) + "…" : a.certificateFileName}
+                                className="adm-chip-yes"
+                              />
+                              <Tooltip title="View Certificate">
+                                <IconButton
+                                  size="small"
+                                  className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+                                  onClick={() => window.open(certViewUrl(a.id), "_blank")}
+                                >
+                                  <MdVisibility />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Delete Certificate">
+                                <IconButton size="small" className="adm-icon-btn-err" onClick={() => onDeleteCertificate(a.id)}>
+                                  <MdDelete />
+                                </IconButton>
+                              </Tooltip>
+                            </Stack>
+                          ) : (
+                            <Button
+                              component="label"
+                              size="small"
+                              className="adm-btn-outlined"
+                              startIcon={certUploading === a.id ? null : <MdUpload />}
+                              disabled={certUploading === a.id || !a.id || a.id > 1e12}
+                            >
+                              {certUploading === a.id ? "Uploading…" : "Upload"}
+                              <input
+                                hidden
+                                type="file"
+                                accept="application/pdf,image/jpeg,image/jpg,image/png"
+                                onChange={(e) => e.target.files?.[0] && onUploadCertificate(a.id, e.target.files[0])}
+                              />
+                            </Button>
+                          )}
+                        </TC>
                         <TC><Stack direction="row" spacing={0.8}><IconEdit onClick={() => openAchEdit(a)} /><IconDel onClick={() => deleteAchLocal(a.id)} /></Stack></TC>
                       </TRow>
                     ))}
@@ -1214,6 +1367,11 @@ export default function AdminDashboard(props) {
                   </TableBody>
                 </Table>
               </TableWrap>
+              <Paper elevation={0} className={`adm-glass ${isDark ? "" : "adm-glass-light"}`} sx={{ p: 1.5, mt: 1.5, borderRadius: "12px" }}>
+                <Typography variant="caption" sx={{ opacity: 0.55 }}>
+                  💡 Click "Save to DB" first before uploading a certificate. The Upload button is disabled for unsaved achievements.
+                </Typography>
+              </Paper>
               <SimpleItemDialog open={achDlgOpen} title={achEditingId ? "Edit Achievement" : "Add Achievement"} onClose={() => setAchDlgOpen(false)} onSave={saveAchLocal}>
                 <Grid container spacing={2}>
                   {[["Title", "title"], ["Issuer", "issuer"], ["Year", "year"], ["Link", "link"]].map(([label, key]) => (
@@ -1501,6 +1659,103 @@ export default function AdminDashboard(props) {
                   <Button className="adm-btn-primary" onClick={() => setPushDialog({ open: false, name: "" })}>OK</Button>
                 </DialogActions>
               </Dialog>
+            </Box>
+          )}
+
+          {active === "profile-image" && (
+            <Box className="adm-page-enter">
+              {["original", "animated"].map((type) => {
+                const img = profileImages.find((i) => i.imageType === type);
+                const isUploading = imgUploading && imgUploadType === type;
+                return (
+                  <Box key={type} sx={{ mb: 3.5 }}>
+                    <SectionHeader
+                      title={type === "original" ? "Original Image" : "Animated Image"}
+                      subtitle={type === "original" ? "Static profile photo shown on the home section" : "GIF / WebP animation shown alongside your intro"}
+                      right={
+                        <Button
+                          component="label"
+                          className="adm-btn-primary"
+                          size="small"
+                          startIcon={isUploading ? null : <MdUpload />}
+                          fullWidth={isMobile}
+                          disabled={isUploading}
+                        >
+                          {isUploading ? "Uploading…" : `Upload ${type === "original" ? "Original" : "Animated"}`}
+                          <input
+                            hidden
+                            type="file"
+                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                            onChange={(e) => e.target.files?.[0] && onUploadProfileImage(type, e.target.files[0])}
+                          />
+                        </Button>
+                      }
+                    />
+                    {img ? (
+                      <Paper
+                        elevation={0}
+                        className={`adm-glass adm-neon-top ${isDark ? "" : "adm-glass-light"}`}
+                        sx={{ p: { xs: 2, md: 2.5 } }}
+                      >
+                        <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5} alignItems={{ xs: "flex-start", sm: "center" }}>
+                          <Box sx={{
+                            width: 100, height: 100, borderRadius: "16px", overflow: "hidden",
+                            border: "2px solid rgba(241,48,36,0.28)",
+                            background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+                            flexShrink: 0,
+                          }}>
+                            <img
+                              src={profileImgUrl(type)}
+                              alt={type}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                              onError={(e) => { e.target.style.display = "none"; }}
+                            />
+                          </Box>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", opacity: 0.90, mb: 0.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {img.filename}
+                            </Typography>
+                            <Typography sx={{ fontSize: "0.75rem", opacity: 0.50 }}>
+                              Uploaded: {img.uploadedAt ? new Date(img.uploadedAt).toLocaleString() : "—"}
+                            </Typography>
+                          </Box>
+                          <Stack direction="row" spacing={1}>
+                            <Tooltip title="Preview in new tab">
+                              <IconButton
+                                size="small"
+                                className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+                                onClick={() => window.open(profileImgUrl(type), "_blank")}
+                              >
+                                <MdVisibility />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title="Delete">
+                              <IconButton
+                                size="small"
+                                className="adm-icon-btn-err"
+                                onClick={() => onDeleteProfileImage(img.id, type)}
+                              >
+                                <MdDelete />
+                              </IconButton>
+                            </Tooltip>
+                          </Stack>
+                        </Stack>
+                      </Paper>
+                    ) : (
+                      <Paper
+                        elevation={0}
+                        className={`adm-glass ${isDark ? "" : "adm-glass-light"}`}
+                        sx={{ p: 3, borderRadius: "16px", textAlign: "center" }}
+                      >
+                        <MdImage style={{ fontSize: "2rem", opacity: 0.25, marginBottom: 8 }} />
+                        <Typography sx={{ opacity: 0.45, fontSize: "0.875rem" }}>
+                          No {type} image uploaded yet.
+                        </Typography>
+                      </Paper>
+                    )}
+                  </Box>
+                );
+              })}
             </Box>
           )}
 

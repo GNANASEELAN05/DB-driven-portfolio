@@ -60,6 +60,12 @@ import {
 import AnimatedPhoto from "../assets/Animated_Prof_Photo.png";
 import OriginalPhoto from "../assets/Proffessional_Gnanaseelan_V_Photo.png";
 
+// ── NEW: API base + cert URL helper ──────────────────────────────────────────
+const API_BASE = import.meta.env.VITE_API_BASE || "";
+const certFileUrl = (achId) =>
+  `${API_BASE}/api/portfolio/achievements/${achId}/certificate`;
+// ─────────────────────────────────────────────────────────────────────────────
+
 const MotionBox = motion(Box);
 const MotionPaper = motion(Paper);
 
@@ -640,8 +646,10 @@ function TiltCard({ children, className = "", sx }) {
 
 // =============================================
 // PROFILE PHOTO
+// Now accepts animatedSrc + originalSrc props.
+// Falls back to bundled assets when not provided.
 // =============================================
-function ProfilePhotoCard() {
+function ProfilePhotoCard({ animatedSrc, originalSrc }) {
   const [showOriginal, setShowOriginal] = useState(false);
   const [hovered, setHovered] = useState(false);
   const timerRef = useRef(null);
@@ -670,14 +678,14 @@ function ProfilePhotoCard() {
         className="profile-photo-layer"
         style={{ opacity: showOriginal ? 0 : 1, transition: "opacity 0.75s ease" }}
       >
-        <img src={AnimatedPhoto} alt="Animated profile" className="profile-photo-img" />
+        <img src={animatedSrc} alt="Animated profile" className="profile-photo-img" />
       </Box>
 
       <Box
         className="profile-photo-layer"
         style={{ opacity: showOriginal ? 1 : 0, transition: "opacity 0.75s ease" }}
       >
-        <img src={OriginalPhoto} alt="Original profile" className="profile-photo-img profile-photo-original" />
+        <img src={originalSrc} alt="Original profile" className="profile-photo-img profile-photo-original" />
       </Box>
 
       <Box
@@ -1030,6 +1038,18 @@ export default function Home({ toggleTheme }) {
   const [resumePreviewBlobUrl, setResumePreviewBlobUrl] = useState("");
   const [resumePreviewLoading, setResumePreviewLoading] = useState(false);
 
+  // ── NEW: certificate preview states ──────────────────────────────────────
+  const [certPreviewOpen, setCertPreviewOpen] = useState(false);
+  const [certPreviewTitle, setCertPreviewTitle] = useState("");
+  const [certPreviewBlobUrl, setCertPreviewBlobUrl] = useState("");
+  const [certPreviewLoading, setCertPreviewLoading] = useState(false);
+  const [certPreviewIsImage, setCertPreviewIsImage] = useState(false);
+
+  // ── NEW: profile image states ─────────────────────────────────────────────
+  const [profileImages, setProfileImages] = useState([]);
+  const [imageBust, setImageBust] = useState(Date.now());
+  // ─────────────────────────────────────────────────────────────────────────
+
   const [activeSection, setActiveSection] = useState("home");
   const [navDirection, setNavDirection] = useState(1);
   const rootRef = useRef(null);
@@ -1095,6 +1115,24 @@ export default function Home({ toggleTheme }) {
       { category: "Tools",    items: splitCSV(s.tools)    },
     ].filter((g) => g.items.length > 0);
   }, [skills]);
+
+  // ── NEW: fetch profile images from DB ─────────────────────────────────────
+  useEffect(() => {
+    const fetchImgs = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/profile-image/list`);
+        if (res.ok) {
+          const data = await res.json();
+          setProfileImages(Array.isArray(data) ? data : []);
+          setImageBust(Date.now());
+        }
+      } catch {
+        // silently fall back to default images
+      }
+    };
+    fetchImgs();
+  }, [reloadTick]);
+  // ─────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
     let alive = true;
@@ -1189,6 +1227,37 @@ export default function Home({ toggleTheme }) {
     setResumePreviewBlobUrl("");
   };
 
+  // ── NEW: certificate preview handlers ────────────────────────────────────
+  const closeCertPreview = () => {
+    setCertPreviewOpen(false);
+    if (certPreviewBlobUrl) { try { URL.revokeObjectURL(certPreviewBlobUrl); } catch {} }
+    setCertPreviewBlobUrl("");
+    setCertPreviewIsImage(false);
+  };
+
+  const onPreviewCertificate = async (achId, achTitle) => {
+    try {
+      setCertPreviewTitle(`Certificate — ${achTitle || "Achievement"}`);
+      setCertPreviewLoading(true);
+      setCertPreviewOpen(true);
+      setCertPreviewBlobUrl("");
+      setCertPreviewIsImage(false);
+      const res = await fetch(certFileUrl(achId), { method: "GET" });
+      if (!res.ok) throw new Error("Preview failed");
+      const blob = await res.blob();
+      const contentType = res.headers.get("content-type") || "application/pdf";
+      setCertPreviewIsImage(contentType.startsWith("image/"));
+      setCertPreviewBlobUrl(
+        URL.createObjectURL(new Blob([blob], { type: contentType }))
+      );
+    } catch {
+      setCertPreviewBlobUrl("");
+    } finally {
+      setCertPreviewLoading(false);
+    }
+  };
+  // ─────────────────────────────────────────────────────────────────────────
+
   const onPreviewResume = async () => {
     try {
       setResumePreviewTitle(resumeName || "Resume Preview");
@@ -1212,6 +1281,22 @@ export default function Home({ toggleTheme }) {
       try { window.open(resumeDownloadUrlBusted, "_blank", "noopener,noreferrer"); } catch {}
     } finally { setDownloading(false); }
   };
+
+  // ── NEW: resolve which image src to use ──────────────────────────────────
+  const resolvedAnimatedSrc = useMemo(() => {
+    const found = profileImages.find((i) => i.imageType === "animated");
+    return found
+      ? `${API_BASE}/api/profile-image/animated?t=${imageBust}`
+      : AnimatedPhoto;
+  }, [profileImages, imageBust]);
+
+  const resolvedOriginalSrc = useMemo(() => {
+    const found = profileImages.find((i) => i.imageType === "original");
+    return found
+      ? `${API_BASE}/api/profile-image/original?t=${imageBust}`
+      : OriginalPhoto;
+  }, [profileImages, imageBust]);
+  // ─────────────────────────────────────────────────────────────────────────
 
   const renderSection = () => {
     switch (activeSection) {
@@ -1272,8 +1357,12 @@ export default function Home({ toggleTheme }) {
                       </Stack>
                     </MotionBox>
                   </Box>
+                  {/* ── CHANGED: pass resolved src props ── */}
                   <Box className="hero-right">
-                    <ProfilePhotoCard />
+                    <ProfilePhotoCard
+                      animatedSrc={resolvedAnimatedSrc}
+                      originalSrc={resolvedOriginalSrc}
+                    />
                   </Box>
                 </Box>
               </MotionBox>
@@ -1382,6 +1471,7 @@ case "skills":
           </MotionBox>
         );
 
+      // ── CHANGED: achievements case — adds "View Certificate" button ──────
       case "achievements":
         return (
           <MotionBox key="achievements" custom={navDirection} variants={pageVariants}
@@ -1396,13 +1486,33 @@ case "skills":
                         <Typography className="timeline-title">{safeString(item?.title) || "Achievement"}</Typography>
                         <Typography className="timeline-subtitle">{safeString(item?.issuer) || ""}</Typography>
                         <Typography className="timeline-meta">{safeString(item?.year) || ""}</Typography>
-                        {safeString(item?.link) ? (
-                          <Button variant="outlined" startIcon={<MdLink />}
-                            sx={{ mt: 2, borderRadius: 999, fontWeight: 700 }}
-                            onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}>
-                            View
-                          </Button>
-                        ) : null}
+                        <Stack direction="row" flexWrap="wrap" spacing={1} sx={{ mt: 2 }}>
+                          {safeString(item?.link) ? (
+                            <Button variant="outlined" startIcon={<MdLink />}
+                              sx={{
+                                borderRadius: 999, fontWeight: 700,
+                                borderColor: "rgba(241,48,36,0.5) !important",
+                                color: "#f13024 !important",
+                                "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" },
+                              }}
+                              onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}>
+                              View
+                            </Button>
+                          ) : null}
+                          {item?.certificateFileName ? (
+                            <Button variant="contained" startIcon={<MdVisibility />}
+                              sx={{
+                                borderRadius: 999, fontWeight: 700,
+                                background: "linear-gradient(135deg, #f13024, #f97316) !important",
+                                color: "white !important",
+                                boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
+                                "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important" },
+                              }}
+                              onClick={() => onPreviewCertificate(item.id, safeString(item?.title))}>
+                              View Certificate
+                            </Button>
+                          ) : null}
+                        </Stack>
                       </GlassPanel>
                     ))
                   ) : <GlassPanel sx={{ p: 3 }}><Typography>No achievements yet.</Typography></GlassPanel>}
@@ -1532,6 +1642,8 @@ case "languages":
           </AnimatePresence>
         </Box>
       </Box>
+
+      {/* Resume preview — unchanged */}
       <ResumePreviewDialog
         open={resumePreviewOpen}
         title={resumePreviewTitle}
@@ -1540,6 +1652,60 @@ case "languages":
         blobUrl={resumePreviewBlobUrl}
         loading={resumePreviewLoading}
       />
+
+      {/* ── NEW: Certificate preview dialog ── */}
+      <Dialog open={certPreviewOpen} onClose={closeCertPreview} fullWidth maxWidth="lg">
+        <DialogTitle sx={{ fontWeight: 900 }}>{certPreviewTitle}</DialogTitle>
+        <DialogContent sx={{ height: 700, p: 0, overflow: "hidden", bgcolor: "black" }}>
+          {certPreviewLoading ? (
+            <Box sx={{ p: 3 }}>
+              <Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography>
+            </Box>
+          ) : certPreviewBlobUrl ? (
+            <Box sx={{ width: "100%", height: "100%", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {certPreviewIsImage ? (
+                <img
+                  src={certPreviewBlobUrl}
+                  alt={certPreviewTitle}
+                  style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", display: "block" }}
+                />
+              ) : (
+                <iframe
+                  title={certPreviewTitle}
+                  src={certPreviewBlobUrl}
+                  style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+                />
+              )}
+            </Box>
+          ) : (
+            <Box sx={{ p: 3 }}>
+              <Typography sx={{ opacity: 0.75 }}>Preview not available.</Typography>
+            </Box>
+          )}
+        </DialogContent>
+        <DialogActions sx={{ p: 2 }}>
+          <Button
+            onClick={closeCertPreview}
+            variant="contained"
+            startIcon={<MdClose />}
+            sx={{
+              background: "linear-gradient(135deg, #f13024, #f97316)",
+              color: "white",
+              borderRadius: 999,
+              fontWeight: 800,
+              textTransform: "none",
+              px: 3,
+              boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #d42a1e, #e8650a)",
+                boxShadow: "0 10px 28px rgba(241,48,36,0.45)",
+              },
+            }}
+          >
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }

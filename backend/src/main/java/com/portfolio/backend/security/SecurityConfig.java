@@ -55,6 +55,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/projects/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/resume/**").permitAll()
 
+                // ===== PUBLIC: Profile Images (viewer reads them) =====
+                .requestMatchers(HttpMethod.GET, "/api/profile-image/**").permitAll()
+
                 // ===== ADMIN =====
                 .requestMatchers(HttpMethod.POST, "/api/projects/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,  "/api/projects/**").hasRole("ADMIN")
@@ -67,6 +70,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/resume/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE,"/api/resume/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT,  "/api/resume/**").hasRole("ADMIN")
+
+                // ===== ADMIN: Profile Image upload/delete =====
+                .requestMatchers(HttpMethod.POST, "/api/profile-image/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/profile-image/**").hasRole("ADMIN")
 
                 .anyRequest().permitAll()
             )
