@@ -243,12 +243,13 @@ function SkillCategoryGroup({ category, skills: skillList }) {
   if (!skillList?.length) return null;
 
   const categoryMeta = {
-    Frontend: { emoji: "🎨", color: "#f13024" },
-    Backend:  { emoji: "⚙️", color: "#f97316" },
-    Database: { emoji: "🗄️", color: "#3b82f6" },
-    Tools:    { emoji: "🛠️", color: "#a855f7" },
+    Frontend: { icon: MdCode,     color: "#f13024" },
+    Backend:  { icon: MdTerminal, color: "#f97316" },
+    Database: { icon: MdWork,     color: "#3b82f6" },
+    Tools:    { icon: MdTimeline, color: "#a855f7" },
   };
-  const meta = categoryMeta[category] || { emoji: "💡", color: "#f13024" };
+  const meta = categoryMeta[category] || { icon: MdCode, color: "#f13024" };
+  const CategoryIcon = meta.icon;
 
   return (
     <Box className="skill-category-group">
@@ -257,7 +258,7 @@ function SkillCategoryGroup({ category, skills: skillList }) {
           className="skill-category-badge"
           style={{ background: `${meta.color}22`, borderColor: `${meta.color}44` }}
         >
-          <span className="skill-category-emoji">{meta.emoji}</span>
+          <CategoryIcon style={{ fontSize: "1rem", color: meta.color, flexShrink: 0 }} />
           <Typography
             className="skill-category-title"
             style={{ color: meta.color }}
