@@ -2830,40 +2830,12 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   width: 100%;
   height: 100%;
   display: block;
-  cursor: crosshair;
+  cursor: grab;
 }
 
-/* Legend */
-.skillsbucket-legend {
-  position: absolute;
-  bottom: 14px;
-  left: 18px;
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-  pointer-events: none;
+.skillsbucket-canvas:active {
+  cursor: grabbing;
 }
-
-.sbb-legend-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.70rem;
-  font-weight: 700;
-  opacity: 0.65;
-  font-family: "Inter", sans-serif;
-}
-
-.sbb-legend-dot {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  display: inline-block;
-}
-
-.mode-dark .sbb-legend-label { color: rgba(255,255,255,0.7); }
-.mode-light .sbb-legend-label { color: rgba(17,24,39,0.7); }
 
 /* Arranged layout */
 .skillsbucket-arranged {
@@ -2971,7 +2943,11 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   width: 100%;
   height: 100%;
   display: block;
-  cursor: crosshair;
+  cursor: grab;
+}
+
+.skillbox-canvas:active {
+  cursor: grabbing;
 }
 
 /* Grid arranged items */
