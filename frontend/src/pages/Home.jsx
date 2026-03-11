@@ -128,94 +128,85 @@ async function blobDownload(url) {
 }
 
 // =============================================
-// SKILL LOGOS MAP
+// DYNAMIC SKILL LOGO RESOLVER
+// Converts any skill name → devicon CDN slug
+// and tries 4 URL patterns before fallback
 // =============================================
-const SKILL_LOGOS = {
-  "html5":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
-  "html":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
-  "css3":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
-  "css":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
-  "react":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
-  "react.js":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
-  "reactjs":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
-  "tailwind":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
-  "tailwindcss":"https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
-  "vue":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg",
-  "vue.js":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg",
-  "angular":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/angularjs/angularjs-original.svg",
-  "next.js":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
-  "nextjs":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
-  "typescript": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
-  "ts":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
-  "javascript": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
-  "javascript (js)": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
-  "js":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
-  "bootstrap":  "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/bootstrap/bootstrap-original.svg",
-  "sass":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sass/sass-original.svg",
-  "figma":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
-  "flutter":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg",
-  "node.js":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
-  "nodejs":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
-  "node":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
-  "python":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
-  "java":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
-  "php":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/php/php-original.svg",
-  "express":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg",
-  "express.js": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg",
-  "django":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg",
-  "fastapi":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/fastapi/fastapi-original.svg",
-  "spring":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg",
-  "go":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/go/go-original-wordmark.svg",
-  "rust":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/rust/rust-original.svg",
-  "c":          "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/c/c-original.svg",
-  "c++":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg",
-  "c#":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg",
-  "ruby":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/ruby/ruby-original.svg",
-  "kotlin":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg",
-  "swift":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/swift/swift-original.svg",
-  "mysql":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
-  "postgresql": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
-  "postgres":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
-  "sql":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
-  "mongodb":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
-  "firebase":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg",
-  "redis":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg",
-  "sqlite":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/sqlite/sqlite-original.svg",
-  "supabase":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg",
-  "oracle":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/oracle/oracle-original.svg",
-  "git":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg",
-  "github":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg",
-  "docker":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg",
-  "kubernetes": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg",
-  "aws":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg",
-  "gcp":        "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg",
-  "google cloud":"https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg",
-  "azure":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg",
-  "linux":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg",
-  "nginx":      "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg",
-  "vs":         "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
-  "vscode":     "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
-  "vs code":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg",
-  "android studio": "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/androidstudio/androidstudio-original.svg",
-  "postman":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postman/postman-original.svg",
-  "webpack":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/webpack/webpack-original.svg",
-  "vite":       "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg",
-  "graphql":    "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg",
-  "solidity":   "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/solidity/solidity-original.svg",
-};
+function toDeviconSlug(name) {
+  const raw = safeString(name).trim().toLowerCase();
+
+  const overrides = {
+    "html":           "html5",
+    "html5":          "html5",
+    "css":            "css3",
+    "css3":           "css3",
+    "js":             "javascript",
+    "javascript (js)":"javascript",
+    "node":           "nodejs",
+    "node.js":        "nodejs",
+    "nodejs":         "nodejs",
+    "react":          "react",
+    "react.js":       "react",
+    "reactjs":        "react",
+    "next.js":        "nextjs",
+    "nextjs":         "nextjs",
+    "vue":            "vuejs",
+    "vue.js":         "vuejs",
+    "tailwind":       "tailwindcss",
+    "tailwindcss":    "tailwindcss",
+    "express":        "express",
+    "express.js":     "express",
+    "postgres":       "postgresql",
+    "sql":            "mysql",
+    "c++":            "cplusplus",
+    "c#":             "csharp",
+    "android studio": "androidstudio",
+    "vs":             "vscode",
+    "vs code":        "vscode",
+    "google cloud":   "googlecloud",
+    "gcp":            "googlecloud",
+    "aws":            "amazonwebservices",
+    "solidity":       "solidity",
+    "spring boot":    "spring",
+    "three.js":       "threejs",
+    "nuxt.js":        "nuxtjs",
+    "nuxt":           "nuxtjs",
+  };
+
+  if (overrides[raw]) return overrides[raw];
+
+  return raw
+    .replace(/\.js$/i, "js")
+    .replace(/\./g, "")
+    .replace(/\s+/g, "")
+    .replace(/[^a-z0-9]/g, "");
+}
 
 function resolveSkillLogo(name) {
-  const key = safeString(name).trim().toLowerCase();
-  return SKILL_LOGOS[key] || null;
+  const slug = toDeviconSlug(name);
+  if (!slug) return null;
+  return {
+    primary:   `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${slug}/${slug}-original.svg`,
+    fallback1: `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${slug}/${slug}-plain.svg`,
+    fallback2: `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${slug}/${slug}-original-wordmark.svg`,
+    fallback3: `https://cdn.jsdelivr.net/gh/devicons/devicon/icons/${slug}/${slug}-plain-wordmark.svg`,
+  };
 }
 
 // =============================================
 // SKILL LOGO CARD
+// Tries 4 URL patterns before showing initials
 // =============================================
 function SkillLogoCard({ name, index }) {
-  const logoUrl = resolveSkillLogo(name);
-  const [imgError, setImgError] = useState(false);
+  const logoInfo = resolveSkillLogo(name);
   const initials = safeString(name).slice(0, 3).toUpperCase();
+  const [urlIndex, setUrlIndex] = useState(0);
+
+  const urls = logoInfo
+    ? [logoInfo.primary, logoInfo.fallback1, logoInfo.fallback2, logoInfo.fallback3]
+    : [];
+
+  const currentUrl = urls[urlIndex] || null;
 
   return (
     <Box
@@ -226,12 +217,13 @@ function SkillLogoCard({ name, index }) {
       <Box className="skill-logo-card-inner">
         <Box className="skill-logo-glow-ring" />
         <Box className="skill-logo-icon-wrap">
-          {logoUrl && !imgError ? (
+          {currentUrl ? (
             <img
-              src={logoUrl}
+              key={currentUrl}
+              src={currentUrl}
               alt={name}
               className="skill-logo-img"
-              onError={() => setImgError(true)}
+              onError={() => setUrlIndex((prev) => prev + 1)}
               loading="lazy"
             />
           ) : (
@@ -1124,9 +1116,6 @@ export default function Home({ toggleTheme }) {
           </MotionBox>
         );
 
-      // =============================================
-      // SKILLS — LOGO GRID (replaces old table)
-      // =============================================
       case "skills":
         return (
           <MotionBox key="skills" custom={navDirection} variants={pageVariants}
