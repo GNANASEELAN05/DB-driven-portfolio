@@ -128,6 +128,182 @@ async function blobDownload(url) {
 }
 
 // =============================================
+// LANGUAGE LOGO CARD — Advanced Horizontal Bento Row
+// =============================================
+function LanguageLogoCard({ lang, index }) {
+  const language   = safeString(lang?.language) || "—";
+  const level      = safeString(lang?.level).trim().toLowerCase();
+  const rawYears   = typeof lang?.years === "number"
+    ? lang.years
+    : Number.parseFloat(String(lang?.years ?? "0").replace(/[^\d.]/g, "") || "0");
+  const years      = Number.isFinite(rawYears) ? Math.max(0, Math.min(5, rawYears)) : 0;
+
+  const levelMap   = { beginner: 1, intermediate: 2, advanced: 3 };
+  const levelSteps = levelMap[level] ?? 0;
+  const levelPct   = { beginner: 33, intermediate: 66, advanced: 100 }[level] ?? 0;
+  const yearsPct   = (years / 5) * 100;
+  const levelLabel = level ? level.charAt(0).toUpperCase() + level.slice(1) : "—";
+
+  const levelColor = { beginner: "#f13024", intermediate: "#f97316", advanced: "#fbbf24" }[level] || "#f97316";
+  const levelBg    = { beginner: "rgba(241,48,36,0.12)", intermediate: "rgba(249,115,22,0.12)", advanced: "rgba(251,191,36,0.12)" }[level] || "rgba(249,115,22,0.12)";
+
+  const logoInfo = resolveSkillLogo(language);
+  const initials = language.slice(0, 3).toUpperCase();
+  const [urlIndex, setUrlIndex] = React.useState(0);
+  const urls = logoInfo
+    ? [logoInfo.primary, logoInfo.fallback1, logoInfo.fallback2, logoInfo.fallback3]
+    : [];
+  const currentUrl = urls[urlIndex] || null;
+
+  // Gauge arc math (compact 200° sweep)
+  const R = 18;
+  const SWEEP = 200;
+  const GAP = (360 - SWEEP) / 2;
+  const toXY = (angleDeg, r) => {
+    const rad = ((angleDeg - 90) * Math.PI) / 180;
+    return { x: 24 + r * Math.cos(rad), y: 24 + r * Math.sin(rad) };
+  };
+  const startAngle = 90 + GAP;
+  const s = toXY(startAngle, R);
+  const e = toXY(startAngle + SWEEP, R);
+  const arcTrack = `M ${s.x} ${s.y} A ${R} ${R} 0 1 1 ${e.x} ${e.y}`;
+  const fillAngle = startAngle + (levelPct / 100) * SWEEP;
+  const fe = toXY(fillAngle, R);
+  const largeArc = (levelPct / 100) * SWEEP > 180 ? 1 : 0;
+  const arcFill = levelPct > 0
+    ? `M ${s.x} ${s.y} A ${R} ${R} 0 ${largeArc} 1 ${fe.x} ${fe.y}`
+    : "";
+
+  return (
+    <Box
+      className="langrow-card"
+      style={{ animationDelay: `${index * 0.07}s`, "--lc": levelColor, "--lb": levelBg }}
+    >
+      {/* Diagonal accent stripe */}
+      <Box className="langrow-stripe" style={{ background: `linear-gradient(135deg, ${levelColor}22 0%, transparent 60%)` }} />
+
+      {/* Index badge */}
+      <Box className="langrow-index">
+        {String(index + 1).padStart(2, "0")}
+      </Box>
+
+      {/* LEFT: Logo block */}
+      <Box className="langrow-left">
+        <Box className="langrow-logo-ring" style={{ boxShadow: `0 0 0 1px ${levelColor}33, 0 0 20px ${levelColor}22` }}>
+          <Box className="langrow-logo-halo" style={{ background: `radial-gradient(circle, ${levelColor}30, transparent 70%)` }} />
+          {currentUrl ? (
+            <img
+              key={currentUrl}
+              src={currentUrl}
+              alt={language}
+              className="langrow-logo-img"
+              onError={() => setUrlIndex((p) => p + 1)}
+              loading="lazy"
+            />
+          ) : (
+            <Box className="langrow-logo-fallback" style={{ color: levelColor, WebkitTextFillColor: levelColor }}>{initials}</Box>
+          )}
+        </Box>
+        <Box className="langrow-name-block">
+          <Typography className="langrow-name">{language}</Typography>
+          <Box className="langrow-level-chip" style={{ background: levelBg, borderColor: `${levelColor}44`, color: levelColor, WebkitTextFillColor: levelColor }}>
+            <span className="langrow-dot" style={{ background: levelColor, boxShadow: `0 0 5px ${levelColor}` }} />
+            {levelLabel}
+          </Box>
+        </Box>
+      </Box>
+
+      {/* CENTER: Skill dots + exp bar */}
+      <Box className="langrow-center">
+        {/* 3 skill dots */}
+        <Box className="langrow-dots-row">
+          {[1, 2, 3].map((step) => (
+            <Box
+              key={step}
+              className="langrow-dot-seg"
+              style={{
+                background: step <= levelSteps
+                  ? `linear-gradient(135deg, ${levelColor}, ${levelColor}bb)`
+                  : undefined,
+                boxShadow: step <= levelSteps ? `0 0 8px ${levelColor}66` : undefined,
+                borderColor: step <= levelSteps ? levelColor : undefined,
+              }}
+            />
+          ))}
+          <Typography className="langrow-level-text" style={{ color: levelColor, WebkitTextFillColor: levelColor }}>
+            {levelLabel}
+          </Typography>
+        </Box>
+
+        {/* Exp track */}
+        <Box className="langrow-exp-section">
+          <Box className="langrow-exp-label-row">
+            <Typography className="langrow-exp-label">EXP TRACK</Typography>
+            <Typography className="langrow-exp-value" style={{ color: levelColor, WebkitTextFillColor: levelColor }}>
+              {years} / 5 yrs
+            </Typography>
+          </Box>
+          <Box className="langrow-exp-track">
+            <Box
+              className="langrow-exp-fill"
+              style={{
+                width: `${yearsPct}%`,
+                background: `linear-gradient(90deg, ${levelColor}dd, ${levelColor}88)`,
+                boxShadow: `0 0 10px ${levelColor}55`,
+              }}
+            >
+              <Box className="langrow-exp-shimmer" />
+            </Box>
+            {/* Tick marks */}
+            {[0, 1, 2, 3, 4, 5].map((t) => (
+              <Box
+                key={t}
+                className="langrow-tick"
+                style={{ left: `${(t / 5) * 100}%`, background: t <= years ? levelColor : undefined }}
+              />
+            ))}
+          </Box>
+          <Box className="langrow-exp-scale">
+            {[0, 1, 2, 3, 4, 5].map((t) => (
+              <span key={t}>{t}</span>
+            ))}
+          </Box>
+        </Box>
+      </Box>
+
+      {/* RIGHT: Compact gauge */}
+      <Box className="langrow-right">
+        <svg viewBox="0 0 48 48" fill="none" className="langrow-gauge-svg">
+          <defs>
+            <linearGradient id={`lg-${index}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={levelColor} stopOpacity="0.95" />
+              <stop offset="100%" stopColor={level === "beginner" ? "#f97316" : level === "intermediate" ? "#fbbf24" : "#ffe066"} stopOpacity="1" />
+            </linearGradient>
+          </defs>
+          <path d={arcTrack} stroke="rgba(255,255,255,0.07)" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+          {arcFill && (
+            <path
+              d={arcFill}
+              stroke={`url(#lg-${index})`}
+              strokeWidth="3.5"
+              strokeLinecap="round"
+              fill="none"
+              style={{ filter: `drop-shadow(0 0 3px ${levelColor}88)` }}
+            />
+          )}
+          <text x="24" y="22" textAnchor="middle" dominantBaseline="middle"
+            fill={levelColor} fontSize="8" fontWeight="900" fontFamily="Inter, sans-serif"
+            letterSpacing="-0.3">{levelPct}%</text>
+          <text x="24" y="31" textAnchor="middle" dominantBaseline="middle"
+            fill="rgba(255,255,255,0.28)" fontSize="4.5" fontWeight="700" fontFamily="Inter, sans-serif"
+            letterSpacing="0.5">LEVEL</text>
+        </svg>
+      </Box>
+    </Box>
+  );
+}
+
+// =============================================
 // DYNAMIC SKILL LOGO RESOLVER
 // Converts any skill name → devicon CDN slug
 // and tries 4 URL patterns before fallback
@@ -1252,34 +1428,34 @@ export default function Home({ toggleTheme }) {
           </MotionBox>
         );
 
-      case "languages":
-        return (
-          <MotionBox key="languages" custom={navDirection} variants={pageVariants}
-            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-            <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Programming Languages" subtitle="Language proficiency and years of experience." />
-                <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 } }}>
-                  {loading ? <Skeleton height={220} sx={{ mt: 2 }} /> : languages.length ? (
-                    <Box className="lang-grid">
-                      {languages.map((lang, idx) => (
-                        <Box key={lang?.id ?? idx} className="language-card">
-                          <Box className="language-card-head">
-                            <Typography className="language-name">{safeString(lang?.language) || "—"}</Typography>
-                          </Box>
-                          <Stack spacing={1.4} sx={{ mt: 1.25 }}>
-                            <LanguageLevelBar level={lang?.level} />
-                            <LanguageYearsBar years={lang?.years} />
-                          </Stack>
-                        </Box>
-                      ))}
-                    </Box>
-                  ) : <Typography sx={{ mt: 2 }}>No language experience added yet.</Typography>}
-                </GlassPanel>
-              </MotionBox>
+case "languages":
+  return (
+    <MotionBox key="languages" custom={navDirection} variants={pageVariants}
+      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+      <Box className="section-scroll-area">
+        <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+          <SectionHeading title="Programming Languages" subtitle="Language proficiency and years of experience." />
+          {loading ? (
+            <Box className="langrow-grid">
+              {[...Array(6)].map((_, i) => (
+  <Skeleton key={i} height={90} sx={{ borderRadius: 3 }} />
+))}
             </Box>
-          </MotionBox>
-        );
+          ) : languages.length ? (
+            <Box className="langrow-grid">
+              {languages.map((lang, idx) => (
+                <LanguageLogoCard key={lang?.id ?? idx} lang={lang} index={idx} />
+              ))}
+            </Box>
+          ) : (
+            <GlassPanel sx={{ p: 3 }}>
+              <Typography>No language experience added yet.</Typography>
+            </GlassPanel>
+          )}
+        </MotionBox>
+      </Box>
+    </MotionBox>
+  );
 
       case "contact":
         return (
