@@ -519,7 +519,7 @@ function ProjectCard({ project }) {
           {techList.map((tech, i) => <Chip key={`${tech}-${i}`} label={tech} size="small" className="project-chip" />)}
         </Stack>
       ) : null}
-      <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap", rowGap: "10px" }}>
+      <Stack direction={{ xs: "column", sm: "row" }} sx={{ mt: 3, gap: 1.2 }}>
 {repoUrl ? (
   <Button variant="outlined" startIcon={<MdLink />}
     onClick={() => window.open(repoUrl, "_blank", "noopener,noreferrer")}
@@ -1130,17 +1130,17 @@ export default function Home({ toggleTheme }) {
                   <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap", rowGap: "10px" }}>
 {socials?.github ? (
   <Button variant="outlined" startIcon={<FaGithub />}
-    sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
+    sx={{ borderRadius: 999, fontWeight: 700, width: { xs: "100%", sm: "auto" }, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
     onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>GitHub</Button>
 ) : null}
 {socials?.linkedin ? (
   <Button variant="outlined" startIcon={<FaLinkedin />}
-    sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
+    sx={{ borderRadius: 999, fontWeight: 700, width: { xs: "100%", sm: "auto" }, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
     onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>LinkedIn</Button>
 ) : null}
 {socials?.website ? (
   <Button variant="outlined" startIcon={<MdLink />}
-    sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
+    sx={{ borderRadius: 999, fontWeight: 700, width: { xs: "100%", sm: "auto" }, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
     onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>Website</Button>
 ) : null}
                   </Stack>
