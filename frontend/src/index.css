@@ -2982,10 +2982,30 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   to   { opacity:1; transform: scale(1) rotate(0deg); }
 }
 
-.skillbox-item:hover { transform: translateY(-4px) scale(1.05); }
+.skillbox-item:hover {
+  transform: translateY(-4px) scale(1.06);
+}
 
-.mode-dark .skillbox-item { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); }
-.mode-light .skillbox-item { background: rgba(17,24,39,0.04); border: 1px solid rgba(17,24,39,0.08); }
+.mode-dark .skillbox-item {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+.mode-light .skillbox-item {
+  background: rgba(17,24,39,0.04);
+  border: 1px solid rgba(17,24,39,0.08);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+.mode-dark .skillbox-item:hover {
+  background: rgba(255,255,255,0.09);
+  box-shadow: -6px 0 18px rgba(255,255,255,0.08), 6px 0 18px rgba(255,255,255,0.04), 0 8px 24px rgba(0,0,0,0.35);
+  border-color: rgba(255,255,255,0.18);
+}
+.mode-light .skillbox-item:hover {
+  background: rgba(255,255,255,0.95);
+  box-shadow: -6px 0 18px rgba(17,24,39,0.10), 6px 0 18px rgba(17,24,39,0.06), 0 8px 24px rgba(0,0,0,0.12);
+  border-color: rgba(17,24,39,0.18);
+}
 
 .skillbox-item-logo {
   width: 42px;
@@ -2996,6 +3016,11 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.skillbox-item:hover .skillbox-item-logo {
+  transform: rotate(-6deg) scale(1.12);
 }
 
 .skillbox-item-name {

@@ -1017,7 +1017,14 @@ function CategoryBox({ category, items }) {
           title={gridMode ? "Physics mode" : "Arrange in grid"}
           onClick={() => setGridMode((p) => !p)}
         >
-          {gridMode ? "🌀" : "⊞"}
+          {gridMode ? (
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+  <circle cx="12" cy="12" r="2"/>
+  <ellipse cx="12" cy="12" rx="10" ry="4"/>
+  <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/>
+  <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>
+</svg>
+          ) : "⊞"}
         </button>
       </Box>
 
@@ -1026,7 +1033,10 @@ function CategoryBox({ category, items }) {
           <Box className="skillbox-grid">
             {items.map((name, i) => (
               <Box key={i} className="skillbox-item" style={{ animationDelay: `${i * 0.04}s` }}>
-                <Box className="skillbox-item-logo" style={{ borderColor: `${col}44`, background: `${col}11` }}>
+                <Box className="skillbox-item-logo" style={{ borderColor: `${col}44`, background: `${col}11`, transition: "box-shadow 0.22s ease" }}
+                  onMouseEnter={e => e.currentTarget.style.boxShadow = `0 0 14px ${col}66, inset 0 0 8px ${col}22`}
+                  onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}
+                >
                   <SkillImg name={name} size={26} />
                 </Box>
                 <Typography className="skillbox-item-name">{name}</Typography>
