@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import emailjs from "@emailjs/browser";
 import {
   Box,
   Button,
@@ -1113,45 +1114,284 @@ export default function Home({ toggleTheme }) {
           </MotionBox>
         );
 
-      case "contact":
-        return (
-          <MotionBox key="contact" custom={navDirection} variants={pageVariants}
-            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-            <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Contact" subtitle="Let's build something great together." />
-                <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 }, mb: 3 }}>
-                  <Typography className="timeline-title">Get in touch</Typography>
-                  <Stack spacing={1.6} sx={{ mt: 2 }}>
-                    {contactEmail ? <Typography className="contact-line"><MdEmail style={{ marginRight: 10 }} />{contactEmail}</Typography> : null}
-                    {socials?.phone ? <Typography className="contact-line"><MdPhone style={{ marginRight: 10 }} />{safeString(socials.phone)}</Typography> : null}
-                    {location ? <Typography className="contact-line"><MdLocationOn style={{ marginRight: 10 }} />{location}</Typography> : null}
-                  </Stack>
-                  <Stack direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap", rowGap: "10px" }}>
-{socials?.github ? (
-  <Button variant="outlined" startIcon={<FaGithub />}
-    sx={{ borderRadius: 999, fontWeight: 700, width: { xs: "100%", sm: "auto" }, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
-    onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>GitHub</Button>
-) : null}
-{socials?.linkedin ? (
-  <Button variant="outlined" startIcon={<FaLinkedin />}
-    sx={{ borderRadius: 999, fontWeight: 700, width: { xs: "100%", sm: "auto" }, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
-    onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>LinkedIn</Button>
-) : null}
-{socials?.website ? (
-  <Button variant="outlined" startIcon={<MdLink />}
-    sx={{ borderRadius: 999, fontWeight: 700, width: { xs: "100%", sm: "auto" }, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
-    onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>Website</Button>
-) : null}
-                  </Stack>
-                </GlassPanel>
-                <Box className="portfolio-footer">
-                  <Typography>© {new Date().getFullYear()} {name}. All rights reserved.</Typography>
-                </Box>
-              </MotionBox>
+case "contact":
+  return (
+    <MotionBox key="contact" custom={navDirection} variants={pageVariants}
+      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+      <Box className="section-scroll-area">
+        <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+          <SectionHeading title="Contact" subtitle="Let's build something great together." />
+
+          {/* ── Single combined card: info left + form right ── */}
+          <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 }, mb: 3 }}>
+            <Box sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              gap: { xs: 3, md: 4 },
+            }}>
+
+              {/* LEFT: Get in touch info */}
+              <Box sx={{ flex: "0 0 auto", minWidth: 0, width: { xs: "100%", md: "38%" } }}>
+                <Typography className="timeline-title" sx={{ mb: 2 }}>Get in touch</Typography>
+                <Stack spacing={1.6}>
+                  {contactEmail ? (
+                    <Typography className="contact-line">
+                      <MdEmail style={{ marginRight: 10 }} />{contactEmail}
+                    </Typography>
+                  ) : null}
+                  {socials?.phone ? (
+                    <Typography className="contact-line">
+                      <MdPhone style={{ marginRight: 10 }} />{safeString(socials.phone)}
+                    </Typography>
+                  ) : null}
+                  {location ? (
+                    <Typography className="contact-line">
+                      <MdLocationOn style={{ marginRight: 10 }} />{location}
+                    </Typography>
+                  ) : null}
+                </Stack>
+                <Stack direction="row" flexWrap="wrap" sx={{ mt: 3, gap: 1.2 }}>
+                  {socials?.github ? (
+                    <Button variant="outlined" startIcon={<FaGithub />}
+                      sx={{
+                        borderRadius: 999, fontWeight: 700,
+                        borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important",
+                        "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" }
+                      }}
+                      onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>
+                      GitHub
+                    </Button>
+                  ) : null}
+                  {socials?.linkedin ? (
+                    <Button variant="outlined" startIcon={<FaLinkedin />}
+                      sx={{
+                        borderRadius: 999, fontWeight: 700,
+                        borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important",
+                        "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" }
+                      }}
+                      onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>
+                      LinkedIn
+                    </Button>
+                  ) : null}
+                  {socials?.website ? (
+                    <Button variant="outlined" startIcon={<MdLink />}
+                      sx={{
+                        borderRadius: 999, fontWeight: 700,
+                        borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important",
+                        "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" }
+                      }}
+                      onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>
+                      Website
+                    </Button>
+                  ) : null}
+                </Stack>
+              </Box>
+
+              {/* DIVIDER — vertical on desktop, horizontal on mobile */}
+              <Box sx={{
+                display: { xs: "none", md: "block" },
+                width: "1px",
+                background: "rgba(241,48,36,0.18)",
+                borderRadius: 4,
+                flexShrink: 0,
+              }} />
+              <Box sx={{
+                display: { xs: "block", md: "none" },
+                height: "1px",
+                background: "rgba(241,48,36,0.18)",
+                borderRadius: 4,
+              }} />
+
+              {/* RIGHT: Send a Message form */}
+              <Box sx={{ flex: 1, minWidth: 0 }}>
+                <ContactMessageCard contactEmail={contactEmail} name={name} />
+              </Box>
+
             </Box>
-          </MotionBox>
-        );
+          </GlassPanel>
+
+          <Box className="portfolio-footer">
+            <Typography>© {new Date().getFullYear()} {name}. All rights reserved.</Typography>
+          </Box>
+        </MotionBox>
+      </Box>
+    </MotionBox>
+  );
+
+
+
+
+// =============================================
+// CONTACT MESSAGE CARD
+// =============================================
+function ContactMessageCard({ contactEmail, name }) {
+  const [msgForm, setMsgForm] = useState({ name: "", email: "", message: "" });
+  const [msgStatus, setMsgStatus] = useState(null);
+  const [sending, setSending] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setMsgForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSend = async () => {
+    const { name: senderName, email: senderEmail, message } = msgForm;
+
+    if (!senderName.trim() || !senderEmail.trim() || !message.trim()) {
+      setMsgStatus("error");
+      return;
+    }
+
+    try {
+      setSending(true);
+      setMsgStatus(null);
+
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        {
+          name: senderName,
+          email: senderEmail,
+          message,
+          to_email: contactEmail || "",
+          portfolio_name: name || "",
+        },
+        {
+          publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+        }
+      );
+
+      setMsgStatus("sent");
+      setMsgForm({ name: "", email: "", message: "" });
+
+      setTimeout(() => setMsgStatus(null), 4000);
+    } catch (error) {
+      console.error("EmailJS send failed:", error);
+      setMsgStatus("failed");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const inputSx = {
+    width: "100%",
+    padding: "10px 14px",
+    borderRadius: "12px",
+    border: "1.5px solid rgba(241,48,36,0.25)",
+    background: "rgba(255,255,255,0.04)",
+    color: "inherit",
+    fontFamily: "inherit",
+    fontSize: "0.93rem",
+    outline: "none",
+    transition: "border-color 0.2s",
+    resize: "none",
+    boxSizing: "border-box",
+  };
+
+  return (
+    <Box>
+      <Typography className="timeline-title" sx={{ mb: 2 }}>
+        Send a Message
+      </Typography>
+
+      <Stack spacing={2}>
+        <Box>
+          <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, mb: 0.6, opacity: 0.75 }}>
+            Your Name
+          </Typography>
+          <input
+            name="name"
+            value={msgForm.name}
+            onChange={handleChange}
+            placeholder="John Doe"
+            style={inputSx}
+            onFocus={(e) => (e.target.style.borderColor = "#f13024")}
+            onBlur={(e) => (e.target.style.borderColor = "rgba(241,48,36,0.25)")}
+          />
+        </Box>
+
+        <Box>
+          <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, mb: 0.6, opacity: 0.75 }}>
+            Your Email
+          </Typography>
+          <input
+            name="email"
+            type="email"
+            value={msgForm.email}
+            onChange={handleChange}
+            placeholder="john@example.com"
+            style={inputSx}
+            onFocus={(e) => (e.target.style.borderColor = "#f13024")}
+            onBlur={(e) => (e.target.style.borderColor = "rgba(241,48,36,0.25)")}
+          />
+        </Box>
+
+        <Box>
+          <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, mb: 0.6, opacity: 0.75 }}>
+            Message
+          </Typography>
+          <textarea
+            name="message"
+            value={msgForm.message}
+            onChange={handleChange}
+            placeholder="Write your message here…"
+            rows={4}
+            style={inputSx}
+            onFocus={(e) => (e.target.style.borderColor = "#f13024")}
+            onBlur={(e) => (e.target.style.borderColor = "rgba(241,48,36,0.25)")}
+          />
+        </Box>
+
+        {msgStatus === "error" && (
+          <Typography sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}>
+            Please fill in all fields before sending.
+          </Typography>
+        )}
+
+        {msgStatus === "sent" && (
+          <Typography sx={{ color: "#22c55e", fontSize: "0.82rem", fontWeight: 600 }}>
+            ✓ Message sent successfully.
+          </Typography>
+        )}
+
+        {msgStatus === "failed" && (
+          <Typography sx={{ color: "#f13024", fontSize: "0.82rem", fontWeight: 600 }}>
+            Failed to send message. Please try again.
+          </Typography>
+        )}
+
+        <Button
+          variant="contained"
+          startIcon={<MdEmail />}
+          onClick={handleSend}
+          disabled={sending}
+          sx={{
+            alignSelf: "flex-start",
+            borderRadius: 999,
+            px: 3,
+            py: 1.2,
+            fontWeight: 800,
+            textTransform: "none",
+            background: "linear-gradient(135deg, #f13024, #f97316) !important",
+            color: "white !important",
+            boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
+            "&:hover": {
+              background: "linear-gradient(135deg, #d42a1e, #e8650a) !important",
+              boxShadow: "0 10px 28px rgba(241,48,36,0.45)",
+              transform: "translateY(-1px)",
+            },
+            "&.Mui-disabled": {
+              color: "rgba(255,255,255,0.7) !important",
+              background: "rgba(241,48,36,0.45) !important",
+            },
+          }}
+        >
+          {sending ? "Sending..." : "Send Message"}
+        </Button>
+      </Stack>
+    </Box>
+  );
+}
 
       default:
         return null;
