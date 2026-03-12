@@ -1180,12 +1180,15 @@ useEffect(() => {
     return () => { alive = false; };
   }, [reloadTick]);
 
-  useEffect(() => {
-    const sync = () => reload();
-    const onStorage = (e) => {
-      if (!e) return;
-      if (e.key === "content_version" || e.key === "active_resume_file_name" || e.key === "resume_file_name") sync();
-    };
+useEffect(() => {
+  const sync = () => {
+    reload();
+    setImageBust(Date.now()); // ← add this line
+  };
+  const onStorage = (e) => {
+    if (!e) return;
+    if (e.key === "content_version" || e.key === "active_resume_file_name" || e.key === "resume_file_name") sync();
+  };
     const onVis = () => { if (document.visibilityState === "visible") sync(); };
     window.addEventListener("storage", onStorage);
     window.addEventListener("focus", sync);
@@ -1302,14 +1305,18 @@ const onPreviewCertificate = async (achId, achTitle) => {
 
 // Change /api/profile-image/animated → /api/profile-image/view/animated
 const resolvedAnimatedSrc = useMemo(() => {
-  const found = profileImages.find((i) => i.imageType === "animated");
+  const found = profileImages.find((i) => i.imageType === "animated" && i.primary === true);
   if (found) return `${API_BASE}/api/profile-image/animated?t=${imageBust}`;
+  const anyAnimated = profileImages.find((i) => i.imageType === "animated");
+  if (anyAnimated) return `${API_BASE}/api/profile-image/animated?t=${imageBust}`;
   return AnimatedPhoto;
 }, [profileImages, imageBust]);
 
 const resolvedOriginalSrc = useMemo(() => {
-  const found = profileImages.find((i) => i.imageType === "original");
+  const found = profileImages.find((i) => i.imageType === "original" && i.primary === true);
   if (found) return `${API_BASE}/api/profile-image/original?t=${imageBust}`;
+  const anyOriginal = profileImages.find((i) => i.imageType === "original");
+  if (anyOriginal) return `${API_BASE}/api/profile-image/original?t=${imageBust}`;
   return OriginalPhoto;
 }, [profileImages, imageBust]);
   // ─────────────────────────────────────────────────────────────────────────
@@ -1374,12 +1381,13 @@ const resolvedOriginalSrc = useMemo(() => {
                     </MotionBox>
                   </Box>
                   {/* ── CHANGED: pass resolved src props ── */}
-                  <Box className="hero-right">
-                    <ProfilePhotoCard
-                      animatedSrc={resolvedAnimatedSrc}
-                      originalSrc={resolvedOriginalSrc}
-                    />
-                  </Box>
+<Box className="hero-right">
+  <ProfilePhotoCard
+    key={`photo-${imageBust}`}
+    animatedSrc={resolvedAnimatedSrc}
+    originalSrc={resolvedOriginalSrc}
+  />
+</Box>
                 </Box>
               </MotionBox>
             </Box>

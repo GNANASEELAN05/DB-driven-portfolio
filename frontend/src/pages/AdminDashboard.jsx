@@ -1915,58 +1915,71 @@ const onPreviewProfileImage = async (type) => {
                     <TC bold sx={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                       {img.filename}
                     </TC>
-                    <TC>
-                      {img.primary
-                        ? <Chip size="small" label="PRIMARY" icon={<MdStar style={{ color: "#ff9800", fontSize: "0.85rem" }} />} className="adm-chip-primary" />
-                        : <Typography variant="caption" sx={{ opacity: 0.4 }}>—</Typography>}
-                    </TC>
-                    <TC sx={{ opacity: 0.65, fontSize: "0.8rem" }}>{formatDate(img.uploadedAt)}</TC>
-                    <TC sx={{ textAlign: "right" }}>
-                      <Stack direction="row" spacing={0.8} justifyContent="flex-end">
-                        <Tooltip title="Preview">
-                          <IconButton
-                            size="small"
-                            className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
-                            onClick={() => {
-                              setImgPreviewTitle(img.filename || type);
-                              setImgPreviewSrc(imgBlobUrls[img.id] || "");
-                              setImgPreviewOpen(true);
-                            }}
-                          >
-                            <MdVisibility />
-                          </IconButton>
-                        </Tooltip>
-                        {!img.primary && (
-                          <Tooltip title="Set as Primary">
-                            <IconButton
-                              size="small"
-                              className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
-                              onClick={async () => {
-                                try {
-                                  setErr(""); setOk(""); setLoading(true);
-                                  await http.put(`/profile-image/set-primary/${img.id}`);
-                                  setOk(`Set as primary ${type} image.`);
-                                  await fetchProfileImages();
-                                  bumpContentVersion();
-                                } catch { setErr("Failed to set primary."); }
-                                finally { setLoading(false); }
-                              }}
-                            >
-                              <MdStar />
-                            </IconButton>
-                          </Tooltip>
-                        )}
-                        <Tooltip title="Delete">
-                          <IconButton
-                            size="small"
-                            className="adm-icon-btn-err"
-                            onClick={() => onDeleteProfileImage(img.id, type)}
-                          >
-                            <MdDelete />
-                          </IconButton>
-                        </Tooltip>
-                      </Stack>
-                    </TC>
+<TC>
+  {img.primary
+    ? (
+      <Chip
+        size="small"
+        label="Image Live"
+        icon={<MdCheckCircle style={{ color: "#4ade80", fontSize: "0.85rem" }} />}
+        sx={{
+          background: "rgba(34,197,94,0.12)",
+          border: "1px solid rgba(34,197,94,0.35)",
+          color: "#4ade80",
+          fontWeight: 700,
+          fontSize: "0.72rem",
+        }}
+      />
+    )
+    : <Typography variant="caption" sx={{ opacity: 0.4 }}>—</Typography>}
+</TC>
+<TC sx={{ opacity: 0.65, fontSize: "0.8rem" }}>{formatDate(img.uploadedAt)}</TC>
+<TC sx={{ textAlign: "right" }}>
+  <Stack direction="row" spacing={0.8} justifyContent="flex-end">
+    <Tooltip title="Preview">
+      <IconButton
+        size="small"
+        className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+        onClick={() => {
+          setImgPreviewTitle(img.filename || type);
+          setImgPreviewSrc(imgBlobUrls[img.id] || "");
+          setImgPreviewOpen(true);
+        }}
+      >
+        <MdVisibility />
+      </IconButton>
+    </Tooltip>
+    {!img.primary && (
+      <Tooltip title="Push to Viewer (Set as Live)">
+        <IconButton
+          size="small"
+          className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+          onClick={async () => {
+            try {
+              setErr(""); setOk(""); setLoading(true);
+              await http.put(`/profile-image/set-primary/${img.id}`);
+              setOk(`"${img.filename}" is now live on your portfolio.`);
+              await fetchProfileImages();
+              bumpContentVersion();
+            } catch { setErr("Failed to push image to viewer."); }
+            finally { setLoading(false); }
+          }}
+        >
+          <MdUpload />
+        </IconButton>
+      </Tooltip>
+    )}
+    <Tooltip title="Delete">
+      <IconButton
+        size="small"
+        className="adm-icon-btn-err"
+        onClick={() => onDeleteProfileImage(img.id, type)}
+      >
+        <MdDelete />
+      </IconButton>
+    </Tooltip>
+  </Stack>
+</TC>
                   </TRow>
                 ))}
               </TableBody>
