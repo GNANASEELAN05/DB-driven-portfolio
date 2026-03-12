@@ -23,12 +23,16 @@ public class ProfileImageController {
     }
 
     // =========================================================
-    // PUBLIC: Get image by type (original / animated)
+    // PUBLIC: Get image by type — /api/profile-image/view/original
+    //                              /api/profile-image/view/animated
     // =========================================================
-    @GetMapping("/{type}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String type) {
-        Optional<ProfileImage> imageOpt = repo.findFirstByImageTypeOrderByUploadedAtDesc(type);
+    @GetMapping("/view/{type}")
+    public ResponseEntity<byte[]> getImageByType(@PathVariable String type) {
+        if (!type.equals("original") && !type.equals("animated")) {
+            return ResponseEntity.badRequest().build();
+        }
 
+        Optional<ProfileImage> imageOpt = repo.findFirstByImageTypeOrderByUploadedAtDesc(type);
         if (imageOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -37,29 +41,34 @@ public class ProfileImageController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(img.getContentType()));
         headers.setContentDisposition(
-            ContentDisposition.inline().filename(img.getFilename() != null ? img.getFilename() : "image").build()
+            ContentDisposition.inline()
+                .filename(img.getFilename() != null ? img.getFilename() : "image")
+                .build()
         );
+        // Prevent browser caching so updates show immediately
+        headers.setCacheControl(CacheControl.noCache().mustRevalidate());
         return new ResponseEntity<>(img.getData(), headers, HttpStatus.OK);
     }
 
     // =========================================================
-    // ADMIN: List all images (metadata only, no binary)
+    // PUBLIC: List all images metadata — /api/profile-image/list
     // =========================================================
     @GetMapping("/list")
     public ResponseEntity<List<Map<String, Object>>> listAll() {
         List<ProfileImage> all = repo.findAll();
         List<Map<String, Object>> result = all.stream().map(img -> Map.<String, Object>of(
-            "id", img.getId(),
-            "imageType", img.getImageType() != null ? img.getImageType() : "",
-            "filename", img.getFilename() != null ? img.getFilename() : "",
+            "id",          img.getId(),
+            "imageType",   img.getImageType() != null ? img.getImageType() : "",
+            "filename",    img.getFilename()  != null ? img.getFilename()  : "",
             "contentType", img.getContentType() != null ? img.getContentType() : "",
-            "uploadedAt", img.getUploadedAt() != null ? img.getUploadedAt().toString() : ""
+            "uploadedAt",  img.getUploadedAt()  != null ? img.getUploadedAt().toString() : ""
         )).toList();
         return ResponseEntity.ok(result);
     }
 
     // =========================================================
-    // ADMIN: Upload image by type (original / animated)
+    // ADMIN: Upload — /api/profile-image/upload/original
+    //                  /api/profile-image/upload/animated
     // =========================================================
     @PostMapping(value = "/upload/{type}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> upload(
@@ -73,14 +82,18 @@ public class ProfileImageController {
         String contentType = file.getContentType();
         if (contentType == null ||
             (!contentType.startsWith("image/jpeg") &&
-             !contentType.startsWith("image/jpg") &&
-             !contentType.startsWith("image/png") &&
-             !contentType.startsWith("image/gif") &&
+             !contentType.startsWith("image/jpg")  &&
+             !contentType.startsWith("image/png")  &&
+             !contentType.startsWith("image/gif")  &&
              !contentType.startsWith("image/webp"))) {
-            return ResponseEntity.badRequest().body("Only image files are allowed (JPEG, PNG, GIF, WebP)");
+            return ResponseEntity.badRequest().body("Only JPEG, PNG, GIF, WebP allowed");
         }
 
         try {
+            // Replace existing image of same type instead of accumulating
+            repo.findFirstByImageTypeOrderByUploadedAtDesc(type)
+                .ifPresent(existing -> repo.deleteById(existing.getId()));
+
             ProfileImage img = new ProfileImage();
             img.setImageType(type);
             img.setFilename(file.getOriginalFilename());
@@ -96,9 +109,9 @@ public class ProfileImageController {
     }
 
     // =========================================================
-    // ADMIN: Delete image by ID
+    // ADMIN: Delete by ID — /api/profile-image/delete/{id}
     // =========================================================
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         if (!repo.existsById(id)) {
             return ResponseEntity.notFound().build();

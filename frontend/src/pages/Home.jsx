@@ -66,8 +66,8 @@ const certFileUrl = (achId) =>
   `${API_BASE}/api/portfolio/achievements/${achId}/certificate`;
 // ─────────────────────────────────────────────────────────────────────────────
 
-const MotionBox = motion(Box);
-const MotionPaper = motion(Paper);
+const MotionBox = motion.create(Box);
+const MotionPaper = motion.create(Paper);
 
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -674,18 +674,28 @@ function ProfilePhotoCard({ animatedSrc, originalSrc }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
+      {/* Animated layer — shown by default */}
       <Box
         className="profile-photo-layer"
         style={{ opacity: showOriginal ? 0 : 1, transition: "opacity 0.75s ease" }}
       >
-        <img src={animatedSrc} alt="Animated profile" className="profile-photo-img" />
+        <img
+          src={animatedSrc}          // ← uses prop, falls back to default asset
+          alt="Animated profile"
+          className="profile-photo-img"
+        />
       </Box>
 
+      {/* Original layer — shown on click */}
       <Box
         className="profile-photo-layer"
         style={{ opacity: showOriginal ? 1 : 0, transition: "opacity 0.75s ease" }}
       >
-        <img src={originalSrc} alt="Original profile" className="profile-photo-img profile-photo-original" />
+        <img
+          src={originalSrc}          // ← uses prop, falls back to default asset
+          alt="Original profile"
+          className="profile-photo-img profile-photo-original"
+        />
       </Box>
 
       <Box
@@ -1117,21 +1127,22 @@ export default function Home({ toggleTheme }) {
   }, [skills]);
 
   // ── NEW: fetch profile images from DB ─────────────────────────────────────
-  useEffect(() => {
-    const fetchImgs = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/profile-image/list`);
-        if (res.ok) {
-          const data = await res.json();
-          setProfileImages(Array.isArray(data) ? data : []);
-          setImageBust(Date.now());
-        }
-      } catch {
-        // silently fall back to default images
+useEffect(() => {
+  const fetchImgs = async () => {
+    try {
+      const res = await fetch(`${API_BASE}/api/profile-image/list`);
+      if (res.ok) {
+        const data = await res.json();
+        setProfileImages(Array.isArray(data) ? data : []);
+        setImageBust(Date.now());
       }
-    };
-    fetchImgs();
-  }, [reloadTick]);
+    } catch {
+      // silently fall back to default images
+    }
+  };
+  fetchImgs();
+}, [reloadTick]);
+
   // ─────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -1235,27 +1246,41 @@ export default function Home({ toggleTheme }) {
     setCertPreviewIsImage(false);
   };
 
-  const onPreviewCertificate = async (achId, achTitle) => {
-    try {
-      setCertPreviewTitle(`Certificate — ${achTitle || "Achievement"}`);
-      setCertPreviewLoading(true);
-      setCertPreviewOpen(true);
-      setCertPreviewBlobUrl("");
-      setCertPreviewIsImage(false);
-      const res = await fetch(certFileUrl(achId), { method: "GET" });
-      if (!res.ok) throw new Error("Preview failed");
-      const blob = await res.blob();
-      const contentType = res.headers.get("content-type") || "application/pdf";
-      setCertPreviewIsImage(contentType.startsWith("image/"));
-      setCertPreviewBlobUrl(
-        URL.createObjectURL(new Blob([blob], { type: contentType }))
-      );
-    } catch {
-      setCertPreviewBlobUrl("");
-    } finally {
-      setCertPreviewLoading(false);
-    }
-  };
+const onPreviewCertificate = async (achId, achTitle) => {
+  setCertPreviewTitle(`Certificate — ${achTitle || "Achievement"}`);
+  setCertPreviewIsImage(false);
+  setCertPreviewBlobUrl("");
+  setCertPreviewLoading(true);
+  setCertPreviewOpen(true);
+
+  try {
+    const headers = {};
+    const token = localStorage.getItem("token");
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+
+    const res = await fetch(
+      `${API_BASE}/api/portfolio/achievements/${achId}/certificate`,
+      { headers }
+    );
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const contentType = res.headers.get("content-type") || "application/pdf";
+    const mimeType = contentType.split(";")[0].trim();
+    const arrayBuffer = await res.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+
+    setCertPreviewIsImage(mimeType.startsWith("image/"));
+    setCertPreviewBlobUrl(url);
+
+  } catch (e) {
+    console.error("Certificate preview failed:", e);
+    setCertPreviewBlobUrl("");
+  } finally {
+    setCertPreviewLoading(false);
+  }
+};
   // ─────────────────────────────────────────────────────────────────────────
 
   const onPreviewResume = async () => {
@@ -1282,20 +1307,18 @@ export default function Home({ toggleTheme }) {
     } finally { setDownloading(false); }
   };
 
-  // ── NEW: resolve which image src to use ──────────────────────────────────
-  const resolvedAnimatedSrc = useMemo(() => {
-    const found = profileImages.find((i) => i.imageType === "animated");
-    return found
-      ? `${API_BASE}/api/profile-image/animated?t=${imageBust}`
-      : AnimatedPhoto;
-  }, [profileImages, imageBust]);
+// Change /api/profile-image/animated → /api/profile-image/view/animated
+const resolvedAnimatedSrc = useMemo(() => {
+  const found = profileImages.find((i) => i.imageType === "animated");
+  if (found) return `${API_BASE}/api/profile-image/view/animated?t=${imageBust}`;
+  return AnimatedPhoto;
+}, [profileImages, imageBust]);
 
-  const resolvedOriginalSrc = useMemo(() => {
-    const found = profileImages.find((i) => i.imageType === "original");
-    return found
-      ? `${API_BASE}/api/profile-image/original?t=${imageBust}`
-      : OriginalPhoto;
-  }, [profileImages, imageBust]);
+const resolvedOriginalSrc = useMemo(() => {
+  const found = profileImages.find((i) => i.imageType === "original");
+  if (found) return `${API_BASE}/api/profile-image/view/original?t=${imageBust}`;
+  return OriginalPhoto;
+}, [profileImages, imageBust]);
   // ─────────────────────────────────────────────────────────────────────────
 
   const renderSection = () => {
@@ -1653,59 +1676,78 @@ case "languages":
         loading={resumePreviewLoading}
       />
 
-      {/* ── NEW: Certificate preview dialog ── */}
-      <Dialog open={certPreviewOpen} onClose={closeCertPreview} fullWidth maxWidth="lg">
-        <DialogTitle sx={{ fontWeight: 900 }}>{certPreviewTitle}</DialogTitle>
-        <DialogContent sx={{ height: 700, p: 0, overflow: "hidden", bgcolor: "black" }}>
-          {certPreviewLoading ? (
-            <Box sx={{ p: 3 }}>
-              <Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography>
-            </Box>
-          ) : certPreviewBlobUrl ? (
-            <Box sx={{ width: "100%", height: "100%", overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              {certPreviewIsImage ? (
-                <img
-                  src={certPreviewBlobUrl}
-                  alt={certPreviewTitle}
-                  style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", display: "block" }}
-                />
-              ) : (
-                <iframe
-                  title={certPreviewTitle}
-                  src={certPreviewBlobUrl}
-                  style={{ width: "100%", height: "100%", border: "none", display: "block" }}
-                />
-              )}
-            </Box>
-          ) : (
-            <Box sx={{ p: 3 }}>
-              <Typography sx={{ opacity: 0.75 }}>Preview not available.</Typography>
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions sx={{ p: 2 }}>
-          <Button
-            onClick={closeCertPreview}
-            variant="contained"
-            startIcon={<MdClose />}
-            sx={{
-              background: "linear-gradient(135deg, #f13024, #f97316)",
-              color: "white",
-              borderRadius: 999,
-              fontWeight: 800,
-              textTransform: "none",
-              px: 3,
-              boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
-              "&:hover": {
-                background: "linear-gradient(135deg, #d42a1e, #e8650a)",
-                boxShadow: "0 10px 28px rgba(241,48,36,0.45)",
-              },
+{/* ── NEW: Certificate preview dialog ── */}
+<Dialog open={certPreviewOpen} onClose={closeCertPreview} fullWidth maxWidth="lg">
+  <DialogTitle sx={{ fontWeight: 900 }}>{certPreviewTitle}</DialogTitle>
+  <DialogContent sx={{ height: 700, p: 0, overflow: "hidden", bgcolor: "black" }}>
+    {certPreviewLoading ? (
+      <Box sx={{ p: 3 }}>
+        <Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography>
+      </Box>
+    ) : certPreviewBlobUrl ? (
+      <Box
+        sx={{
+          width: "100%",
+          height: "100%",
+          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {certPreviewIsImage ? (
+          <img
+            src={certPreviewBlobUrl}
+            alt={certPreviewTitle}
+            style={{
+              maxWidth: "100%",
+              maxHeight: "100%",
+              objectFit: "contain",
+              display: "block",
             }}
-          >
-            Close
-          </Button>
-        </DialogActions>
-      </Dialog>
+          />
+        ) : (
+          <iframe
+            title={certPreviewTitle}
+            src={certPreviewBlobUrl}
+            style={{
+              width: "100%",
+              height: "100%",
+              border: "none",
+              display: "block",
+            }}
+          />
+        )}
+      </Box>
+    ) : (
+      <Box sx={{ p: 3 }}>
+        <Typography sx={{ opacity: 0.75 }}>Preview not available.</Typography>
+      </Box>
+    )}
+  </DialogContent>
+  <DialogActions sx={{ p: 2 }}>
+    <Button
+      onClick={closeCertPreview}
+      variant="contained"
+      startIcon={<MdClose />}
+      sx={{
+        background: "linear-gradient(135deg, #f13024, #f97316)",
+        color: "white",
+        borderRadius: 999,
+        fontWeight: 800,
+        textTransform: "none",
+        px: 3,
+        boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
+        "&:hover": {
+          background: "linear-gradient(135deg, #d42a1e, #e8650a)",
+          boxShadow: "0 10px 28px rgba(241,48,36,0.45)",
+        },
+      }}
+    >
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
     </Box>
   );
 }

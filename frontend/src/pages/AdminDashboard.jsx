@@ -457,6 +457,21 @@ export default function AdminDashboard(props) {
   const [imgUploading, setImgUploading] = useState(false);
   const [imgUploadType, setImgUploadType] = useState("");
 
+  const [imgPreviewOpen, setImgPreviewOpen] = useState(false);
+  const [imgPreviewSrc, setImgPreviewSrc] = useState("");
+  const [imgPreviewTitle, setImgPreviewTitle] = useState("");
+
+  const [pendingImages, setPendingImages] = useState({}); // { original: File, animated: File }
+  const [pendingPreviews, setPendingPreviews] = useState({}); // { original: objectUrl, animated: objectUrl }
+
+  const [certPreviewOpen, setCertPreviewOpen] = useState(false);
+  const [certPreviewSrc, setCertPreviewSrc] = useState("");
+  const [certPreviewTitle, setCertPreviewTitle] = useState("");
+  const [certPreviewIsImage, setCertPreviewIsImage] = useState(false);
+  const [certPreviewLoading, setCertPreviewLoading] = useState(false);
+
+  const [imgBlobUrls, setImgBlobUrls] = useState({});
+
   const handleDrawerToggle = () => setMobileOpen((p) => !p);
 
   // ── ALL HANDLERS ──────────────────────────────────────────────────────────
@@ -487,6 +502,58 @@ export default function AdminDashboard(props) {
     } catch { setErr("Failed to load Admin data. Check backend is running + token + CORS."); }
     finally { setLoading(false); }
   };
+
+
+  const onPreviewCertificate = async (ach) => {
+  setCertPreviewTitle(ach.title || "Certificate");
+  setCertPreviewSrc("");
+  setCertPreviewLoading(true);
+  setCertPreviewOpen(true);
+  const isImage = ach.certificateContentType?.startsWith("image/");
+  setCertPreviewIsImage(isImage);
+  try {
+    const res = await http.get(
+      `/portfolio/achievements/${ach.id}/certificate`,
+      { responseType: "arraybuffer" }
+    );
+    const contentType = res.headers["content-type"] || ach.certificateContentType || "application/pdf";
+    const blob = new Blob([res.data], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    setCertPreviewSrc(url);
+  } catch {
+    setCertPreviewSrc("");
+  } finally {
+    setCertPreviewLoading(false);
+  }
+};
+
+const closeCertPreview = () => {
+  setCertPreviewOpen(false);
+  if (certPreviewSrc) {
+    try { URL.revokeObjectURL(certPreviewSrc); } catch {}
+  }
+  setCertPreviewSrc("");
+};
+
+const loadProfileImageBlob = async (type) => {
+  try {
+    const res = await http.get(`/profile-image/view/${type}`, { responseType: "arraybuffer" });
+    const contentType = res.headers["content-type"] || "image/png";
+    const blob = new Blob([res.data], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    setImgBlobUrls((prev) => ({ ...prev, [type]: url }));
+  } catch {
+    // image not found
+  }
+};
+
+// In fetchProfileImages (or useEffect after profileImages loads), call:
+// After you set profileImages, call:
+React.useEffect(() => {
+  if (profileImages.length > 0) {
+    profileImages.forEach((img) => loadProfileImageBlob(img.imageType));
+  }
+}, [profileImages]);
 
   React.useEffect(() => { fetchAllAdmin(); }, []); // eslint-disable-line
 
@@ -824,27 +891,31 @@ export default function AdminDashboard(props) {
 
   React.useEffect(() => { fetchProfileImages(); }, []); // eslint-disable-line
 
-  const onUploadProfileImage = async (type, file) => {
-    if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setErr("Only image files are allowed (JPEG, PNG, GIF, WebP).");
-      return;
-    }
-    try {
-      setErr(""); setOk("");
-      setImgUploading(true);
-      setImgUploadType(type);
-      const formData = new FormData();
-      formData.append("file", file);
-      await http.post(`/profile-image/upload/${type}`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setOk(`${type === "original" ? "Original" : "Animated"} image uploaded.`);
-      await fetchProfileImages();
-      bumpContentVersion();
-    } catch { setErr("Image upload failed."); }
-    finally { setImgUploading(false); setImgUploadType(""); }
-  };
+const onUploadProfileImage = async (type, file) => {
+  if (!file) return;
+  if (!file.type.startsWith("image/")) {
+    setErr("Only image files are allowed (JPEG, PNG, GIF, WebP).");
+    return;
+  }
+  try {
+    setErr(""); setOk("");
+    setImgUploading(true);
+    setImgUploadType(type);
+    const formData = new FormData();
+    formData.append("file", file);
+    await http.post(`/profile-image/upload/${type}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    setOk(`${type === "original" ? "Original" : "Animated"} image saved to DB.`);
+    // Clear pending
+    if (pendingPreviews[type]) URL.revokeObjectURL(pendingPreviews[type]);
+    setPendingImages((p) => { const n = { ...p }; delete n[type]; return n; });
+    setPendingPreviews((p) => { const n = { ...p }; delete n[type]; return n; });
+    await fetchProfileImages();
+    bumpContentVersion();
+  } catch { setErr("Image upload failed."); }
+  finally { setImgUploading(false); setImgUploadType(""); }
+};
 
   const onDeleteProfileImage = async (id, type) => {
     setConfirmPayload({
@@ -855,7 +926,7 @@ export default function AdminDashboard(props) {
         setConfirmOpen(false);
         try {
           setErr(""); setOk(""); setLoading(true);
-          await http.delete(`/profile-image/${id}`);
+          await http.delete(`/profile-image/delete/${id}`);
           setOk("Image deleted.");
           await fetchProfileImages();
           bumpContentVersion();
@@ -865,6 +936,22 @@ export default function AdminDashboard(props) {
     });
     setConfirmOpen(true);
   };
+
+const onPreviewProfileImage = async (type) => {
+  setImgPreviewTitle(type === "original" ? "Original Image" : "Animated Image");
+  setImgPreviewSrc(""); // clear first
+  setImgPreviewOpen(true);
+  try {
+    const token = localStorage.getItem("token"); // or however you store JWT
+    const res = await http.get(`/profile-image/view/${type}`, { responseType: "arraybuffer" });
+    const contentType = res.headers["content-type"] || "image/png";
+    const blob = new Blob([res.data], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    setImgPreviewSrc(url);
+  } catch {
+    setImgPreviewSrc(""); // leave empty so error shows
+  }
+};
 
   const profileImgUrl = (type) =>
     `${import.meta.env.VITE_API_BASE || ""}/api/profile-image/${type}?t=${Date.now()}`;
@@ -1331,7 +1418,7 @@ export default function AdminDashboard(props) {
                                 <IconButton
                                   size="small"
                                   className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
-                                  onClick={() => window.open(certViewUrl(a.id), "_blank")}
+                                  onClick={() => onPreviewCertificate(a)}
                                 >
                                   <MdVisibility />
                                 </IconButton>
@@ -1379,6 +1466,58 @@ export default function AdminDashboard(props) {
                   ))}
                 </Grid>
               </SimpleItemDialog>
+              {/* Certificate Preview Dialog */}
+<Dialog
+  open={certPreviewOpen}
+  onClose={closeCertPreview}
+  fullWidth
+  maxWidth="md"
+  className={isDark ? "adm-dialog" : "adm-dialog adm-dialog-light"}
+>
+  <DialogTitle className="adm-dialog-title">{certPreviewTitle}</DialogTitle>
+  <DialogContent
+    sx={{
+      height: 650, p: 0, overflow: "hidden",
+      background: isDark ? "#000" : "#fff",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }}
+  >
+    {certPreviewLoading ? (
+      <Box sx={{ p: 2 }}>
+        <Typography sx={{ opacity: 0.7 }}>Loading preview…</Typography>
+      </Box>
+    ) : certPreviewSrc ? (
+      certPreviewIsImage ? (
+        <img
+          src={certPreviewSrc}
+          alt={certPreviewTitle}
+          style={{ maxWidth: "100%", maxHeight: 620, objectFit: "contain", borderRadius: 8 }}
+        />
+      ) : (
+        <Box sx={{
+          width: "100%", height: "100%", overflowY: "scroll", overflowX: "hidden",
+          position: "relative", scrollbarWidth: "none", msOverflowStyle: "none",
+          "&::-webkit-scrollbar": { width: "0px", background: "transparent" },
+        }}>
+          <iframe
+            title="Certificate Preview"
+            src={certPreviewSrc}
+            style={{ width: "100%", height: "200%", border: "none", display: "block" }}
+          />
+        </Box>
+      )
+    ) : (
+      <Box sx={{ p: 2 }}>
+        <Typography sx={{ opacity: 0.7 }}>Preview not available.</Typography>
+      </Box>
+    )}
+  </DialogContent>
+  <DialogActions sx={{ p: 2 }}>
+    <Button onClick={closeCertPreview} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>
+      Close
+    </Button>
+  </DialogActions>
+</Dialog>
             </Box>
           )}
 
@@ -1662,102 +1801,202 @@ export default function AdminDashboard(props) {
             </Box>
           )}
 
-          {active === "profile-image" && (
-            <Box className="adm-page-enter">
-              {["original", "animated"].map((type) => {
-                const img = profileImages.find((i) => i.imageType === type);
-                const isUploading = imgUploading && imgUploadType === type;
-                return (
-                  <Box key={type} sx={{ mb: 3.5 }}>
-                    <SectionHeader
-                      title={type === "original" ? "Original Image" : "Animated Image"}
-                      subtitle={type === "original" ? "Static profile photo shown on the home section" : "GIF / WebP animation shown alongside your intro"}
-                      right={
-                        <Button
-                          component="label"
-                          className="adm-btn-primary"
-                          size="small"
-                          startIcon={isUploading ? null : <MdUpload />}
-                          fullWidth={isMobile}
-                          disabled={isUploading}
-                        >
-                          {isUploading ? "Uploading…" : `Upload ${type === "original" ? "Original" : "Animated"}`}
-                          <input
-                            hidden
-                            type="file"
-                            accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
-                            onChange={(e) => e.target.files?.[0] && onUploadProfileImage(type, e.target.files[0])}
-                          />
-                        </Button>
-                      }
-                    />
-                    {img ? (
-                      <Paper
-                        elevation={0}
-                        className={`adm-glass adm-neon-top ${isDark ? "" : "adm-glass-light"}`}
-                        sx={{ p: { xs: 2, md: 2.5 } }}
-                      >
-                        <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5} alignItems={{ xs: "flex-start", sm: "center" }}>
-                          <Box sx={{
-                            width: 100, height: 100, borderRadius: "16px", overflow: "hidden",
-                            border: "2px solid rgba(241,48,36,0.28)",
-                            background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
-                            flexShrink: 0,
-                          }}>
-                            <img
-                              src={profileImgUrl(type)}
-                              alt={type}
-                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                              onError={(e) => { e.target.style.display = "none"; }}
-                            />
-                          </Box>
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", opacity: 0.90, mb: 0.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                              {img.filename}
-                            </Typography>
-                            <Typography sx={{ fontSize: "0.75rem", opacity: 0.50 }}>
-                              Uploaded: {img.uploadedAt ? new Date(img.uploadedAt).toLocaleString() : "—"}
-                            </Typography>
-                          </Box>
-                          <Stack direction="row" spacing={1}>
-                            <Tooltip title="Preview in new tab">
-                              <IconButton
-                                size="small"
-                                className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
-                                onClick={() => window.open(profileImgUrl(type), "_blank")}
-                              >
-                                <MdVisibility />
-                              </IconButton>
-                            </Tooltip>
-                            <Tooltip title="Delete">
-                              <IconButton
-                                size="small"
-                                className="adm-icon-btn-err"
-                                onClick={() => onDeleteProfileImage(img.id, type)}
-                              >
-                                <MdDelete />
-                              </IconButton>
-                            </Tooltip>
-                          </Stack>
-                        </Stack>
-                      </Paper>
-                    ) : (
-                      <Paper
-                        elevation={0}
-                        className={`adm-glass ${isDark ? "" : "adm-glass-light"}`}
-                        sx={{ p: 3, borderRadius: "16px", textAlign: "center" }}
-                      >
-                        <MdImage style={{ fontSize: "2rem", opacity: 0.25, marginBottom: 8 }} />
-                        <Typography sx={{ opacity: 0.45, fontSize: "0.875rem" }}>
-                          No {type} image uploaded yet.
-                        </Typography>
-                      </Paper>
-                    )}
-                  </Box>
-                );
-              })}
-            </Box>
+{active === "profile-image" && (
+  <Box className="adm-page-enter">
+    {["original", "animated"].map((type) => {
+      const img = profileImages.find((i) => i.imageType === type);
+      const isUploading = imgUploading && imgUploadType === type;
+      const pendingFile = pendingImages[type];
+      const pendingPreview = pendingPreviews[type];
+
+      return (
+        <Box key={type} sx={{ mb: 3.5 }}>
+          <SectionHeader
+            title={type === "original" ? "Original Image" : "Animated Image"}
+            subtitle={
+              type === "original"
+                ? "Static profile photo shown on the home section"
+                : "GIF / WebP animation shown alongside your intro"
+            }
+            right={
+              <Stack direction="row" spacing={1}>
+                {pendingFile && (
+                  <Button
+                    className="adm-btn-primary"
+                    size="small"
+                    startIcon={isUploading ? null : <MdSave />}
+                    disabled={isUploading}
+                    onClick={() => onUploadProfileImage(type, pendingFile)}
+                  >
+                    {isUploading ? "Saving…" : "Save to DB"}
+                  </Button>
+                )}
+                <Button
+                  component="label"
+                  className="adm-btn-outlined"
+                  size="small"
+                  startIcon={<MdUpload />}
+                  fullWidth={isMobile}
+                  disabled={isUploading}
+                >
+                  {`Select ${type === "original" ? "Original" : "Animated"}`}
+                  <input
+                    hidden
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      // revoke old preview
+                      if (pendingPreviews[type]) URL.revokeObjectURL(pendingPreviews[type]);
+                      const previewUrl = URL.createObjectURL(file);
+                      setPendingImages((p) => ({ ...p, [type]: file }));
+                      setPendingPreviews((p) => ({ ...p, [type]: previewUrl }));
+                    }}
+                  />
+                </Button>
+              </Stack>
+            }
+          />
+
+          {/* Pending preview (selected but not yet saved) */}
+          {pendingPreview && (
+            <Paper
+              elevation={0}
+              className={`adm-glass ${isDark ? "" : "adm-glass-light"}`}
+              sx={{ p: 2, mb: 1.5, borderRadius: "16px", border: "1.5px dashed rgba(241,48,36,0.4)" }}
+            >
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Box sx={{
+                  width: 72, height: 72, borderRadius: "12px", overflow: "hidden",
+                  border: "2px solid rgba(241,48,36,0.4)", flexShrink: 0,
+                }}>
+                  <img src={pendingPreview} alt="pending" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </Box>
+                <Box sx={{ flex: 1 }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: "0.8rem", opacity: 0.7, mb: 0.3 }}>
+                    Selected (not saved yet)
+                  </Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: "0.875rem", opacity: 0.90 }}>
+                    {pendingImages[type]?.name}
+                  </Typography>
+                </Box>
+                <IconButton size="small" onClick={() => {
+                  URL.revokeObjectURL(pendingPreview);
+                  setPendingImages((p) => { const n = { ...p }; delete n[type]; return n; });
+                  setPendingPreviews((p) => { const n = { ...p }; delete n[type]; return n; });
+                }}>
+                  <MdClose />
+                </IconButton>
+              </Stack>
+            </Paper>
           )}
+
+          {img ? (
+            <Paper
+              elevation={0}
+              className={`adm-glass adm-neon-top ${isDark ? "" : "adm-glass-light"}`}
+              sx={{ p: { xs: 2, md: 2.5 } }}
+            >
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5} alignItems={{ xs: "flex-start", sm: "center" }}>
+                <Box sx={{
+                  width: 100, height: 100, borderRadius: "16px", overflow: "hidden",
+                  border: "2px solid rgba(241,48,36,0.28)",
+                  background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
+                  flexShrink: 0,
+                }}>
+                  <img
+                    src={imgBlobUrls[type] || ""}
+                    alt={type}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    onError={(e) => { e.target.style.display = "none"; }}
+                  />
+                </Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", opacity: 0.90, mb: 0.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {img.filename}
+                  </Typography>
+                  <Typography sx={{ fontSize: "0.75rem", opacity: 0.50 }}>
+                    Uploaded: {img.uploadedAt ? new Date(img.uploadedAt).toLocaleString() : "—"}
+                  </Typography>
+                </Box>
+                <Stack direction="row" spacing={1}>
+                  {/* Push to Portfolio (set active) */}
+                  <Tooltip title="Push to Portfolio">
+                    <IconButton
+                      size="small"
+                      className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+                      onClick={async () => {
+                        setOk(`${type} image is live on portfolio.`);
+                        bumpContentVersion();
+                      }}
+                    >
+                      <MdUpload />
+                    </IconButton>
+                  </Tooltip>
+<Tooltip title="Preview">
+  <IconButton
+    size="small"
+    className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+    onClick={(e) => {
+      e.stopPropagation(); // prevent any parent click
+      onPreviewProfileImage(type);
+    }}
+  >
+    <MdVisibility />
+  </IconButton>
+</Tooltip>
+                  <Tooltip title="Delete">
+                    <IconButton
+                      size="small"
+                      className="adm-icon-btn-err"
+                      onClick={() => onDeleteProfileImage(img.id, type)}
+                    >
+                      <MdDelete />
+                    </IconButton>
+                  </Tooltip>
+                </Stack>
+              </Stack>
+            </Paper>
+          ) : (
+            <Paper
+              elevation={0}
+              className={`adm-glass ${isDark ? "" : "adm-glass-light"}`}
+              sx={{ p: 3, borderRadius: "16px", textAlign: "center" }}
+            >
+              <MdImage style={{ fontSize: "2rem", opacity: 0.25, marginBottom: 8 }} />
+              <Typography sx={{ opacity: 0.45, fontSize: "0.875rem" }}>
+                No {type} image uploaded yet.
+              </Typography>
+            </Paper>
+          )}
+        </Box>
+      );
+    })}
+
+    {/* Inline Image Preview Dialog */}
+    <Dialog
+      open={imgPreviewOpen}
+      onClose={() => setImgPreviewOpen(false)}
+      fullWidth maxWidth="md"
+      className={isDark ? "adm-dialog" : "adm-dialog adm-dialog-light"}
+    >
+      <DialogTitle className="adm-dialog-title">{imgPreviewTitle}</DialogTitle>
+      <DialogContent sx={{ p: 2, background: isDark ? "#000" : "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 400 }}>
+        {imgPreviewSrc && (
+          <img
+            src={imgPreviewSrc}
+            alt={imgPreviewTitle}
+            style={{ maxWidth: "100%", maxHeight: 500, objectFit: "contain", borderRadius: 12 }}
+          />
+        )}
+      </DialogContent>
+      <DialogActions sx={{ p: 2 }}>
+        <Button onClick={() => setImgPreviewOpen(false)} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>Close</Button>
+      </DialogActions>
+    </Dialog>
+  </Box>
+)}
 
           <ConfirmDialog
             open={confirmOpen}
