@@ -20,7 +20,7 @@ http.interceptors.request.use(
       delete config.headers.Authorization;
     }
 
-    // attach fresh token
+    // attach fresh token only if token exists
     if (token) {
       config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
@@ -31,16 +31,17 @@ http.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// 🔥 AUTO LOGOUT IF TOKEN INVALID
+// 🔥 AUTO LOGOUT IF TOKEN INVALID — ONLY on admin pages
 http.interceptors.response.use(
   (res) => res,
   (error) => {
     if (error?.response?.status === 401) {
-      localStorage.removeItem("token");
-      sessionStorage.clear();
-
-      // redirect to login instantly
-      window.location.href = "/admin-login";
+      const isAdminPage = window.location.pathname.startsWith("/admin");
+      if (isAdminPage) {
+        localStorage.removeItem("token");
+        sessionStorage.clear();
+        window.location.href = "/admin-login";
+      }
     }
     return Promise.reject(error);
   }

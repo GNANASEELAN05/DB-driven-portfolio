@@ -1132,12 +1132,10 @@ export default function Home({ toggleTheme }) {
 useEffect(() => {
   const fetchImgs = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/profile-image/list`);
-      if (res.ok) {
-        const data = await res.json();
-        setProfileImages(Array.isArray(data) ? data : []);
-        setImageBust(Date.now());
-      }
+      const res = await http.get("/profile-image/list");
+      const data = res.data;
+      setProfileImages(Array.isArray(data) ? data : []);
+      setImageBust(Date.now());
     } catch {
       // silently fall back to default images
     }
@@ -1304,19 +1302,24 @@ const onPreviewCertificate = async (achId, achTitle) => {
   };
 
 // Change /api/profile-image/animated → /api/profile-image/view/animated
+const BACKEND_BASE = (
+  import.meta.env.VITE_API_URL ||
+  "https://portfolio-backend-cok2.onrender.com/api"
+).replace(/\/api$/, "");
+
 const resolvedAnimatedSrc = useMemo(() => {
   const found = profileImages.find((i) => i.imageType === "animated" && i.primary === true);
-  if (found) return `${API_BASE}/api/profile-image/animated?t=${imageBust}`;
+  if (found) return `${BACKEND_BASE}/api/profile-image/animated?t=${imageBust}`;
   const anyAnimated = profileImages.find((i) => i.imageType === "animated");
-  if (anyAnimated) return `${API_BASE}/api/profile-image/animated?t=${imageBust}`;
+  if (anyAnimated) return `${BACKEND_BASE}/api/profile-image/animated?t=${imageBust}`;
   return AnimatedPhoto;
 }, [profileImages, imageBust]);
 
 const resolvedOriginalSrc = useMemo(() => {
   const found = profileImages.find((i) => i.imageType === "original" && i.primary === true);
-  if (found) return `${API_BASE}/api/profile-image/original?t=${imageBust}`;
+  if (found) return `${BACKEND_BASE}/api/profile-image/original?t=${imageBust}`;
   const anyOriginal = profileImages.find((i) => i.imageType === "original");
-  if (anyOriginal) return `${API_BASE}/api/profile-image/original?t=${imageBust}`;
+  if (anyOriginal) return `${BACKEND_BASE}/api/profile-image/original?t=${imageBust}`;
   return OriginalPhoto;
 }, [profileImages, imageBust]);
   // ─────────────────────────────────────────────────────────────────────────
