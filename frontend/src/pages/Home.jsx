@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import emailjs from "@emailjs/browser";
+import http from "../api/http";
 import SkillsBucketSection from "../components/SkillsBucket";
 import {
   Box,
@@ -1048,12 +1049,13 @@ export default function Home({ toggleTheme }) {
   const [resumePreviewBlobUrl, setResumePreviewBlobUrl] = useState("");
   const [resumePreviewLoading, setResumePreviewLoading] = useState(false);
 
-  // ── NEW: certificate preview states ──────────────────────────────────────
+// ── NEW: certificate preview states ──────────────────────────────────────
   const [certPreviewOpen, setCertPreviewOpen] = useState(false);
   const [certPreviewTitle, setCertPreviewTitle] = useState("");
   const [certPreviewBlobUrl, setCertPreviewBlobUrl] = useState("");
   const [certPreviewLoading, setCertPreviewLoading] = useState(false);
   const [certPreviewIsImage, setCertPreviewIsImage] = useState(false);
+  const [certPreviewAchId, setCertPreviewAchId] = useState(null);
 
   // ── NEW: profile image states ─────────────────────────────────────────────
   const [profileImages, setProfileImages] = useState([]);
@@ -1239,44 +1241,35 @@ useEffect(() => {
   };
 
   // ── NEW: certificate preview handlers ────────────────────────────────────
-  const closeCertPreview = () => {
-    setCertPreviewOpen(false);
-    if (certPreviewBlobUrl) { try { URL.revokeObjectURL(certPreviewBlobUrl); } catch {} }
-    setCertPreviewBlobUrl("");
-    setCertPreviewIsImage(false);
-  };
+const closeCertPreview = () => {
+  setCertPreviewOpen(false);
+  if (certPreviewBlobUrl) { try { URL.revokeObjectURL(certPreviewBlobUrl); } catch {} }
+  setCertPreviewBlobUrl("");
+  setCertPreviewIsImage(false);
+  setCertPreviewAchId(null);
+};
 
 const onPreviewCertificate = async (achId, achTitle) => {
   setCertPreviewTitle(`Certificate — ${achTitle || "Achievement"}`);
-  setCertPreviewIsImage(false);
   setCertPreviewBlobUrl("");
   setCertPreviewLoading(true);
   setCertPreviewOpen(true);
-
   try {
-    const headers = {};
-    const token = localStorage.getItem("token");
-    if (token) headers["Authorization"] = `Bearer ${token}`;
-
-    const res = await fetch(
-      `${API_BASE}/api/portfolio/achievements/${achId}/certificate`,
-      { headers }
+    const res = await http.get(
+      `/portfolio/achievements/${achId}/certificate`,
+      { responseType: "arraybuffer" }
     );
-
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-    const contentType = res.headers.get("content-type") || "application/pdf";
+    const contentType = res.headers["content-type"] || "application/pdf";
     const mimeType = contentType.split(";")[0].trim();
-    const arrayBuffer = await res.arrayBuffer();
-    const blob = new Blob([arrayBuffer], { type: mimeType });
+    const isImage = mimeType.startsWith("image/");
+    setCertPreviewIsImage(isImage);
+    const blob = new Blob([res.data], { type: mimeType });
     const url = URL.createObjectURL(blob);
-
-    setCertPreviewIsImage(mimeType.startsWith("image/"));
     setCertPreviewBlobUrl(url);
-
   } catch (e) {
     console.error("Certificate preview failed:", e);
     setCertPreviewBlobUrl("");
+    setCertPreviewAchId(null);
   } finally {
     setCertPreviewLoading(false);
   }
@@ -1310,13 +1303,13 @@ const onPreviewCertificate = async (achId, achTitle) => {
 // Change /api/profile-image/animated → /api/profile-image/view/animated
 const resolvedAnimatedSrc = useMemo(() => {
   const found = profileImages.find((i) => i.imageType === "animated");
-  if (found) return `${API_BASE}/api/profile-image/view/animated?t=${imageBust}`;
+  if (found) return `${API_BASE}/api/profile-image/animated?t=${imageBust}`;
   return AnimatedPhoto;
 }, [profileImages, imageBust]);
 
 const resolvedOriginalSrc = useMemo(() => {
   const found = profileImages.find((i) => i.imageType === "original");
-  if (found) return `${API_BASE}/api/profile-image/view/original?t=${imageBust}`;
+  if (found) return `${API_BASE}/api/profile-image/original?t=${imageBust}`;
   return OriginalPhoto;
 }, [profileImages, imageBust]);
   // ─────────────────────────────────────────────────────────────────────────
@@ -1676,7 +1669,7 @@ case "languages":
         loading={resumePreviewLoading}
       />
 
-{/* ── NEW: Certificate preview dialog ── */}
+{/* ── Certificate preview dialog ── */}
 <Dialog open={certPreviewOpen} onClose={closeCertPreview} fullWidth maxWidth="lg">
   <DialogTitle sx={{ fontWeight: 900 }}>{certPreviewTitle}</DialogTitle>
   <DialogContent sx={{ height: 700, p: 0, overflow: "hidden", bgcolor: "black" }}>
@@ -1684,41 +1677,41 @@ case "languages":
       <Box sx={{ p: 3 }}>
         <Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography>
       </Box>
-    ) : certPreviewBlobUrl ? (
+    ) : certPreviewIsImage && certPreviewBlobUrl ? (
+      // Image: blob URL works fine with <img>
       <Box
         sx={{
           width: "100%",
           height: "100%",
-          overflow: "hidden",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          overflow: "hidden",
         }}
       >
-        {certPreviewIsImage ? (
-          <img
-            src={certPreviewBlobUrl}
-            alt={certPreviewTitle}
-            style={{
-              maxWidth: "100%",
-              maxHeight: "100%",
-              objectFit: "contain",
-              display: "block",
-            }}
-          />
-        ) : (
-          <iframe
-            title={certPreviewTitle}
-            src={certPreviewBlobUrl}
-            style={{
-              width: "100%",
-              height: "100%",
-              border: "none",
-              display: "block",
-            }}
-          />
-        )}
+        <img
+          src={certPreviewBlobUrl}
+          alt={certPreviewTitle}
+          style={{
+            maxWidth: "100%",
+            maxHeight: "100%",
+            objectFit: "contain",
+            display: "block",
+          }}
+        />
       </Box>
+) : !certPreviewIsImage && certPreviewBlobUrl ? (
+      <embed
+        key={certPreviewBlobUrl}
+        src={certPreviewBlobUrl}
+        type="application/pdf"
+        style={{
+          width: "100%",
+          height: "100%",
+          border: "none",
+          display: "block",
+        }}
+      />
     ) : (
       <Box sx={{ p: 3 }}>
         <Typography sx={{ opacity: 0.75 }}>Preview not available.</Typography>
