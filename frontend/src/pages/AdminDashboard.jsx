@@ -535,13 +535,13 @@ const closeCertPreview = () => {
   setCertPreviewSrc("");
 };
 
-const loadProfileImageBlob = async (type) => {
+const loadProfileImageBlob = async (id) => {
   try {
-    const res = await http.get(`/profile-image/view/${type}`, { responseType: "arraybuffer" });
+    const res = await http.get(`/profile-image/view/${id}`, { responseType: "arraybuffer" });
     const contentType = res.headers["content-type"] || "image/png";
     const blob = new Blob([res.data], { type: contentType });
     const url = URL.createObjectURL(blob);
-    setImgBlobUrls((prev) => ({ ...prev, [type]: url }));
+    setImgBlobUrls((prev) => ({ ...prev, [id]: url }));
   } catch {
     // image not found
   }
@@ -551,7 +551,7 @@ const loadProfileImageBlob = async (type) => {
 // After you set profileImages, call:
 React.useEffect(() => {
   if (profileImages.length > 0) {
-    profileImages.forEach((img) => loadProfileImageBlob(img.imageType));
+    profileImages.forEach((img) => loadProfileImageBlob(img.id));
   }
 }, [profileImages]);
 
@@ -1804,19 +1804,19 @@ const onPreviewProfileImage = async (type) => {
 {active === "profile-image" && (
   <Box className="adm-page-enter">
     {["original", "animated"].map((type) => {
-      const img = profileImages.find((i) => i.imageType === type);
+      const imgsOfType = profileImages.filter((i) => i.imageType === type);
       const isUploading = imgUploading && imgUploadType === type;
       const pendingFile = pendingImages[type];
       const pendingPreview = pendingPreviews[type];
 
       return (
-        <Box key={type} sx={{ mb: 3.5 }}>
+        <Box key={type} sx={{ mb: 4 }}>
           <SectionHeader
             title={type === "original" ? "Original Image" : "Animated Image"}
             subtitle={
               type === "original"
-                ? "Static profile photo shown on the home section"
-                : "GIF / WebP animation shown alongside your intro"
+                ? "Static profile photo — upload multiple, set one as primary"
+                : "GIF / WebP animation — upload multiple, set one as primary"
             }
             right={
               <Stack direction="row" spacing={1}>
@@ -1839,7 +1839,7 @@ const onPreviewProfileImage = async (type) => {
                   fullWidth={isMobile}
                   disabled={isUploading}
                 >
-                  {`Select ${type === "original" ? "Original" : "Animated"}`}
+                  {`Upload ${type === "original" ? "Original" : "Animated"}`}
                   <input
                     hidden
                     type="file"
@@ -1847,7 +1847,6 @@ const onPreviewProfileImage = async (type) => {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
-                      // revoke old preview
                       if (pendingPreviews[type]) URL.revokeObjectURL(pendingPreviews[type]);
                       const previewUrl = URL.createObjectURL(file);
                       setPendingImages((p) => ({ ...p, [type]: file }));
@@ -1859,7 +1858,7 @@ const onPreviewProfileImage = async (type) => {
             }
           />
 
-          {/* Pending preview (selected but not yet saved) */}
+          {/* Pending preview */}
           {pendingPreview && (
             <Paper
               elevation={0}
@@ -1867,19 +1866,12 @@ const onPreviewProfileImage = async (type) => {
               sx={{ p: 2, mb: 1.5, borderRadius: "16px", border: "1.5px dashed rgba(241,48,36,0.4)" }}
             >
               <Stack direction="row" spacing={2} alignItems="center">
-                <Box sx={{
-                  width: 72, height: 72, borderRadius: "12px", overflow: "hidden",
-                  border: "2px solid rgba(241,48,36,0.4)", flexShrink: 0,
-                }}>
+                <Box sx={{ width: 72, height: 72, borderRadius: "12px", overflow: "hidden", border: "2px solid rgba(241,48,36,0.4)", flexShrink: 0 }}>
                   <img src={pendingPreview} alt="pending" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </Box>
                 <Box sx={{ flex: 1 }}>
-                  <Typography sx={{ fontWeight: 700, fontSize: "0.8rem", opacity: 0.7, mb: 0.3 }}>
-                    Selected (not saved yet)
-                  </Typography>
-                  <Typography sx={{ fontWeight: 600, fontSize: "0.875rem", opacity: 0.90 }}>
-                    {pendingImages[type]?.name}
-                  </Typography>
+                  <Typography sx={{ fontWeight: 700, fontSize: "0.8rem", opacity: 0.7, mb: 0.3 }}>Selected (not saved yet)</Typography>
+                  <Typography sx={{ fontWeight: 600, fontSize: "0.875rem" }}>{pendingImages[type]?.name}</Typography>
                 </Box>
                 <IconButton size="small" onClick={() => {
                   URL.revokeObjectURL(pendingPreview);
@@ -1892,89 +1884,105 @@ const onPreviewProfileImage = async (type) => {
             </Paper>
           )}
 
-          {img ? (
-            <Paper
-              elevation={0}
-              className={`adm-glass adm-neon-top ${isDark ? "" : "adm-glass-light"}`}
-              sx={{ p: { xs: 2, md: 2.5 } }}
-            >
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2.5} alignItems={{ xs: "flex-start", sm: "center" }}>
-                <Box sx={{
-                  width: 100, height: 100, borderRadius: "16px", overflow: "hidden",
-                  border: "2px solid rgba(241,48,36,0.28)",
-                  background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)",
-                  flexShrink: 0,
-                }}>
-                  <img
-                    src={imgBlobUrls[type] || ""}
-                    alt={type}
-                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    onError={(e) => { e.target.style.display = "none"; }}
-                  />
-                </Box>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography sx={{ fontWeight: 700, fontSize: "0.875rem", opacity: 0.90, mb: 0.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                    {img.filename}
-                  </Typography>
-                  <Typography sx={{ fontSize: "0.75rem", opacity: 0.50 }}>
-                    Uploaded: {img.uploadedAt ? new Date(img.uploadedAt).toLocaleString() : "—"}
-                  </Typography>
-                </Box>
-                <Stack direction="row" spacing={1}>
-                  {/* Push to Portfolio (set active) */}
-                  <Tooltip title="Push to Portfolio">
-                    <IconButton
-                      size="small"
-                      className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
-                      onClick={async () => {
-                        setOk(`${type} image is live on portfolio.`);
-                        bumpContentVersion();
-                      }}
-                    >
-                      <MdUpload />
-                    </IconButton>
-                  </Tooltip>
-<Tooltip title="Preview">
-  <IconButton
-    size="small"
-    className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
-    onClick={(e) => {
-      e.stopPropagation(); // prevent any parent click
-      onPreviewProfileImage(type);
-    }}
-  >
-    <MdVisibility />
-  </IconButton>
-</Tooltip>
-                  <Tooltip title="Delete">
-                    <IconButton
-                      size="small"
-                      className="adm-icon-btn-err"
-                      onClick={() => onDeleteProfileImage(img.id, type)}
-                    >
-                      <MdDelete />
-                    </IconButton>
-                  </Tooltip>
-                </Stack>
-              </Stack>
-            </Paper>
-          ) : (
-            <Paper
-              elevation={0}
-              className={`adm-glass ${isDark ? "" : "adm-glass-light"}`}
-              sx={{ p: 3, borderRadius: "16px", textAlign: "center" }}
-            >
-              <MdImage style={{ fontSize: "2rem", opacity: 0.25, marginBottom: 8 }} />
-              <Typography sx={{ opacity: 0.45, fontSize: "0.875rem" }}>
-                No {type} image uploaded yet.
-              </Typography>
-            </Paper>
-          )}
+          {/* Table of uploaded images */}
+          <TableWrap>
+            <Table size="small">
+              <THead cols={[
+                { label: "S.No", sx: { width: 50 } },
+                { label: "Thumbnail", sx: { width: 80 } },
+                { label: "Filename" },
+                { label: "Status", sx: { width: 120 } },
+                { label: "Uploaded", sx: { width: 140 } },
+                { label: "Actions", sx: { width: 140, textAlign: "right" } },
+              ]} />
+              <TableBody>
+                {imgsOfType.length === 0 && (
+                  <TRow><TC colSpan={6} sx={{ opacity: 0.55 }}>No {type} images uploaded yet.</TC></TRow>
+                )}
+                {imgsOfType.map((img, idx) => (
+                  <TRow key={img.id}>
+                    <TC sx={{ opacity: 0.55, fontWeight: 600 }}>{idx + 1}</TC>
+                    <TC>
+                      <Box sx={{ width: 48, height: 48, borderRadius: "8px", overflow: "hidden", border: "1.5px solid rgba(241,48,36,0.25)", background: isDark ? "rgba(255,255,255,0.04)" : "rgba(0,0,0,0.04)" }}>
+                        <img
+                          src={imgBlobUrls[img.id] || ""}
+                          alt={img.filename}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          onError={(e) => { e.target.style.display = "none"; }}
+                        />
+                      </Box>
+                    </TC>
+                    <TC bold sx={{ maxWidth: 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      {img.filename}
+                    </TC>
+                    <TC>
+                      {img.primary
+                        ? <Chip size="small" label="PRIMARY" icon={<MdStar style={{ color: "#ff9800", fontSize: "0.85rem" }} />} className="adm-chip-primary" />
+                        : <Typography variant="caption" sx={{ opacity: 0.4 }}>—</Typography>}
+                    </TC>
+                    <TC sx={{ opacity: 0.65, fontSize: "0.8rem" }}>{formatDate(img.uploadedAt)}</TC>
+                    <TC sx={{ textAlign: "right" }}>
+                      <Stack direction="row" spacing={0.8} justifyContent="flex-end">
+                        <Tooltip title="Preview">
+                          <IconButton
+                            size="small"
+                            className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+                            onClick={() => {
+                              setImgPreviewTitle(img.filename || type);
+                              setImgPreviewSrc(imgBlobUrls[img.id] || "");
+                              setImgPreviewOpen(true);
+                            }}
+                          >
+                            <MdVisibility />
+                          </IconButton>
+                        </Tooltip>
+                        {!img.primary && (
+                          <Tooltip title="Set as Primary">
+                            <IconButton
+                              size="small"
+                              className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+                              onClick={async () => {
+                                try {
+                                  setErr(""); setOk(""); setLoading(true);
+                                  await http.put(`/profile-image/set-primary/${img.id}`);
+                                  setOk(`Set as primary ${type} image.`);
+                                  await fetchProfileImages();
+                                  bumpContentVersion();
+                                } catch { setErr("Failed to set primary."); }
+                                finally { setLoading(false); }
+                              }}
+                            >
+                              <MdStar />
+                            </IconButton>
+                          </Tooltip>
+                        )}
+                        <Tooltip title="Delete">
+                          <IconButton
+                            size="small"
+                            className="adm-icon-btn-err"
+                            onClick={() => onDeleteProfileImage(img.id, type)}
+                          >
+                            <MdDelete />
+                          </IconButton>
+                        </Tooltip>
+                      </Stack>
+                    </TC>
+                  </TRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableWrap>
+
+          <Paper elevation={0} className={`adm-glass ${isDark ? "" : "adm-glass-light"}`} sx={{ p: 1.5, mt: 1, borderRadius: "12px" }}>
+            <Typography variant="caption" sx={{ opacity: 0.55 }}>
+              💡 Upload as many images as you want. Only the PRIMARY one shows on your portfolio. Click ★ to change which one is active.
+            </Typography>
+          </Paper>
         </Box>
       );
     })}
 
-    {/* Inline Image Preview Dialog */}
+    {/* Image preview dialog */}
     <Dialog
       open={imgPreviewOpen}
       onClose={() => setImgPreviewOpen(false)}
@@ -1983,12 +1991,10 @@ const onPreviewProfileImage = async (type) => {
     >
       <DialogTitle className="adm-dialog-title">{imgPreviewTitle}</DialogTitle>
       <DialogContent sx={{ p: 2, background: isDark ? "#000" : "#f5f5f5", display: "flex", alignItems: "center", justifyContent: "center", minHeight: 400 }}>
-        {imgPreviewSrc && (
-          <img
-            src={imgPreviewSrc}
-            alt={imgPreviewTitle}
-            style={{ maxWidth: "100%", maxHeight: 500, objectFit: "contain", borderRadius: 12 }}
-          />
+        {imgPreviewSrc ? (
+          <img src={imgPreviewSrc} alt={imgPreviewTitle} style={{ maxWidth: "100%", maxHeight: 500, objectFit: "contain", borderRadius: 12 }} />
+        ) : (
+          <Typography sx={{ opacity: 0.5 }}>No preview available.</Typography>
         )}
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
