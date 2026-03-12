@@ -1308,18 +1308,14 @@ const BACKEND_BASE = (
 ).replace(/\/api$/, "");
 
 const resolvedAnimatedSrc = useMemo(() => {
-  const found = profileImages.find((i) => i.imageType === "animated" && i.primary === true);
-  if (found) return `${BACKEND_BASE}/api/profile-image/animated?t=${imageBust}`;
-  const anyAnimated = profileImages.find((i) => i.imageType === "animated");
-  if (anyAnimated) return `${BACKEND_BASE}/api/profile-image/animated?t=${imageBust}`;
+  const hasPrimary = profileImages.some((i) => i.imageType === "animated" && i.primary === true);
+  if (hasPrimary) return `${BACKEND_BASE}/api/profile-image/animated?t=${imageBust}`;
   return AnimatedPhoto;
 }, [profileImages, imageBust]);
 
 const resolvedOriginalSrc = useMemo(() => {
-  const found = profileImages.find((i) => i.imageType === "original" && i.primary === true);
-  if (found) return `${BACKEND_BASE}/api/profile-image/original?t=${imageBust}`;
-  const anyOriginal = profileImages.find((i) => i.imageType === "original");
-  if (anyOriginal) return `${BACKEND_BASE}/api/profile-image/original?t=${imageBust}`;
+  const hasPrimary = profileImages.some((i) => i.imageType === "original" && i.primary === true);
+  if (hasPrimary) return `${BACKEND_BASE}/api/profile-image/original?t=${imageBust}`;
   return OriginalPhoto;
 }, [profileImages, imageBust]);
   // ─────────────────────────────────────────────────────────────────────────
