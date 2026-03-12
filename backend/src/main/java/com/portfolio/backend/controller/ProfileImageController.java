@@ -42,8 +42,7 @@ public class ProfileImageController {
             img.setUploadedAt(LocalDateTime.now());
  
             // Auto-set as primary if it's the first one of this type
-            List<ProfileImage> existing = profileImageRepository.findByImageTypeOrderByUploadedAtDesc(type);
-            img.setPrimary(existing.isEmpty());
+            img.setPrimary(false);
  
             profileImageRepository.save(img);
  

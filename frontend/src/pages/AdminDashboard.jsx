@@ -1949,12 +1949,15 @@ const onPreviewProfileImage = async (type) => {
         <MdVisibility />
       </IconButton>
     </Tooltip>
-    {!img.primary && (
-      <Tooltip title="Push to Viewer (Set as Live)">
+    <Tooltip title={img.primary ? "Already Live" : "Push to Viewer (Set as Live)"}>
+      <span>
         <IconButton
           size="small"
+          disabled={!!img.primary}
           className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+          sx={img.primary ? { opacity: 0.3, cursor: "default" } : {}}
           onClick={async () => {
+            if (img.primary) return;
             try {
               setErr(""); setOk(""); setLoading(true);
               await http.put(`/profile-image/set-primary/${img.id}`);
@@ -1967,8 +1970,8 @@ const onPreviewProfileImage = async (type) => {
         >
           <MdUpload />
         </IconButton>
-      </Tooltip>
-    )}
+      </span>
+    </Tooltip>
     <Tooltip title="Delete">
       <IconButton
         size="small"
