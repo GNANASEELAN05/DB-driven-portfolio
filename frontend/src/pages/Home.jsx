@@ -1850,47 +1850,19 @@ case "languages":
       </Box>
 ) : !certPreviewIsImage && certPreviewBlobUrl ? (
   /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent) ? (
-    // Mobile: blob iframes don't work — show open button instead
-    <Box
-      sx={{
+    <iframe
+      key={`cert-mobile-${certPreviewAchId}`}
+      src={`https://docs.google.com/viewer?url=${encodeURIComponent(
+        `${(import.meta.env.VITE_API_URL || "").replace(/^\/api$/, "https://portfolio-backend-cok2.onrender.com/api") || "https://portfolio-backend-cok2.onrender.com/api"}/portfolio/achievements/${certPreviewAchId}/certificate`
+      )}&embedded=true`}
+      title={certPreviewTitle}
+      style={{
         width: "100%",
         height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 2,
-        p: 3,
+        border: "none",
+        display: "block",
       }}
-    >
-      <Typography sx={{ opacity: 0.7, textAlign: "center", fontSize: "0.9rem" }}>
-        PDF preview is not supported in mobile browsers.
-      </Typography>
-      <Button
-        variant="contained"
-        startIcon={<MdArrowOutward />}
-        onClick={() => {
-          const a = document.createElement("a");
-          a.href = certPreviewBlobUrl;
-          a.target = "_blank";
-          a.rel = "noopener noreferrer";
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-        }}
-        sx={{
-          borderRadius: 999,
-          fontWeight: 800,
-          textTransform: "none",
-          background: "linear-gradient(135deg, #f13024, #f97316)",
-          color: "white",
-          px: 3,
-          boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
-        }}
-      >
-        Open Certificate
-      </Button>
-    </Box>
+    />
   ) : (
     <iframe
       key={certPreviewBlobUrl}
