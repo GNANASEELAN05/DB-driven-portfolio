@@ -4978,26 +4978,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
 /* Grid scan overlay */
 .pv2-grid-scan {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.022;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.8) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.8) 1px, transparent 1px);
-  background-size: 26px 26px;
-  transition: opacity 0.3s ease;
-}
-
-.pv2-hovered .pv2-grid-scan,
-.pv2-card:hover .pv2-grid-scan { opacity: 0.04; backdrop-filter: none; }
-
-.mode-light .pv2-grid-scan {
-  opacity: 0.012;
-  background-image:
-    linear-gradient(rgba(17,24,39,0.6) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(17,24,39,0.6) 1px, transparent 1px);
+  display: none;
 }
 
 /* Corner brackets */
