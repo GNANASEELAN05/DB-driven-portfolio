@@ -4862,6 +4862,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 28px;
+  isolation: isolate;
 }
 
 @media (max-width: 1199px) { .pv2-ultra-grid { grid-template-columns: 1fr; } }
@@ -4872,7 +4873,6 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   position: relative;
   border-radius: 28px;
   overflow: hidden;
-  backdrop-filter: blur(30px);
   cursor: default;
   display: flex;
   flex-direction: column;
@@ -4888,23 +4888,37 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 }
 
 .mode-dark .pv2-card {
-  background: linear-gradient(145deg, rgba(20, 12, 30, 0.96) 0%, rgba(12, 14, 34, 0.92) 60%, rgba(6, 8, 26, 0.96) 100%);
-  border: 1px solid rgba(241, 48, 36, 0.16);
+  background:
+    linear-gradient(145deg,
+      rgba(28, 16, 42, 1) 0%,
+      rgba(18, 16, 44, 1) 40%,
+      rgba(12, 10, 32, 1) 100%
+    );
+  border: 1px solid rgba(241, 48, 36, 0.22);
   box-shadow:
-    0 0 0 1px rgba(241, 48, 36, 0.05),
-    0 14px 48px rgba(0, 0, 0, 0.42),
-    0 0 80px rgba(241, 48, 36, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+    0 0 0 1px rgba(241, 48, 36, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.65),
+    0 4px 16px rgba(0, 0, 0, 0.50),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
+    inset 1px 0 0 rgba(255, 255, 255, 0.03),
+    inset -1px 0 0 rgba(0, 0, 0, 0.2);
 }
 
 .mode-light .pv2-card {
-  background: linear-gradient(145deg, rgba(255, 252, 250, 0.98) 0%, rgba(255, 248, 245, 0.96) 60%, rgba(255, 255, 255, 0.99) 100%);
-  border: 1px solid rgba(241, 48, 36, 0.14);
+  background:
+    linear-gradient(145deg,
+      rgba(255, 250, 248, 1) 0%,
+      rgba(252, 246, 243, 1) 45%,
+      rgba(255, 252, 252, 1) 100%
+    );
+  border: 1px solid rgba(241, 48, 36, 0.20);
   box-shadow:
-    0 14px 52px rgba(0, 0, 0, 0.10),
-    0 0 0 1px rgba(241, 48, 36, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+    0 0 0 1px rgba(241, 48, 36, 0.08),
+    0 20px 60px rgba(0, 0, 0, 0.14),
+    0 4px 16px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04);
 }
 
 .pv2-card:hover,
@@ -4913,7 +4927,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
     0 0 0 1.5px var(--pv2-from),
     0 0 70px var(--pv2-glow),
     0 0 130px color-mix(in srgb, var(--pv2-from) 12%, transparent),
-    0 36px 90px rgba(0, 0, 0, 0.45),
+    0 36px 90px rgba(0, 0, 0, 0.70),
+    0 4px 16px rgba(0, 0, 0, 0.55),
     inset 0 1px 0 rgba(255, 255, 255, 0.10) !important;
 }
 
@@ -4922,7 +4937,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   box-shadow:
     0 0 0 1.5px var(--pv2-from),
     0 0 48px var(--pv2-glow),
-    0 28px 68px rgba(0, 0, 0, 0.13) !important;
+    0 28px 68px rgba(0, 0, 0, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.10) !important;
 }
 
 /* Spinning prismatic border */
@@ -4974,7 +4990,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 }
 
 .pv2-hovered .pv2-grid-scan,
-.pv2-card:hover .pv2-grid-scan { opacity: 0.04; }
+.pv2-card:hover .pv2-grid-scan { opacity: 0.04; backdrop-filter: none; }
 
 .mode-light .pv2-grid-scan {
   opacity: 0.012;

@@ -1120,9 +1120,7 @@ function ProjectCard({ project, index = 0 }) {
           <Box className="pv2-term-sep" />
           <Box className="pv2-term-item">
             <Typography className="pv2-term-val" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-              {projectNumber}
             </Typography>
-            <Typography className="pv2-term-lbl">INDEX</Typography>
           </Box>
           <Box sx={{ flex: 1 }} />
           <Box className="pv2-verified-chip" style={{
