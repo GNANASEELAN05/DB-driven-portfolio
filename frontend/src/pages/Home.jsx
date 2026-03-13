@@ -136,7 +136,7 @@ async function blobDownload(url) {
 }
 
 // =============================================
-// LANGUAGE LOGO CARD — Advanced Horizontal Bento Row
+// LANGUAGE LOGO CARD — CYBERPUNK HOLOGRAM PANEL
 // =============================================
 function LanguageLogoCard({ lang, index }) {
   const language   = safeString(lang?.language) || "—";
@@ -147,13 +147,21 @@ function LanguageLogoCard({ lang, index }) {
   const years      = Number.isFinite(rawYears) ? Math.max(0, Math.min(5, rawYears)) : 0;
 
   const levelMap   = { beginner: 1, intermediate: 2, advanced: 3 };
-  const levelSteps = levelMap[level] ?? 0;
+  const levelNum   = levelMap[level] ?? 0;
   const levelPct   = { beginner: 33, intermediate: 66, advanced: 100 }[level] ?? 0;
   const yearsPct   = (years / 5) * 100;
-  const levelLabel = level ? level.charAt(0).toUpperCase() + level.slice(1) : "—";
+  const levelLabel = level ? level.charAt(0).toUpperCase() + level.slice(1) : "Unknown";
 
-  const levelColor = { beginner: "#f13024", intermediate: "#f97316", advanced: "#fbbf24" }[level] || "#f97316";
-  const levelBg    = { beginner: "rgba(241,48,36,0.12)", intermediate: "rgba(249,115,22,0.12)", advanced: "rgba(251,191,36,0.12)" }[level] || "rgba(249,115,22,0.12)";
+  // Per-card color palette cycling
+  const PALETTES = [
+    { a: "#f13024", b: "#f97316", glow: "rgba(241,48,36,0.45)", dim: "rgba(241,48,36,0.12)", hue: "15" },
+    { a: "#06b6d4", b: "#6366f1", glow: "rgba(6,182,212,0.40)", dim: "rgba(6,182,212,0.12)", hue: "195" },
+    { a: "#a855f7", b: "#ec4899", glow: "rgba(168,85,247,0.40)", dim: "rgba(168,85,247,0.12)", hue: "270" },
+    { a: "#10b981", b: "#06b6d4", glow: "rgba(16,185,129,0.38)", dim: "rgba(16,185,129,0.12)", hue: "160" },
+    { a: "#f59e0b", b: "#f97316", glow: "rgba(245,158,11,0.38)", dim: "rgba(245,158,11,0.12)", hue: "38" },
+    { a: "#3b82f6", b: "#06b6d4", glow: "rgba(59,130,246,0.38)", dim: "rgba(59,130,246,0.12)", hue: "215" },
+  ];
+  const pal = PALETTES[index % PALETTES.length];
 
   const logoInfo = resolveSkillLogo(language);
   const initials = language.slice(0, 3).toUpperCase();
@@ -163,13 +171,11 @@ function LanguageLogoCard({ lang, index }) {
     : [];
   const currentUrl = urls[urlIndex] || null;
 
-  // Gauge arc math (compact 200° sweep)
-  const R = 18;
-  const SWEEP = 200;
-  const GAP = (360 - SWEEP) / 2;
-  const toXY = (angleDeg, r) => {
-    const rad = ((angleDeg - 90) * Math.PI) / 180;
-    return { x: 24 + r * Math.cos(rad), y: 24 + r * Math.sin(rad) };
+  // Arc gauge math
+  const R = 26, SWEEP = 220, GAP = (360 - SWEEP) / 2;
+  const toXY = (deg, r) => {
+    const rad = ((deg - 90) * Math.PI) / 180;
+    return { x: 36 + r * Math.cos(rad), y: 36 + r * Math.sin(rad) };
   };
   const startAngle = 90 + GAP;
   const s = toXY(startAngle, R);
@@ -182,135 +188,201 @@ function LanguageLogoCard({ lang, index }) {
     ? `M ${s.x} ${s.y} A ${R} ${R} 0 ${largeArc} 1 ${fe.x} ${fe.y}`
     : "";
 
+  // Level to bar segments
+  const barSegs = 12;
+  const filledSegs = Math.round((levelPct / 100) * barSegs);
+
   return (
     <Box
-      className="langrow-card"
-      style={{ animationDelay: `${index * 0.07}s`, "--lc": levelColor, "--lb": levelBg }}
+      className="lholo-card"
+      style={{
+        "--lha": pal.a,
+        "--lhb": pal.b,
+        "--lhg": pal.glow,
+        "--lhd": pal.dim,
+        "--lhi": index,
+        animationDelay: `${index * 0.08}s`,
+      }}
     >
-      {/* Diagonal accent stripe */}
-      <Box className="langrow-stripe" style={{ background: `linear-gradient(135deg, ${levelColor}22 0%, transparent 60%)` }} />
+      {/* Spinning conic border */}
+      <Box className="lholo-prism" style={{ background: `conic-gradient(from 0deg, transparent 40%, ${pal.a}, ${pal.b}, transparent)` }} />
 
-      {/* Index badge */}
-      <Box className="langrow-index">
+      {/* Scan line sweep */}
+      <Box className="lholo-scan" style={{ background: `linear-gradient(180deg, transparent, ${pal.a}18, ${pal.a}2a, ${pal.a}18, transparent)` }} />
+
+      {/* Corner brackets */}
+      <Box className="lholo-corner lholo-corner--tl" style={{ borderColor: `${pal.a}99` }} />
+      <Box className="lholo-corner lholo-corner--br" style={{ borderColor: `${pal.b}77` }} />
+
+      {/* Index stamp */}
+      <Box className="lholo-idx-stamp" style={{ background: `linear-gradient(135deg, ${pal.a}, ${pal.b})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
         {String(index + 1).padStart(2, "0")}
       </Box>
 
-      {/* LEFT: Logo block */}
-      <Box className="langrow-left">
-        <Box className="langrow-logo-ring" style={{ boxShadow: `0 0 0 1px ${levelColor}33, 0 0 20px ${levelColor}22` }}>
-          <Box className="langrow-logo-halo" style={{ background: `radial-gradient(circle, ${levelColor}30, transparent 70%)` }} />
-          {currentUrl ? (
-            <img
-              key={currentUrl}
-              src={currentUrl}
-              alt={language}
-              className="langrow-logo-img"
-              onError={() => setUrlIndex((p) => p + 1)}
-              loading="lazy"
-            />
-          ) : (
-            <Box className="langrow-logo-fallback" style={{ color: levelColor, WebkitTextFillColor: levelColor }}>{initials}</Box>
-          )}
-        </Box>
-        <Box className="langrow-name-block">
-          <Typography className="langrow-name">{language}</Typography>
-          <Box className="langrow-level-chip" style={{ background: levelBg, borderColor: `${levelColor}44`, color: levelColor, WebkitTextFillColor: levelColor }}>
-            <span className="langrow-dot" style={{ background: levelColor, boxShadow: `0 0 5px ${levelColor}` }} />
-            {levelLabel}
-          </Box>
-        </Box>
-      </Box>
 
-      {/* CENTER: Skill dots + exp bar */}
-      <Box className="langrow-center">
-        {/* 3 skill dots */}
-        <Box className="langrow-dots-row">
-          {[1, 2, 3].map((step) => (
-            <Box
-              key={step}
-              className="langrow-dot-seg"
-              style={{
-                background: step <= levelSteps
-                  ? `linear-gradient(135deg, ${levelColor}, ${levelColor}bb)`
-                  : undefined,
-                boxShadow: step <= levelSteps ? `0 0 8px ${levelColor}66` : undefined,
-                borderColor: step <= levelSteps ? levelColor : undefined,
-              }}
-            />
-          ))}
-          <Typography className="langrow-level-text" style={{ color: levelColor, WebkitTextFillColor: levelColor }}>
-            {levelLabel}
-          </Typography>
+{/* LEFT: Logo orb — matches exp-v4-hex-wrap style */}
+<Box className="lholo-orb-wrap" style={{ position: "relative", zIndex: 2 }}>
+  <Box className="lholo-hex-wrap" style={{ position: "relative", width: 64, height: 64, display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <Box className="lholo-orb-ring lholo-ring-1" style={{ borderTopColor: pal.a, borderColor: `${pal.a}55`, position: "absolute", inset: 0, borderRadius: "50%", border: "1.5px solid", animation: "lholoSpin1 4.5s linear infinite" }} />
+    <Box className="lholo-orb-ring lholo-ring-2" style={{ borderRightColor: pal.b, borderColor: `${pal.b}33`, position: "absolute", inset: -8, borderRadius: "50%", border: "1px dashed", animation: "lholoSpin1 7.5s linear infinite reverse" }} />
+    <Box className="lholo-orb-core" style={{
+      position: "relative", zIndex: 4,
+      background: `radial-gradient(circle at 35% 35%, ${pal.a}28, ${pal.b}14, transparent)`,
+      borderColor: `${pal.a}44`,
+      boxShadow: `0 0 24px ${pal.glow}, inset 0 0 16px ${pal.a}0d`,
+    }}>
+      {currentUrl ? (
+        <img key={currentUrl} src={currentUrl} alt={language} className="lholo-logo-img"
+          onError={() => setUrlIndex((p) => p + 1)} loading="lazy" />
+      ) : (
+        <Box className="lholo-logo-fallback" style={{ background: `linear-gradient(135deg, ${pal.a}, ${pal.b})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+          {initials}
+        </Box>
+      )}
+    </Box>
+    <Box style={{ position: "absolute", inset: -10, borderRadius: "50%", background: `radial-gradient(circle, ${pal.a}44, transparent 70%)`, zIndex: 0, opacity: 0, transition: "opacity 0.35s ease", pointerEvents: "none" }} />
+  </Box>
+</Box>
+
+      {/* CENTER: Name + metadata */}
+      <Box className="lholo-info">
+        {/* Language name */}
+        <Typography className="lholo-name">{language}</Typography>
+
+        {/* Level badge */}
+        <Box className="lholo-level-badge" style={{ background: `${pal.a}18`, borderColor: `${pal.a}44`, color: pal.a, WebkitTextFillColor: pal.a }}>
+          <span className="lholo-badge-dot" style={{ background: pal.a, boxShadow: `0 0 6px ${pal.a}` }} />
+          {levelLabel}
         </Box>
 
-        {/* Exp track */}
-        <Box className="langrow-exp-section">
-          <Box className="langrow-exp-label-row">
-            <Typography className="langrow-exp-label">EXP TRACK</Typography>
-            <Typography className="langrow-exp-value" style={{ color: levelColor, WebkitTextFillColor: levelColor }}>
-              {years} / 5 yrs
-            </Typography>
-          </Box>
-          <Box className="langrow-exp-track">
-            <Box
-              className="langrow-exp-fill"
-              style={{
-                width: `${yearsPct}%`,
-                background: `linear-gradient(90deg, ${levelColor}dd, ${levelColor}88)`,
-                boxShadow: `0 0 10px ${levelColor}55`,
-              }}
-            >
-              <Box className="langrow-exp-shimmer" />
-            </Box>
-            {/* Tick marks */}
-            {[0, 1, 2, 3, 4, 5].map((t) => (
+        {/* Segmented bar */}
+        <Box className="lholo-segbar-wrap">
+          <Box className="lholo-segbar-label">PROFICIENCY</Box>
+          <Box className="lholo-segbar">
+            {Array.from({ length: barSegs }, (_, i) => (
               <Box
-                key={t}
-                className="langrow-tick"
-                style={{ left: `${(t / 5) * 100}%`, background: t <= years ? levelColor : undefined }}
+                key={i}
+                className="lholo-seg"
+                style={i < filledSegs ? {
+                  background: `linear-gradient(135deg, ${pal.a}, ${pal.b})`,
+                  boxShadow: `0 0 6px ${pal.a}66`,
+                  opacity: 1 - (i / barSegs) * 0.25,
+                } : undefined}
               />
             ))}
           </Box>
-          <Box className="langrow-exp-scale">
-            {[0, 1, 2, 3, 4, 5].map((t) => (
-              <span key={t}>{t}</span>
-            ))}
+        </Box>
+
+        {/* Exp track */}
+        <Box className="lholo-exp-wrap">
+          <Box className="lholo-exp-label-row">
+            <Typography className="lholo-exp-lbl">EXP</Typography>
+            <Typography className="lholo-exp-val" style={{ color: pal.a, WebkitTextFillColor: pal.a }}>{years}yr / 5yr</Typography>
+          </Box>
+          <Box className="lholo-track">
+            <Box className="lholo-track-fill" style={{
+              width: `${yearsPct}%`,
+              background: `linear-gradient(90deg, ${pal.a}, ${pal.b})`,
+              boxShadow: `0 0 10px ${pal.a}77`,
+            }}>
+              <Box className="lholo-shimmer" />
+            </Box>
           </Box>
         </Box>
       </Box>
 
-      {/* RIGHT: Compact gauge */}
-      <Box className="langrow-right">
-        <svg viewBox="0 0 48 48" fill="none" className="langrow-gauge-svg">
+      {/* RIGHT: Arc gauge */}
+      <Box className="lholo-gauge-wrap">
+        <svg viewBox="0 0 72 72" fill="none" className="lholo-gauge-svg">
           <defs>
-            <linearGradient id={`lg-${index}`} x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor={levelColor} stopOpacity="0.95" />
-              <stop offset="100%" stopColor={level === "beginner" ? "#f97316" : level === "intermediate" ? "#fbbf24" : "#ffe066"} stopOpacity="1" />
+            <linearGradient id={`lhg-${index}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor={pal.a} stopOpacity="1" />
+              <stop offset="100%" stopColor={pal.b} stopOpacity="1" />
             </linearGradient>
+            <filter id={`lhf-${index}`}>
+              <feGaussianBlur stdDeviation="1.5" result="blur" />
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+            </filter>
           </defs>
-          <path d={arcTrack} stroke="rgba(255,255,255,0.07)" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+          {/* Outer decorative ring */}
+          <circle cx="36" cy="36" r="34" stroke={`${pal.a}18`} strokeWidth="1" fill="none" />
+          {/* Track */}
+          <path d={arcTrack} stroke="rgba(255,255,255,0.06)" strokeWidth="5" strokeLinecap="round" fill="none" />
+          {/* Fill */}
           {arcFill && (
             <path
               d={arcFill}
-              stroke={`url(#lg-${index})`}
-              strokeWidth="3.5"
+              stroke={`url(#lhg-${index})`}
+              strokeWidth="5"
               strokeLinecap="round"
               fill="none"
-              style={{ filter: `drop-shadow(0 0 3px ${levelColor}88)` }}
+              filter={`url(#lhf-${index})`}
             />
           )}
-          <text x="24" y="22" textAnchor="middle" dominantBaseline="middle"
-            fill={levelColor} fontSize="8" fontWeight="900" fontFamily="Inter, sans-serif"
-            letterSpacing="-0.3">{levelPct}%</text>
-          <text x="24" y="31" textAnchor="middle" dominantBaseline="middle"
-            fill="rgba(255,255,255,0.28)" fontSize="4.5" fontWeight="700" fontFamily="Inter, sans-serif"
-            letterSpacing="0.5">LEVEL</text>
+          {/* Center label */}
+          <text x="36" y="32" textAnchor="middle" dominantBaseline="middle"
+            fill={pal.a} fontSize="11" fontWeight="900" fontFamily="Inter, sans-serif"
+            letterSpacing="-0.5">{levelPct}</text>
+          <text x="36" y="43" textAnchor="middle" dominantBaseline="middle"
+            fill="rgba(255,255,255,0.22)" fontSize="6" fontWeight="700" fontFamily="Inter, sans-serif"
+            letterSpacing="0.8">PCT</text>
+          {/* Tick marks around gauge */}
+          {Array.from({ length: 12 }, (_, i) => {
+            const tickAngle = startAngle + (i / 11) * SWEEP;
+            const tInner = toXY(tickAngle, 30);
+            const tOuter = toXY(tickAngle, 33);
+            return (
+              <line key={i} x1={tInner.x} y1={tInner.y} x2={tOuter.x} y2={tOuter.y}
+                stroke={i <= Math.round((levelPct / 100) * 11) ? pal.a : "rgba(255,255,255,0.08)"}
+                strokeWidth="1.5" strokeLinecap="round" />
+            );
+          })}
         </svg>
+
+        {/* XP stars */}
+        <Box className="lholo-stars">
+          {[1, 2, 3, 4, 5].map((s) => (
+            <span key={s} className={`lholo-star ${s <= Math.ceil((years / 5) * 5) ? "lholo-star-on" : "lholo-star-off"}`}
+              style={s <= Math.ceil((years / 5) * 5) ? { color: pal.a, textShadow: `0 0 8px ${pal.a}` } : undefined}>
+              ★
+            </span>
+          ))}
+        </Box>
       </Box>
+
+      {/* Bottom terminal strip */}
+      <Box className="lholo-terminal" style={{ borderTopColor: `${pal.a}18`, background: `${pal.a}06` }}>
+        <Box className="lholo-term-item">
+          <Typography className="lholo-term-val" style={{ background: `linear-gradient(135deg, ${pal.a}, ${pal.b})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            {String(levelNum)}/3
+          </Typography>
+          <Typography className="lholo-term-lbl">RANK</Typography>
+        </Box>
+        <Box className="lholo-term-sep" />
+        <Box className="lholo-term-item">
+          <Typography className="lholo-term-val" style={{ background: `linear-gradient(135deg, ${pal.b}, ${pal.a})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            {years.toFixed(1)}
+          </Typography>
+          <Typography className="lholo-term-lbl">YEARS</Typography>
+        </Box>
+        <Box className="lholo-term-sep" />
+        <Box className="lholo-term-item">
+          <Typography className="lholo-term-val" style={{ background: `linear-gradient(135deg, ${pal.a}, ${pal.b})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            {levelPct}%
+          </Typography>
+          <Typography className="lholo-term-lbl">MASTERY</Typography>
+        </Box>
+        <Box sx={{ flex: 1 }} />
+        <Box className="lholo-active-chip" style={{ background: `${pal.a}14`, borderColor: `${pal.a}44`, color: pal.a, WebkitTextFillColor: pal.a }}>
+          ✦ ACTIVE
+        </Box>
+      </Box>
+
+      {/* Watermark */}
+      <Box className="lholo-watermark" style={{ WebkitTextFillColor: `${pal.a}07` }}>⬡</Box>
     </Box>
   );
 }
-
 // =============================================
 // DYNAMIC SKILL LOGO RESOLVER
 // Converts any skill name → devicon CDN slug
@@ -2198,15 +2270,15 @@ case "languages":
       initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
       <Box className="section-scroll-area">
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-          <SectionHeading title="Programming Languages" subtitle="Language proficiency and years of experience." />
+          <SectionHeading title="Programming Languages" subtitle="Mastery metrics — experience depth and proficiency levels." />
           {loading ? (
-            <Box className="langrow-grid">
+            <Box className="lholo-grid">
               {[...Array(6)].map((_, i) => (
-  <Skeleton key={i} height={90} sx={{ borderRadius: 3 }} />
-))}
+                <Skeleton key={i} height={170} sx={{ borderRadius: 4 }} />
+              ))}
             </Box>
           ) : languages.length ? (
-            <Box className="langrow-grid">
+            <Box className="lholo-grid">
               {languages.map((lang, idx) => (
                 <LanguageLogoCard key={lang?.id ?? idx} lang={lang} index={idx} />
               ))}
