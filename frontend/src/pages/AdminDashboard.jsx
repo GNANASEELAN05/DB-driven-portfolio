@@ -320,25 +320,36 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const src = blobUrl || url;
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
   return (
     <Dialog
       open={open} onClose={onClose} fullWidth maxWidth="md"
       className={isDark ? "adm-dialog" : "adm-dialog adm-dialog-light"}
     >
-      <DialogTitle className="adm-dialog-title">{title}</DialogTitle>
-      <DialogContent sx={{ height: 650, p: 0, overflow: "hidden", background: isDark ? "#000" : "#fff" }}>
+      <DialogTitle className="adm-dialog-title" sx={{ fontSize: { xs: "1rem", md: "1.25rem" }, py: 1.5 }}>
+        {title}
+      </DialogTitle>
+      <DialogContent sx={{ height: { xs: 480, md: 580 }, p: 0, overflow: "hidden", bgcolor: "black" }}>
         {loading ? (
-          <Box sx={{ p: 2 }}><Typography sx={{ opacity: 0.7 }}>Loading preview…</Typography></Box>
+          <Box sx={{ p: 3 }}><Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography></Box>
         ) : src ? (
-          <Box sx={{ width: "100%", height: "100%", overflowY: "scroll", overflowX: "hidden", position: "relative", scrollbarWidth: "none", msOverflowStyle: "none", "&::-webkit-scrollbar": { width: "0px", background: "transparent" } }}>
-            <Box sx={{ position: "absolute", right: 0, top: 0, width: "16px", height: "100%", background: isDark ? "#000" : "#fff", zIndex: 5, pointerEvents: "none" }} />
-            <iframe title="Resume Preview" src={src} style={{ width: "100%", height: "200%", border: "none", display: "block", overflow: "hidden" }} />
+          <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
+            <iframe
+              title="Resume Preview"
+              src={
+                isMobile
+                  ? `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`
+                  : `${src}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`
+              }
+              style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+            />
           </Box>
         ) : (
-          <Box sx={{ p: 2 }}><Typography sx={{ opacity: 0.7 }}>Preview not available.</Typography></Box>
+          <Box sx={{ p: 3 }}><Typography sx={{ opacity: 0.75 }}>Preview not available.</Typography></Box>
         )}
       </DialogContent>
-      <DialogActions sx={{ p: 2 }}>
+      <DialogActions sx={{ p: 2, gap: 1 }}>
         <Button onClick={onClose} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>Close</Button>
       </DialogActions>
     </Dialog>
@@ -469,6 +480,7 @@ export default function AdminDashboard(props) {
   const [certPreviewTitle, setCertPreviewTitle] = useState("");
   const [certPreviewIsImage, setCertPreviewIsImage] = useState(false);
   const [certPreviewLoading, setCertPreviewLoading] = useState(false);
+  const [certPreviewAchId, setCertPreviewAchId] = useState(null);
 
   const [imgBlobUrls, setImgBlobUrls] = useState({});
 
@@ -504,13 +516,13 @@ export default function AdminDashboard(props) {
   };
 
 
-  const onPreviewCertificate = async (ach) => {
+const onPreviewCertificate = async (ach) => {
   setCertPreviewTitle(ach.title || "Certificate");
   setCertPreviewSrc("");
+  setCertPreviewIsImage(false);
+  setCertPreviewAchId(ach.id);   // ← ADD THIS LINE
   setCertPreviewLoading(true);
   setCertPreviewOpen(true);
-  const isImage = ach.certificateContentType?.startsWith("image/");
-  setCertPreviewIsImage(isImage);
   try {
     const res = await http.get(
       `/portfolio/achievements/${ach.id}/certificate`,
@@ -520,6 +532,7 @@ export default function AdminDashboard(props) {
     const blob = new Blob([res.data], { type: contentType });
     const url = URL.createObjectURL(blob);
     setCertPreviewSrc(url);
+    setCertPreviewIsImage(contentType.startsWith("image/"));  // ← MOVE isImage detection here
   } catch {
     setCertPreviewSrc("");
   } finally {
@@ -1466,7 +1479,7 @@ const onPreviewProfileImage = async (type) => {
                   ))}
                 </Grid>
               </SimpleItemDialog>
-              {/* Certificate Preview Dialog */}
+{/* Certificate Preview Dialog */}
 <Dialog
   open={certPreviewOpen}
   onClose={closeCertPreview}
@@ -1474,48 +1487,44 @@ const onPreviewProfileImage = async (type) => {
   maxWidth="md"
   className={isDark ? "adm-dialog" : "adm-dialog adm-dialog-light"}
 >
-  <DialogTitle className="adm-dialog-title">{certPreviewTitle}</DialogTitle>
-  <DialogContent
-    sx={{
-      height: 650, p: 0, overflow: "hidden",
-      background: isDark ? "#000" : "#fff",
-      display: "flex", alignItems: "center", justifyContent: "center",
-    }}
-  >
+  <DialogTitle className="adm-dialog-title" sx={{ fontSize: { xs: "1rem", md: "1.25rem" }, py: 1.5 }}>
+    {certPreviewTitle}
+  </DialogTitle>
+  <DialogContent sx={{ height: { xs: 480, md: 580 }, p: 0, overflow: "hidden", bgcolor: "black" }}>
     {certPreviewLoading ? (
-      <Box sx={{ p: 2 }}>
-        <Typography sx={{ opacity: 0.7 }}>Loading preview…</Typography>
+      <Box sx={{ p: 3 }}>
+        <Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography>
       </Box>
-    ) : certPreviewSrc ? (
-      certPreviewIsImage ? (
+    ) : certPreviewIsImage && certPreviewSrc ? (
+      <Box sx={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <img
           src={certPreviewSrc}
           alt={certPreviewTitle}
-          style={{ maxWidth: "100%", maxHeight: 620, objectFit: "contain", borderRadius: 8 }}
+          style={{ maxWidth: "100%", maxHeight: "100%", objectFit: "contain", display: "block" }}
         />
-      ) : (
-        <Box sx={{
-          width: "100%", height: "100%", overflowY: "scroll", overflowX: "hidden",
-          position: "relative", scrollbarWidth: "none", msOverflowStyle: "none",
-          "&::-webkit-scrollbar": { width: "0px", background: "transparent" },
-        }}>
-          <iframe
-            title="Certificate Preview"
-            src={certPreviewSrc}
-            style={{ width: "100%", height: "200%", border: "none", display: "block" }}
-          />
-        </Box>
-      )
+      </Box>
+    ) : !certPreviewIsImage && certPreviewSrc ? (
+      <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
+        <iframe
+          title="Certificate Preview"
+          src={
+            /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+              ? `https://docs.google.com/viewer?url=${encodeURIComponent(
+                  `${(import.meta.env.VITE_API_URL || "https://portfolio-backend-cok2.onrender.com/api")}/portfolio/achievements/${certPreviewAchId}/certificate`
+                )}&embedded=true`
+              : `${certPreviewSrc}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`
+          }
+          style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+        />
+      </Box>
     ) : (
-      <Box sx={{ p: 2 }}>
-        <Typography sx={{ opacity: 0.7 }}>Preview not available.</Typography>
+      <Box sx={{ p: 3 }}>
+        <Typography sx={{ opacity: 0.75 }}>Preview not available.</Typography>
       </Box>
     )}
   </DialogContent>
-  <DialogActions sx={{ p: 2 }}>
-    <Button onClick={closeCertPreview} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>
-      Close
-    </Button>
+  <DialogActions sx={{ p: 2, gap: 1 }}>
+    <Button onClick={closeCertPreview} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>Close</Button>
   </DialogActions>
 </Dialog>
             </Box>
