@@ -4250,7 +4250,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   inset: -1px;
   border-radius: 28px;
   padding: 1.5px;
-  animation: pv2PrismSpin 5s linear infinite;
+  animation: pv2PrismSpin 20s linear infinite;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -4309,7 +4309,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   height: 64px;
   pointer-events: none;
   z-index: 0;
-  animation: pv2ScanBeam 4s ease-in-out infinite;
+  animation: pv2ScanBeam 15s ease-in-out infinite;
 }
 
 @keyframes pv2ScanBeam {
