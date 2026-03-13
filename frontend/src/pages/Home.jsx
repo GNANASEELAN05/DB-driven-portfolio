@@ -1447,18 +1447,28 @@ case "experience":
       <Box className="section-scroll-area">
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
           <SectionHeading title="Experience" subtitle="Career and internship timeline." />
-          <Stack spacing={2}>
+          <Stack spacing={2.5}>
             {loading ? <Skeleton height={220} /> : experience.length ? (
               experience.map((item, idx) => {
                 const isCurrentRole = !safeString(item?.end).trim();
+                const startYear = safeString(item?.start).match(/\d{4}/)?.[0];
+                const endYear = safeString(item?.end).match(/\d{4}/)?.[0];
+                const yearsCount = startYear
+                  ? (endYear ? parseInt(endYear) : new Date().getFullYear()) - parseInt(startYear)
+                  : null;
                 return (
-                  <Box key={item?.id ?? idx} className={`exp-card-luxury ${isCurrentRole ? "exp-card-current" : ""}`}>
+                  <Box key={item?.id ?? idx} className={`exp-card-luxury ${isCurrentRole ? "exp-card-current" : ""}`}
+                    style={{ "--exp-idx": idx }}>
+                    <Box className="exp-slash-accent" />
                     <Box className="exp-card-left-bar" />
                     <Box className="exp-card-top-glow" />
-                    <Box sx={{ p: { xs: "22px 22px 22px 28px", md: "26px 26px 26px 32px" } }}>
+                    <Box className="exp-holographic-layer" />
+                    <Box sx={{ p: { xs: "22px 22px 0 28px", md: "26px 26px 0 32px" } }}>
                       <Box className="exp-card-header">
                         <Box className="exp-card-header-left">
-                          <Box className="exp-company-icon">🏢</Box>
+                          <Box className="exp-company-icon">
+                            {isCurrentRole ? "⚡" : "🏢"}
+                          </Box>
                           <Box>
                             <Typography className="exp-role">{safeString(item?.role) || "Role"}</Typography>
                             <Typography className="exp-company">{safeString(item?.company) || "Company"}</Typography>
@@ -1466,20 +1476,44 @@ case "experience":
                         </Box>
                         <Box className="exp-card-header-right">
                           <Box className={`exp-date-badge ${isCurrentRole ? "exp-date-badge-current" : ""}`}>
-                            {safeString(item?.start)}{safeString(item?.end) ? ` — ${safeString(item?.end)}` : ""}
+                            {safeString(item?.start)}{safeString(item?.end) ? ` — ${safeString(item?.end)}` : " — Present"}
                           </Box>
                           {isCurrentRole && (
                             <Box className="exp-current-dot-row">
                               <span className="exp-green-dot" />
-                              <Typography sx={{ fontSize: "0.73rem", opacity: 0.5 }}>Current Role</Typography>
+                              <Typography sx={{ fontSize: "0.73rem", opacity: 0.5 }}>Currently here</Typography>
                             </Box>
                           )}
                         </Box>
                       </Box>
-                      <Box className="exp-card-divider" />
                       {safeString(item?.description) ? (
-                        <Typography className="exp-description">{safeString(item?.description)}</Typography>
+                        <Typography className="exp-description" sx={{ mt: 1.5 }}>{safeString(item?.description)}</Typography>
                       ) : null}
+                    </Box>
+                    {/* Stat strip */}
+                    <Box className="exp-stat-strip">
+                      <Box className="exp-stat-item">
+                        <Typography className="exp-stat-value">{idx + 1}</Typography>
+                        <Typography className="exp-stat-label">Position</Typography>
+                      </Box>
+                      <Box className="exp-stat-divider" />
+                      {yearsCount !== null && yearsCount >= 0 && (
+                        <>
+                          <Box className="exp-stat-item">
+                            <Typography className="exp-stat-value">{yearsCount || "<1"}</Typography>
+                            <Typography className="exp-stat-label">{yearsCount === 1 ? "Year" : "Years"}</Typography>
+                          </Box>
+                          <Box className="exp-stat-divider" />
+                        </>
+                      )}
+                      <Box className="exp-stat-item">
+                        <Typography className="exp-stat-value">{isCurrentRole ? "Active" : "Done"}</Typography>
+                        <Typography className="exp-stat-label">Status</Typography>
+                      </Box>
+                      <Box sx={{ flex: 1 }} />
+                      <Box className={`exp-status-pill ${isCurrentRole ? "exp-status-pill-active" : "exp-status-pill-past"}`}>
+                        {isCurrentRole ? "● LIVE" : "✓ COMPLETED"}
+                      </Box>
                     </Box>
                   </Box>
                 );
@@ -1501,25 +1535,34 @@ case "education":
           <Box className="edu-timeline">
             {loading ? <Skeleton height={220} /> : education.length ? (
               education.map((item, idx) => (
-                <Box key={item?.id ?? idx} className="edu-card-luxury">
-                  {/* Timeline connector */}
+                <Box key={item?.id ?? idx} className="edu-card-luxury" style={{ "--edu-idx": idx }}>
                   {idx < education.length - 1 && <Box className="edu-timeline-line" />}
                   <Box className="edu-card-node">
                     <Box className="edu-node-dot">
-                      <MdSchool style={{ fontSize: "0.95rem", color: "#f13024" }} />
+                      <Box className="edu-node-orbit" />
+                      <Box className="edu-node-orbit edu-node-orbit-2" />
+                      <MdSchool style={{ fontSize: "1rem", color: "#f13024", position: "relative", zIndex: 2 }} />
                     </Box>
+                    <Box className="edu-node-index">#{String(idx + 1).padStart(2, "0")}</Box>
                   </Box>
                   <Box className="edu-card-content">
                     <Box className="edu-card-inner">
                       <Box className="edu-card-top-accent" />
-                      <Box sx={{ p: { xs: "20px", md: "24px 28px" } }}>
+                      <Box className="edu-corner-ribbon">EDU</Box>
+                      <Box sx={{ p: { xs: "20px", md: "24px 28px 20px" } }}>
                         <Box className="edu-header-row">
-                          <Box sx={{ flex: 1 }}>
+                          <Box sx={{ flex: 1, minWidth: 0 }}>
                             <Typography className="edu-degree">{safeString(item?.degree) || "Degree"}</Typography>
-                            <Typography className="edu-institution">{safeString(item?.institution) || "Institution"}</Typography>
+                            <Box className="edu-institution-row">
+                              <MdSchool style={{ fontSize: "0.85rem", color: "#f97316", flexShrink: 0 }} />
+                              <Typography className="edu-institution">{safeString(item?.institution) || "Institution"}</Typography>
+                            </Box>
                           </Box>
                           {safeString(item?.year) ? (
-                            <Box className="edu-year-badge">{safeString(item?.year)}</Box>
+                            <Box className="edu-year-badge-stack">
+                              <Box className="edu-year-badge">{safeString(item?.year)}</Box>
+                              <Box className="edu-year-glow" />
+                            </Box>
                           ) : null}
                         </Box>
                         {safeString(item?.details) ? (
@@ -1528,6 +1571,11 @@ case "education":
                             <Typography className="edu-details">{safeString(item?.details)}</Typography>
                           </>
                         ) : null}
+                      </Box>
+                      {/* Bottom indicator bar */}
+                      <Box className="edu-bottom-bar">
+                        <Box className="edu-bottom-fill" style={{ width: `${Math.min(100, (idx + 1) * 33)}%` }} />
+                        <Typography className="edu-bottom-label">Academic Record #{idx + 1}</Typography>
                       </Box>
                     </Box>
                   </Box>
@@ -1552,20 +1600,36 @@ case "achievements":
             {loading ? <Skeleton height={220} /> : achievements.length ? (
               achievements.map((item, idx) => (
                 <Box key={item?.id ?? idx} className="ach-card-luxury" style={{ "--ach-idx": idx }}>
+                  {/* Holographic foil layer */}
+                  <Box className="ach-foil-layer" />
                   <Box className="ach-card-shimmer" />
                   <Box className="ach-card-glow-corner" />
+                  {/* Corner ribbon stamp */}
+                  <Box className="ach-ribbon-corner">
+                    <Box className="ach-ribbon-text">★</Box>
+                  </Box>
                   <Box sx={{ p: { xs: "22px", md: "26px" }, position: "relative", zIndex: 1 }}>
-                    {/* Trophy icon row */}
+                    {/* Header row */}
                     <Box className="ach-icon-row">
                       <Box className="ach-trophy-icon">
-                        <MdEmojiEvents style={{ fontSize: "1.3rem", color: "#f13024" }} />
+                        <MdEmojiEvents style={{ fontSize: "1.4rem", color: "#f13024" }} />
                       </Box>
                       <Box className="ach-index-label">#{String(idx + 1).padStart(2, "0")}</Box>
                     </Box>
                     <Typography className="ach-title">{safeString(item?.title) || "Achievement"}</Typography>
                     {safeString(item?.issuer) && (
-                      <Typography className="ach-issuer">{safeString(item?.issuer)}</Typography>
+                      <Box className="ach-issuer-row">
+                        <Box className="ach-issuer-dot" />
+                        <Typography className="ach-issuer">{safeString(item?.issuer)}</Typography>
+                      </Box>
                     )}
+                    {/* Star rating */}
+                    <Box className="ach-stars-row">
+                      {[1,2,3,4,5].map((s) => (
+                        <span key={s} className={`ach-star ${s <= 5 ? "ach-star-filled" : ""}`}>★</span>
+                      ))}
+                      <Typography className="ach-stars-label">Verified</Typography>
+                    </Box>
                     {safeString(item?.year) && (
                       <Box className="ach-year-chip">{safeString(item?.year)}</Box>
                     )}
@@ -1596,6 +1660,13 @@ case "achievements":
                         </Button>
                       ) : null}
                     </Box>
+                    {/* Certified stamp */}
+                    {item?.certificateFileName && (
+                      <Box className="ach-certified-stamp">
+                        <Box className="ach-stamp-ring" />
+                        <Typography className="ach-stamp-text">CERTIFIED</Typography>
+                      </Box>
+                    )}
                   </Box>
                 </Box>
               ))
