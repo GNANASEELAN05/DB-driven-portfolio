@@ -1543,12 +1543,12 @@ case "education":
                       <Box className="edu-node-orbit edu-node-orbit-2" />
                       <MdSchool style={{ fontSize: "1rem", color: "#f13024", position: "relative", zIndex: 2 }} />
                     </Box>
-                    <Box className="edu-node-index">#{String(idx + 1).padStart(2, "0")}</Box>
+                    <Box className="edu-node-index">{String(idx + 1).padStart(2, "0")}</Box>
                   </Box>
                   <Box className="edu-card-content">
                     <Box className="edu-card-inner">
                       <Box className="edu-card-top-accent" />
-                      <Box className="edu-corner-ribbon">EDU</Box>
+                      <Box className="edu-corner-ribbon"></Box>
                       <Box sx={{ p: { xs: "20px", md: "24px 28px 20px" } }}>
                         <Box className="edu-header-row">
                           <Box sx={{ flex: 1, minWidth: 0 }}>
@@ -1614,7 +1614,7 @@ case "achievements":
                       <Box className="ach-trophy-icon">
                         <MdEmojiEvents style={{ fontSize: "1.4rem", color: "#f13024" }} />
                       </Box>
-                      <Box className="ach-index-label">#{String(idx + 1).padStart(2, "0")}</Box>
+                      <Box className="ach-index-label">{String(idx + 1).padStart(2, "0")}</Box>
                     </Box>
                     <Typography className="ach-title">{safeString(item?.title) || "Achievement"}</Typography>
                     {safeString(item?.issuer) && (

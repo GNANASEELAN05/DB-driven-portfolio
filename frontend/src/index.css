@@ -2444,19 +2444,19 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 /* Index badge */
 .langrow-index {
   position: absolute;
-  left: 14px;
+  left: 10px;
   top: 50%;
   transform: translateY(-50%);
   font-size: 0.58rem;
   font-weight: 900;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.04em;
   opacity: 0.22;
   font-family: "Inter", sans-serif;
-  writing-mode: vertical-rl;
+  writing-mode: horizontal-tb;
   text-orientation: mixed;
   user-select: none;
+  line-height: 1;
 }
-
 /* LEFT section */
 .langrow-left {
   display: flex;
@@ -2724,16 +2724,18 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 @media (max-width: 600px) {
   .langrow-card {
     grid-template-columns: auto 1fr;
-    padding: 12px 14px 12px 38px;
-    gap: 12px;
+    padding: 12px 14px 12px 34px;
+    gap: 10px;
   }
   .langrow-right { display: none; }
-  .langrow-logo-ring { width: 40px; height: 40px; border-radius: 11px; }
-  .langrow-logo-img { width: 24px; height: 24px; }
-  .langrow-name { font-size: 0.84rem !important; }
-  .langrow-dot-seg { width: 22px; }
-  .langrow-name-block { width: 80px; min-width: 80px; max-width: 80px; }
-  .langrow-left { width: auto; min-width: auto; max-width: none; }
+  .langrow-logo-ring { width: 38px; height: 38px; border-radius: 10px; }
+  .langrow-logo-img { width: 22px; height: 22px; }
+  .langrow-name { font-size: 0.78rem !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .langrow-dot-seg { width: 18px; }
+  .langrow-name-block { width: 72px; min-width: 72px; max-width: 72px; }
+  .langrow-left { width: auto; min-width: auto; max-width: none; gap: 8px; }
+  .langrow-level-chip { font-size: 0.52rem; padding: 2px 5px; letter-spacing: 0.05em; }
+  .langrow-index { left: 7px; font-size: 0.50rem; }
 }
 
 
@@ -3429,8 +3431,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
 .edu-timeline-line {
   position: absolute;
-  left: 19px;
-  top: 50px;
+  left: 35px;
+  top: 68px;
   bottom: -28px;
   width: 2px;
   background: linear-gradient(180deg, rgba(241, 48, 36, 0.40), rgba(241, 48, 36, 0.04));
@@ -3446,7 +3448,10 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   gap: 6px;
   margin-right: 22px;
   z-index: 1;
-  padding-top: 2px;
+  padding-top: 10px;
+  padding-left: 16px;
+  padding-right: 4px;
+  overflow: visible;
 }
 
 .edu-node-dot {
@@ -3459,6 +3464,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   flex-shrink: 0;
   position: relative;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  margin: 18px;
 }
 .mode-dark .edu-node-dot {
   background: rgba(241, 48, 36, 0.12);
@@ -3660,9 +3666,9 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 }
 
 @media (max-width: 600px) {
-  .edu-node-dot { width: 34px; height: 34px; }
-  .edu-timeline-line { left: 16px; }
-  .edu-card-node { margin-right: 16px; }
+  .edu-node-dot { width: 34px; height: 34px; margin: 14px; }
+  .edu-timeline-line { left: 28px; }
+  .edu-card-node { margin-right: 12px; padding-left: 10px; }
   .edu-header-row { flex-direction: column; gap: 8px; }
   .edu-node-orbit { inset: -6px; }
   .edu-node-orbit-2 { inset: -11px; }
