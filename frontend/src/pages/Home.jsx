@@ -1606,7 +1606,7 @@ case "achievements":
                   <Box className="ach-card-glow-corner" />
                   {/* Corner ribbon stamp */}
                   <Box className="ach-ribbon-corner">
-                    <Box className="ach-ribbon-text">★</Box>
+                    <Box className="ach-ribbon-text"></Box>
                   </Box>
                   <Box sx={{ p: { xs: "22px", md: "26px" }, position: "relative", zIndex: 1 }}>
                     {/* Header row */}
