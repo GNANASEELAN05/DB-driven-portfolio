@@ -523,8 +523,11 @@ function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
           <Box sx={{ p: 3 }}><Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography></Box>
         ) : src ? (
           <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
-            <iframe title="Resume Preview" src={src}
-              style={{ width: "100%", height: "100%", border: "none", display: "block" }} />
+            <iframe
+              title="Resume Preview"
+              src={`${src}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+              style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+            />
           </Box>
         ) : (
           <Box sx={{ p: 3 }}><Typography sx={{ opacity: 0.75 }}>Preview not available.</Typography></Box>
@@ -1840,10 +1843,10 @@ case "languages":
         />
       </Box>
 ) : !certPreviewIsImage && certPreviewBlobUrl ? (
-      <embed
+      <iframe
         key={certPreviewBlobUrl}
-        src={certPreviewBlobUrl}
-        type="application/pdf"
+        src={`${certPreviewBlobUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+        title={certPreviewTitle}
         style={{
           width: "100%",
           height: "100%",
