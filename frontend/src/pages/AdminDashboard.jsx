@@ -517,17 +517,27 @@ export default function AdminDashboard(props) {
 
 
   // ── Reorder state ──────────────────────────────────────────────────────────
-const [reorderMenu, setReorderMenu] = useState({ open: false, section: null, itemId: null, anchorEl: null });
+const [reorderMenu, setReorderMenu] = useState({ open: false, section: null, itemId: null, anchorEl: null, position: null });
 const [pendingOrders, setPendingOrders] = useState({}); 
 // pendingOrders shape: { projects: {id: order}, achievements: {id: order}, ... }
 
-const openReorderMenu = (e, section, itemId) => {
-  e.stopPropagation();
-  setReorderMenu({ open: true, section, itemId, anchorEl: e.currentTarget });
+const openReorderMenu = (el, section, itemId) => {
+  const rect = el.getBoundingClientRect();
+  setReorderMenu({
+    open: true,
+    section,
+    itemId,
+    anchorEl: el,
+    position: {
+      top: rect.bottom + window.scrollY,
+      left: rect.left + window.scrollX,
+    },
+  });
 };
 const closeReorderMenu = () => {
-  setReorderMenu({ open: false, section: null, itemId: null, anchorEl: null });
+  setReorderMenu({ open: false, section: null, itemId: null, anchorEl: null, position: null });
 };
+
 const getSectionItems = (section) => {
   if (section === "projects") return projects;
   if (section === "achievements") return achievements;
@@ -707,6 +717,29 @@ React.useEffect(() => {
     try { setErr(""); setOk(""); setLoading(true); await saveAchievements(achievements.map(({ id, ...rest }) => rest)); setOk("Achievements saved to DB.");setPendingOrders(p => { const n={...p}; delete n.achievements; return n; }); await fetchAllAdmin(); bumpContentVersion(); }
     catch { setErr("Saving achievements failed."); } finally { setLoading(false); }
   };
+
+
+
+  const persistProjectOrder = async () => {
+  try {
+    setErr(""); setOk(""); setLoading(true);
+    // Re-save each project with its new sortOrder, sequentially
+    // BUT also call a bulk endpoint if you have one — mirror achievements:
+    // Since projects use individual update, we still need sortOrder on backend
+    // The REAL fix: send array order as payload same as achievements
+    // Use saveAchievements-style: send full array stripped of id
+    // You need a bulk-save endpoint for projects, OR use sortOrder correctly.
+    // For now, sequential with sortOrder (matches your existing backend field):
+    for (let idx = 0; idx < projects.length; idx++) {
+      await updateProject(projects[idx].id, { ...projects[idx], sortOrder: idx + 1 });
+    }
+    setOk("Project order saved to DB.");
+    setPendingOrders(prev => { const n = { ...prev }; delete n.projects; return n; });
+    await fetchAllAdmin();
+    bumpContentVersion();
+  } catch { setErr("Failed to save project order."); }
+  finally { setLoading(false); }
+};
 
   const openLangAdd = () => { setLangEditingId(null); setLangForm({ language: "", level: "Beginner", years: 1, notes: "" }); setLangDlgOpen(true); };
   const openLangEdit = (l) => { setLangEditingId(l.id); setLangForm({ language: l.language || l.name || "", level: l.level || "Beginner", years: Number(l.years || 1), notes: l.notes || "" }); setLangDlgOpen(true); };
@@ -1038,8 +1071,13 @@ const onPreviewProfileImage = async (type) => {
   const IconEdit = ({ onClick }) => (
     <IconButton size="small" className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`} onClick={onClick}><MdEdit /></IconButton>
   );
-const IconOrder = ({ onClick }) => (
-  <IconButton size="small" className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`} onClick={onClick} title="Reorder">
+const IconOrder = ({ onClickBtn }) => (
+  <IconButton
+    size="small"
+    className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+    title="Reorder"
+    onClick={(e) => onClickBtn(e.currentTarget)}
+  >
     <MdArrowUpward />
   </IconButton>
 );
@@ -1430,24 +1468,37 @@ const IconDel = ({ onClick }) => (
   title="Projects Manager" subtitle="Add / edit / delete projects shown on Viewer"
   right={
     <Stack direction="row" spacing={1} alignItems="center">
-      {pendingOrders.projects && (
-        <>
-          <Chip label="Order changed" size="small" sx={{ background: "rgba(249,115,22,0.18)", color: "#f97316", border: "1px solid rgba(249,115,22,0.35)", fontWeight: 700, fontSize: "0.72rem" }} />
+{pendingOrders.projects && (
+  <>
+<Chip
+  label={`Order changed · ${projects.map((p, i) => `${i + 1}. ${(p.title || "").slice(0, 10)}`).join("  ")}`}
+  size="small"
+  sx={{
+    background: "rgba(249,115,22,0.18)",
+    color: "#f97316",
+    border: "1px solid rgba(249,115,22,0.35)",
+    fontWeight: 700,
+    fontSize: "0.68rem",
+    maxWidth: 360,
+    "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+  }}
+/>
           <PBtn
             startIcon={<MdSave />}
-            onClick={async () => {
-              try {
-                setErr(""); setOk(""); setLoading(true);
-                // Save order by updating each project with a sortOrder field
-                await Promise.all(
-                  projects.map((p, idx) => updateProject(p.id, { ...p, sortOrder: idx }))
-                );
-                setOk("Project order saved to DB.");
-                setPendingOrders(prev => { const n={...prev}; delete n.projects; return n; });
-                bumpContentVersion();
-              } catch { setErr("Failed to save project order."); }
-              finally { setLoading(false); }
-            }}
+onClick={async () => {
+  try {
+    setErr(""); setOk(""); setLoading(true);
+    // Sequential updates preserve order even if backend uses insert-order
+    for (let idx = 0; idx < projects.length; idx++) {
+      await updateProject(projects[idx].id, { ...projects[idx], sortOrder: idx + 1 });
+    }
+    setOk("Project order saved to DB.");
+    setPendingOrders(prev => { const n = { ...prev }; delete n.projects; return n; });
+    await fetchAllAdmin();
+    bumpContentVersion();
+  } catch { setErr("Failed to save project order."); }
+  finally { setLoading(false); }
+}}
           >
             Save Order
           </PBtn>
@@ -1468,7 +1519,7 @@ const IconDel = ({ onClick }) => (
                         <TC><Chip size="small" label={p.featured ? "YES" : "NO"} className={p.featured ? "adm-chip-yes" : "adm-chip-no"} /></TC>
 <TC>
   <Stack direction="row" spacing={0.8}>
-    <IconOrder onClick={(e) => openReorderMenu(e, "projects", p.id)} />
+    <IconOrder onClickBtn={(el) => openReorderMenu(el, "projects", p.id)} />
     <IconEdit onClick={() => openEditProject(p)} />
     <IconDel onClick={() => askDeleteProject(p)} />
   </Stack>
@@ -1489,7 +1540,21 @@ const IconDel = ({ onClick }) => (
                 title="Achievements" subtitle="Add / edit / delete then Save to DB. Upload certificate per achievement after saving."
 right={
   <Stack direction="row" spacing={1} alignItems="center">
-    {pendingOrders.achievements && <Chip label="Order changed" size="small" sx={{ background: "rgba(249,115,22,0.18)", color: "#f97316", border: "1px solid rgba(249,115,22,0.35)", fontWeight: 700, fontSize: "0.72rem" }} />}
+{pendingOrders.achievements && (
+  <Chip
+    label={`Order · ${achievements.map((a, i) => `${i + 1}. ${(a.title || "").slice(0, 10)}`).join("  ")}`}
+    size="small"
+    sx={{
+      background: "rgba(249,115,22,0.18)",
+      color: "#f97316",
+      border: "1px solid rgba(249,115,22,0.35)",
+      fontWeight: 700,
+      fontSize: "0.68rem",
+      maxWidth: 360,
+      "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+    }}
+  />
+)}
     <OBtn startIcon={<MdAdd />} onClick={openAchAdd}>Add</OBtn>
     <PBtn startIcon={<MdSave />} onClick={persistAchievements}>Save to DB</PBtn>
   </Stack>
@@ -1544,7 +1609,7 @@ right={
                             </Button>
                           )}
                         </TC>
-                        <TC><Stack direction="row" spacing={0.8}><IconOrder onClick={(e) => openReorderMenu(e, "achievements", a.id)} /><IconEdit onClick={() => openAchEdit(a)} /><IconDel onClick={() => deleteAchLocal(a.id)} /></Stack></TC>
+                        <TC><Stack direction="row" spacing={0.8}><IconOrder onClickBtn={(el) => openReorderMenu(el, "achievements", a.id)} /><IconEdit onClick={() => openAchEdit(a)} /><IconDel onClick={() => deleteAchLocal(a.id)} /></Stack></TC>
                       </TRow>
                     ))}
                     {achievements.length === 0 && <TRow><TC colSpan={5} sx={{ opacity: 0.55 }}>No achievements yet.</TC></TRow>}
@@ -1620,7 +1685,21 @@ right={
                 title="Programming Languages" subtitle="Language proficiency and experience"
 right={
   <Stack direction="row" spacing={1} alignItems="center">
-    {pendingOrders.languages && <Chip label="Order changed" size="small" sx={{ background: "rgba(249,115,22,0.18)", color: "#f97316", border: "1px solid rgba(249,115,22,0.35)", fontWeight: 700, fontSize: "0.72rem" }} />}
+{pendingOrders.languages && (
+  <Chip
+    label={`Order · ${languages.map((l, i) => `${i + 1}. ${((l.language || l.name) || "").slice(0, 10)}`).join("  ")}`}
+    size="small"
+    sx={{
+      background: "rgba(249,115,22,0.18)",
+      color: "#f97316",
+      border: "1px solid rgba(249,115,22,0.35)",
+      fontWeight: 700,
+      fontSize: "0.68rem",
+      maxWidth: 360,
+      "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+    }}
+  />
+)}
     <OBtn startIcon={<MdAdd />} onClick={openLangAdd}>Add</OBtn>
     <PBtn startIcon={<MdSave />} onClick={persistLanguages}>Save to DB</PBtn>
   </Stack>
@@ -1636,7 +1715,7 @@ right={
                         <TC sx={{ opacity: 0.80 }}>{l.level}</TC>
                         <TC sx={{ opacity: 0.80 }}>{l.years}</TC>
                         <TC sx={{ opacity: 0.80 }}>{l.notes}</TC>
-                        <TC><Stack direction="row" spacing={0.8}><IconOrder onClick={(e) => openReorderMenu(e, "languages", l.id)} /><IconEdit onClick={() => openLangEdit(l)} /><IconDel onClick={() => deleteLangLocal(l.id)} /></Stack></TC>
+                        <TC><Stack direction="row" spacing={0.8}><IconOrder onClickBtn={(el) => openReorderMenu(el, "languages", l.id)} /><IconEdit onClick={() => openLangEdit(l)} /><IconDel onClick={() => deleteLangLocal(l.id)} /></Stack></TC>
                       </TRow>
                     ))}
                     {languages.length === 0 && <TRow><TC colSpan={5} sx={{ opacity: 0.55 }}>No languages yet.</TC></TRow>}
@@ -1674,7 +1753,21 @@ right={
                 title="Education" subtitle="Academic background and qualifications"
 right={
   <Stack direction="row" spacing={1} alignItems="center">
-    {pendingOrders.education && <Chip label="Order changed" size="small" sx={{ background: "rgba(249,115,22,0.18)", color: "#f97316", border: "1px solid rgba(249,115,22,0.35)", fontWeight: 700, fontSize: "0.72rem" }} />}
+{pendingOrders.education && (
+  <Chip
+    label={`Order · ${education.map((e, i) => `${i + 1}. ${(e.degree || "").slice(0, 10)}`).join("  ")}`}
+    size="small"
+    sx={{
+      background: "rgba(249,115,22,0.18)",
+      color: "#f97316",
+      border: "1px solid rgba(249,115,22,0.35)",
+      fontWeight: 700,
+      fontSize: "0.68rem",
+      maxWidth: 360,
+      "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+    }}
+  />
+)}
     <OBtn startIcon={<MdAdd />} onClick={openEduAdd}>Add</OBtn>
     <PBtn startIcon={<MdSave />} onClick={persistEducation}>Save to DB</PBtn>
   </Stack>
@@ -1689,7 +1782,7 @@ right={
                         <TC bold>{e.degree}</TC>
                         <TC sx={{ opacity: 0.80 }}>{e.institution}</TC>
                         <TC sx={{ opacity: 0.80 }}>{e.year}</TC>
-                        <TC><Stack direction="row" spacing={0.8}><IconOrder onClick={(ev) => openReorderMenu(ev, "education", e.id)} /><IconEdit onClick={() => openEduEdit(e)} /><IconDel onClick={() => deleteEduLocal(e.id)} /></Stack></TC>
+                        <TC><Stack direction="row" spacing={0.8}><IconOrder onClickBtn={(el) => openReorderMenu(el, "education", e.id)} /><IconEdit onClick={() => openEduEdit(e)} /><IconDel onClick={() => deleteEduLocal(e.id)} /></Stack></TC>
                       </TRow>
                     ))}
                     {education.length === 0 && <TRow><TC colSpan={4} sx={{ opacity: 0.55 }}>No education yet.</TC></TRow>}
@@ -1713,7 +1806,21 @@ right={
                 title="Experience" subtitle="Career and internship timeline"
 right={
   <Stack direction="row" spacing={1} alignItems="center">
-    {pendingOrders.experience && <Chip label="Order changed" size="small" sx={{ background: "rgba(249,115,22,0.18)", color: "#f97316", border: "1px solid rgba(249,115,22,0.35)", fontWeight: 700, fontSize: "0.72rem" }} />}
+{pendingOrders.experience && (
+  <Chip
+    label={`Order · ${experience.map((e, i) => `${i + 1}. ${(e.company || "").slice(0, 10)}`).join("  ")}`}
+    size="small"
+    sx={{
+      background: "rgba(249,115,22,0.18)",
+      color: "#f97316",
+      border: "1px solid rgba(249,115,22,0.35)",
+      fontWeight: 700,
+      fontSize: "0.68rem",
+      maxWidth: 360,
+      "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" },
+    }}
+  />
+)}
     <OBtn startIcon={<MdAdd />} onClick={openExpAdd}>Add</OBtn>
     <PBtn startIcon={<MdSave />} onClick={persistExperience}>Save to DB</PBtn>
   </Stack>
@@ -1729,7 +1836,7 @@ right={
                         <TC sx={{ opacity: 0.80 }}>{e.role}</TC>
                         <TC sx={{ opacity: 0.80 }}>{e.start}</TC>
                         <TC sx={{ opacity: 0.80 }}>{e.end}</TC>
-                        <TC><Stack direction="row" spacing={0.8}><IconOrder onClick={(ev) => openReorderMenu(ev, "experience", e.id)} /><IconEdit onClick={() => openExpEdit(e)} /><IconDel onClick={() => deleteExpLocal(e.id)} /></Stack></TC>
+                        <TC><Stack direction="row" spacing={0.8}><IconOrder onClickBtn={(el) => openReorderMenu(el, "experience", e.id)} /><IconEdit onClick={() => openExpEdit(e)} /><IconDel onClick={() => deleteExpLocal(e.id)} /></Stack></TC>
                       </TRow>
                     ))}
                     {experience.length === 0 && <TRow><TC colSpan={5} sx={{ opacity: 0.55 }}>No experience yet.</TC></TRow>}
@@ -2131,7 +2238,7 @@ right={
   </Box>
 )}
 
-          <ConfirmDialog
+<ConfirmDialog
             open={confirmOpen}
             title={confirmPayload.title}
             description={confirmPayload.description}
@@ -2141,19 +2248,24 @@ right={
           />
 
         {/* Reorder Menu */}
-<Menu
-  anchorEl={reorderMenu.anchorEl}
-  open={reorderMenu.open}
-  onClose={closeReorderMenu}
-  anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-  transformOrigin={{ vertical: "top", horizontal: "left" }}
-  PaperProps={{ className: isDark ? "adm-dialog" : "adm-dialog adm-dialog-light", sx: { minWidth: 140 } }}
->
+        <Menu
+          anchorEl={reorderMenu.anchorEl}
+          anchorReference="anchorPosition"
+          anchorPosition={
+            reorderMenu.position
+              ? { top: reorderMenu.position.top, left: reorderMenu.position.left }
+              : undefined
+          }
+          open={reorderMenu.open}
+          onClose={closeReorderMenu}
+          PaperProps={{ className: isDark ? "adm-dialog" : "adm-dialog adm-dialog-light", sx: { minWidth: 140 } }}
+        >
           <Typography sx={{ px: 2, py: 0.8, fontSize: "0.75rem", fontWeight: 800, opacity: 0.5, letterSpacing: "0.08em", textTransform: "uppercase" }}>
             Move to position
           </Typography>
-          {reorderMenu.section && getSectionItems(reorderMenu.section).map((_, idx) => {
+          {reorderMenu.section && getSectionItems(reorderMenu.section).map((item, idx) => {
             const currentPos = getSectionItems(reorderMenu.section).findIndex(x => x.id === reorderMenu.itemId) + 1;
+            const itemName = item.title || item.company || item.degree || item.language || item.name || "";
             return (
               <MenuItem
                 key={idx + 1}
@@ -2161,20 +2273,12 @@ right={
                 onClick={() => selectOrder(reorderMenu.section, reorderMenu.itemId, idx + 1)}
                 sx={{ fontWeight: currentPos === idx + 1 ? 800 : 500, fontSize: "0.875rem" }}
               >
-                {currentPos === idx + 1 ? `${idx + 1} (current)` : idx + 1}
+                {idx + 1}. {itemName.slice(0, 18)}{itemName.length > 18 ? "…" : ""}
+                {currentPos === idx + 1 ? <Typography component="span" sx={{ ml: 1, fontSize: "0.72rem", opacity: 0.5 }}>(current)</Typography> : null}
               </MenuItem>
             );
           })}
         </Menu>
-
-          <ConfirmDialog
-            open={confirmOpen}
-            title={confirmPayload.title}
-            description={confirmPayload.description}
-            confirmText={confirmPayload.confirmText}
-            onClose={() => setConfirmOpen(false)}
-            onConfirm={confirmPayload.onConfirm || (() => setConfirmOpen(false))}
-          />
 
         </Container>
       </Box>

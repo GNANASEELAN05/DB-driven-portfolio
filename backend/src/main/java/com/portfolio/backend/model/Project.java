@@ -16,22 +16,20 @@ public class Project {
     @Column(length = 5000)
     private String description;
 
-    // frontend: repoUrl
     private String repoUrl;
-
-    // frontend: liveUrl
     private String liveUrl;
 
-    // frontend: tech (comma separated)
     @Column(length = 2000)
     private String tech;
 
-    // frontend: status (Live / Draft / In Progress)
     private String status;
 
     private Boolean featured = true;
 
     private Instant updatedAt = Instant.now();
+
+    @Column(name = "sort_order")
+    private Integer sortOrder;
 
     public Project() {}
 
@@ -67,4 +65,7 @@ public class Project {
 
     public Instant getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
+
+    public Integer getSortOrder() { return sortOrder; }
+    public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
 }

@@ -20,13 +20,13 @@ public class ProjectController {
     // PUBLIC
     @GetMapping
     public List<Project> getAll() {
-        return repo.findAll();
+        return repo.findAllByOrderBySortOrderAscIdAsc();
     }
 
     // PUBLIC (Home uses featured)
     @GetMapping("/featured")
     public List<Project> featured() {
-        return repo.findByFeaturedTrueOrderByUpdatedAtDesc();
+        return repo.findByFeaturedTrueOrderBySortOrderAscUpdatedAtDesc();
     }
 
     // ADMIN
@@ -47,6 +47,7 @@ public class ProjectController {
                     existing.setTech(req.getTech());
                     existing.setStatus(req.getStatus());
                     existing.setFeatured(req.getFeatured());
+                    existing.setSortOrder(req.getSortOrder());
                     return ResponseEntity.ok(repo.save(existing));
                 })
                 .orElse(ResponseEntity.notFound().build());
