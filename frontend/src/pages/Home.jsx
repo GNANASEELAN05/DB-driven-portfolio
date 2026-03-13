@@ -516,16 +516,20 @@ function CursorSpotlight() {
 function ResumePreviewDialog({ open, title, onClose, url, blobUrl, loading }) {
   const src = blobUrl || url;
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="lg">
-      <DialogTitle sx={{ fontWeight: 900 }}>{title}</DialogTitle>
-      <DialogContent sx={{ height: 700, p: 0, overflow: "hidden", bgcolor: "black" }}>
+<Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+  <DialogTitle sx={{ fontWeight: 900, fontSize: { xs: "1rem", md: "1.25rem" }, py: 1.5 }}>{title}</DialogTitle>
+  <DialogContent sx={{ height: { xs: 480, md: 580 }, p: 0, overflow: "hidden", bgcolor: "black" }}>
         {loading ? (
           <Box sx={{ p: 3 }}><Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography></Box>
         ) : src ? (
           <Box sx={{ width: "100%", height: "100%", overflow: "hidden" }}>
             <iframe
               title="Resume Preview"
-              src={`${src}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+              src={
+                /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+                  ? `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`
+                  : `${src}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`
+              }
               style={{ width: "100%", height: "100%", border: "none", display: "block" }}
             />
           </Box>
@@ -1812,9 +1816,9 @@ case "languages":
       />
 
 {/* ── Certificate preview dialog ── */}
-<Dialog open={certPreviewOpen} onClose={closeCertPreview} fullWidth maxWidth="lg">
-  <DialogTitle sx={{ fontWeight: 900 }}>{certPreviewTitle}</DialogTitle>
-  <DialogContent sx={{ height: 700, p: 0, overflow: "hidden", bgcolor: "black" }}>
+<Dialog open={certPreviewOpen} onClose={closeCertPreview} fullWidth maxWidth="md">
+  <DialogTitle sx={{ fontWeight: 900, fontSize: { xs: "1rem", md: "1.25rem" }, py: 1.5 }}>{certPreviewTitle}</DialogTitle>
+  <DialogContent sx={{ height: { xs: 480, md: 580 }, p: 0, overflow: "hidden", bgcolor: "black" }}>
     {certPreviewLoading ? (
       <Box sx={{ p: 3 }}>
         <Typography sx={{ opacity: 0.75 }}>Loading preview…</Typography>
@@ -1845,7 +1849,13 @@ case "languages":
 ) : !certPreviewIsImage && certPreviewBlobUrl ? (
       <iframe
         key={certPreviewBlobUrl}
-        src={`${certPreviewBlobUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+        src={
+          /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+            ? `https://docs.google.com/viewer?url=${encodeURIComponent(
+                `${(import.meta.env.VITE_API_URL || "https://portfolio-backend-cok2.onrender.com/api")}/portfolio/achievements/${certPreviewAchId}/certificate`
+              )}&embedded=true`
+            : `${certPreviewBlobUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`
+        }
         title={certPreviewTitle}
         style={{
           width: "100%",
