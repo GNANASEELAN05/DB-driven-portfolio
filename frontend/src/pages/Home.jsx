@@ -906,16 +906,16 @@ function ProjectCard({ project, index = 0 }) {
   const liveUrl = safeString(project?.liveUrl);
   const ref = useRef(null);
   const [hovered, setHovered] = useState(false);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [mousePos, setMousePos] = useState({ x: 50, y: 50 });
+  const [revealed, setRevealed] = useState(false);
 
-  // Assign a unique accent color per card index
   const CARD_ACCENTS = [
-    { from: "#f13024", to: "#f97316", glow: "rgba(241,48,36,0.35)" },
-    { from: "#6366f1", to: "#a855f7", glow: "rgba(139,92,246,0.35)" },
-    { from: "#06b6d4", to: "#3b82f6", glow: "rgba(59,130,246,0.35)" },
-    { from: "#10b981", to: "#06b6d4", glow: "rgba(16,185,129,0.35)" },
-    { from: "#f59e0b", to: "#ef4444", glow: "rgba(245,158,11,0.35)" },
-    { from: "#ec4899", to: "#a855f7", glow: "rgba(236,72,153,0.35)" },
+    { from: "#f13024", to: "#f97316", glow: "rgba(241,48,36,0.40)", mid: "#ff6b35", hue: "15" },
+    { from: "#6366f1", to: "#a855f7", glow: "rgba(139,92,246,0.40)", mid: "#8b5cf6", hue: "270" },
+    { from: "#06b6d4", to: "#3b82f6", glow: "rgba(59,130,246,0.40)", mid: "#0ea5e9", hue: "210" },
+    { from: "#10b981", to: "#06b6d4", glow: "rgba(16,185,129,0.40)", mid: "#14b8a6", hue: "170" },
+    { from: "#f59e0b", to: "#ef4444", glow: "rgba(245,158,11,0.40)", mid: "#f97316", hue: "38" },
+    { from: "#ec4899", to: "#a855f7", glow: "rgba(236,72,153,0.40)", mid: "#d946ef", hue: "300" },
   ];
   const accent = CARD_ACCENTS[index % CARD_ACCENTS.length];
 
@@ -927,101 +927,146 @@ function ProjectCard({ project, index = 0 }) {
     const y = e.clientY - rect.top;
     const cx = rect.width / 2;
     const cy = rect.height / 2;
-    const rotX = ((y - cy) / cy) * -10;
-    const rotY = ((x - cx) / cx) * 10;
-    el.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(12px) translateY(-6px)`;
+    const rotX = ((y - cy) / cy) * -8;
+    const rotY = ((x - cx) / cx) * 8;
+    el.style.transform = `perspective(1200px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(16px)`;
     setMousePos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
     const el = ref.current;
     if (!el) return;
-    el.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px) translateY(0px)";
+    el.style.transform = "perspective(1200px) rotateX(0deg) rotateY(0deg) translateZ(0px)";
     setHovered(false);
   }, []);
 
   const projectNumber = String(index + 1).padStart(2, "0");
+  const techCount = techList.length;
+  const linkCount = (repoUrl ? 1 : 0) + (liveUrl ? 1 : 0);
 
   return (
     <Box
       ref={ref}
-      className="proj-card-ultra"
-      style={{ "--proj-from": accent.from, "--proj-to": accent.to, "--proj-glow": accent.glow, "--proj-idx": index }}
+      className={`proj-v2-card ${hovered ? "proj-v2-hovered" : ""}`}
+      style={{
+        "--pv2-from": accent.from,
+        "--pv2-to": accent.to,
+        "--pv2-glow": accent.glow,
+        "--pv2-mid": accent.mid,
+        "--pv2-hue": accent.hue,
+        "--pv2-mx": `${mousePos.x}%`,
+        "--pv2-my": `${mousePos.y}%`,
+        "--pv2-idx": index,
+      }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseEnter={() => setHovered(true)}
     >
-      {/* Animated gradient border */}
-      <Box className="proj-border-beam" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to}, transparent, ${accent.from})` }} />
+      {/* ── Spinning prismatic border ── */}
+      <Box className="pv2-prism" style={{ background: `conic-gradient(from 0deg, transparent 50%, ${accent.from}, ${accent.to}, transparent)` }} />
 
-      {/* Holographic foil background */}
-      <Box className="proj-foil" style={{
-        background: `radial-gradient(ellipse at ${mousePos.x}% ${mousePos.y}%, ${accent.from}18 0%, ${accent.to}0d 40%, transparent 70%)`,
+      {/* ── Holographic foil overlay ── */}
+      <Box className="pv2-foil" style={{
+        background: `radial-gradient(ellipse at var(--pv2-mx) var(--pv2-my), ${accent.from}22 0%, ${accent.mid}11 35%, transparent 65%)`,
         opacity: hovered ? 1 : 0,
       }} />
 
-      {/* Top scan line */}
-      <Box className="proj-scan-line" style={{ background: `linear-gradient(90deg, transparent, ${accent.from}, ${accent.to}, transparent)` }} />
+      {/* ── Grid scan overlay ── */}
+      <Box className="pv2-grid-scan" />
 
-      {/* Corner accent */}
-      <Box className="proj-corner-tl" style={{ borderColor: `${accent.from}55` }} />
-      <Box className="proj-corner-br" style={{ borderColor: `${accent.to}55` }} />
+      {/* ── Corner circuit brackets ── */}
+      <Box className="pv2-corner pv2-corner--tl" style={{ borderColor: `${accent.from}99` }} />
+      <Box className="pv2-corner pv2-corner--tr" style={{ borderColor: `${accent.from}66` }} />
+      <Box className="pv2-corner pv2-corner--bl" style={{ borderColor: `${accent.to}77` }} />
+      <Box className="pv2-corner pv2-corner--br" style={{ borderColor: `${accent.to}55` }} />
 
-      {/* Header row */}
-      <Box className="proj-header">
-        <Box className="proj-number-badge" style={{ background: `linear-gradient(135deg, ${accent.from}22, ${accent.to}11)`, borderColor: `${accent.from}44` }}>
-          <Typography className="proj-number-text" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-            {projectNumber}
-          </Typography>
+      {/* ── Horizontal scan beam ── */}
+      <Box className="pv2-scan-beam" style={{ background: `linear-gradient(90deg, transparent, ${accent.from}44, ${accent.to}33, transparent)` }} />
+
+      {/* ── macOS top status bar ── */}
+      <Box className="pv2-status-bar">
+        <Box className="pv2-status-dots">
+          <span className="pv2-dot pv2-dot-red" />
+          <span className="pv2-dot pv2-dot-yellow" />
+          <span className={`pv2-dot ${liveUrl ? "pv2-dot-green" : "pv2-dot-grey"}`} />
+        </Box>
+        <Box className="pv2-status-tag" style={{ color: accent.from, WebkitTextFillColor: accent.from }}>
+          PROJ_{projectNumber}
+        </Box>
+        <Box className="pv2-status-signal">
+          {[1,2,3,4].map(b => (
+            <Box key={b} className="pv2-signal-bar" style={{
+              height: `${b * 3 + 2}px`,
+              background: b <= 3 ? accent.from : "rgba(255,255,255,0.12)"
+            }} />
+          ))}
+        </Box>
+        {liveUrl && (
+          <Box className="pv2-live-pill">
+            <span className="pv2-live-pulse" style={{ background: "#22c55e", boxShadow: "0 0 6px #22c55e" }} />
+            <Typography sx={{ fontSize: "0.52rem", fontWeight: 900, color: "#22c55e", WebkitTextFillColor: "#22c55e", letterSpacing: "0.18em" }}>LIVE</Typography>
+          </Box>
+        )}
+      </Box>
+
+      {/* ── Main body ── */}
+      <Box className="pv2-body">
+
+        {/* Index orb with orbital rings */}
+        <Box className="pv2-orb-wrap">
+          <Box className="pv2-orb-ring pv2-orb-ring-1" style={{ borderTopColor: accent.from, borderColor: `${accent.from}22` }} />
+          <Box className="pv2-orb-ring pv2-orb-ring-2" style={{ borderRightColor: accent.to, borderColor: `${accent.to}18` }} />
+          <Box className="pv2-orb-core" style={{
+            background: `radial-gradient(circle at 35% 35%, ${accent.from}22, ${accent.to}11, transparent)`,
+            borderColor: `${accent.from}44`,
+            boxShadow: `0 0 28px ${accent.glow}`,
+          }}>
+            <Typography className="pv2-orb-num" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              {projectNumber}
+            </Typography>
+          </Box>
+          <Box className="pv2-orb-glow" style={{ background: `radial-gradient(circle, ${accent.from}44, transparent 70%)` }} />
         </Box>
 
-        <Box className="proj-header-dots">
-          <span className="proj-dot" style={{ background: accent.from }} />
-          <span className="proj-dot" style={{ background: accent.to, opacity: 0.6 }} />
-          <span className="proj-dot" style={{ background: "#ffffff", opacity: 0.2 }} />
-        </Box>
-
-        <Box className="proj-live-indicator" style={{ opacity: liveUrl ? 1 : 0 }}>
-          <span className="proj-live-dot" style={{ background: "#22c55e", boxShadow: `0 0 8px #22c55e` }} />
-          <Typography className="proj-live-text">LIVE</Typography>
+        {/* Title + issuer-style line */}
+        <Box className="pv2-title-block">
+          <Box className="pv2-title-row">
+            <Box className="pv2-title-beam" style={{ background: `linear-gradient(180deg, ${accent.from}, ${accent.to})`, boxShadow: `0 0 10px ${accent.from}88` }} />
+            <Typography className="pv2-title">{title}</Typography>
+          </Box>
+          <Box className="pv2-date-row">
+            <Box className="pv2-feat-pill" style={{ background: `${accent.from}18`, borderColor: `${accent.from}44`, color: accent.to, WebkitTextFillColor: accent.to }}>
+              ✦ FEATURED PROJECT
+            </Box>
+          </Box>
         </Box>
       </Box>
 
-      {/* Title */}
-      <Typography className="proj-title-ultra" style={{
-        backgroundImage: hovered ? `linear-gradient(135deg, ${accent.from}, ${accent.to}, #ffffff)` : undefined,
-        WebkitBackgroundClip: hovered ? "text" : undefined,
-        WebkitTextFillColor: hovered ? "transparent" : undefined,
-        backgroundClip: hovered ? "text" : undefined,
-      }}>
-        {title}
-      </Typography>
+      {/* ── Divider beam ── */}
+      <Box className="pv2-divider" style={{ background: `linear-gradient(90deg, ${accent.from}99, ${accent.to}55, transparent)` }} />
 
-      {/* Divider */}
-      <Box className="proj-divider" style={{ background: `linear-gradient(90deg, ${accent.from}88, ${accent.to}44, transparent)` }} />
+      {/* ── Description ── */}
+      <Box className="pv2-desc-wrap">
+        <Typography className="pv2-desc">{description || "No description provided."}</Typography>
+      </Box>
 
-      {/* Description */}
-      <Typography className="proj-desc-ultra">
-        {description || "No description added yet."}
-      </Typography>
-
-      {/* Tech stack */}
+      {/* ── Tech stack ── */}
       {techList.length > 0 && (
-        <Box className="proj-tech-wrap">
-          <Typography className="proj-tech-label">TECH STACK</Typography>
-          <Box className="proj-tech-row">
+        <Box className="pv2-tech-wrap">
+          <Typography className="pv2-tech-label">TECH STACK</Typography>
+          <Box className="pv2-tech-row">
             {techList.map((tech, i) => {
               const tc = getTechColor(tech);
               return (
                 <Box
                   key={`${tech}-${i}`}
-                  className="proj-tech-chip"
+                  className="pv2-chip"
                   style={tc ? {
                     background: tc.bg,
                     borderColor: tc.border,
                     color: tc.color,
                     WebkitTextFillColor: tc.color,
-                    boxShadow: `0 0 12px ${tc.border}`,
+                    boxShadow: `0 0 10px ${tc.border}`,
                   } : {
                     background: `${accent.from}14`,
                     borderColor: `${accent.from}38`,
@@ -1029,7 +1074,7 @@ function ProjectCard({ project, index = 0 }) {
                     WebkitTextFillColor: accent.from,
                   }}
                 >
-                  <span className="proj-tech-dot" style={{ background: tc ? tc.color : accent.from }} />
+                  <span className="pv2-chip-dot" style={{ background: tc ? tc.color : accent.from }} />
                   {tech}
                 </Box>
               );
@@ -1038,50 +1083,62 @@ function ProjectCard({ project, index = 0 }) {
         </Box>
       )}
 
-      {/* Action buttons */}
-      <Box className="proj-actions">
-        {repoUrl ? (
-          <button
-            type="button"
-            className="proj-btn proj-btn-outline"
-            style={{ "--btn-color": accent.from }}
-            onClick={() => window.open(repoUrl, "_blank", "noopener,noreferrer")}
-          >
-            <MdLink style={{ fontSize: "1rem" }} />
+      {/* ── Action buttons ── */}
+      <Box className="pv2-actions">
+        {repoUrl && (
+          <button type="button" className="pv2-btn pv2-btn-outline" style={{ "--bc": accent.from }}
+            onClick={() => window.open(repoUrl, "_blank", "noopener,noreferrer")}>
+            <MdLink style={{ fontSize: "0.95rem" }} />
             Repository
           </button>
-        ) : null}
-        {liveUrl ? (
-          <button
-            type="button"
-            className="proj-btn proj-btn-solid"
-            style={{ "--btn-from": accent.from, "--btn-to": accent.to, "--btn-glow": accent.glow }}
-            onClick={() => window.open(liveUrl, "_blank", "noopener,noreferrer")}
-          >
-            <MdArrowOutward style={{ fontSize: "1rem" }} />
+        )}
+        {liveUrl && (
+          <button type="button" className="pv2-btn pv2-btn-solid" style={{ "--bf": accent.from, "--bt": accent.to, "--bg": accent.glow }}
+            onClick={() => window.open(liveUrl, "_blank", "noopener,noreferrer")}>
+            <MdArrowOutward style={{ fontSize: "0.95rem" }} />
             Live Preview
           </button>
-        ) : null}
+        )}
       </Box>
 
-      {/* Bottom stat bar */}
-      <Box className="proj-stat-bar" style={{ borderTopColor: `${accent.from}18` }}>
-        <Typography className="proj-stat-item">
-          <span style={{ color: accent.from, WebkitTextFillColor: accent.from }}>{techList.length}</span>
-          {" "}TECHNOLOGIES
-        </Typography>
-        <Box className="proj-stat-divider" />
-        <Typography className="proj-stat-item">
-          <span style={{ color: accent.to, WebkitTextFillColor: accent.to }}>
-            {(repoUrl ? 1 : 0) + (liveUrl ? 1 : 0)}
-          </span>
-          {" "}LINKS
-        </Typography>
-        <Box className="proj-stat-divider" />
-        <Typography className="proj-stat-item" style={{ color: "#22c55e", WebkitTextFillColor: "#22c55e" }}>
-          ✓ FEATURED
-        </Typography>
+      {/* ── Bottom terminal data strip ── */}
+      <Box className="pv2-terminal">
+        <Box className="pv2-terminal-inner" style={{ borderTopColor: `${accent.from}1a`, background: `${accent.from}06` }}>
+          <Box className="pv2-term-item">
+            <Typography className="pv2-term-val" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              {String(techCount).padStart(2, "0")}
+            </Typography>
+            <Typography className="pv2-term-lbl">TECH</Typography>
+          </Box>
+          <Box className="pv2-term-sep" />
+          <Box className="pv2-term-item">
+            <Typography className="pv2-term-val" style={{ background: `linear-gradient(135deg, ${accent.to}, ${accent.from})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              {String(linkCount).padStart(2, "0")}
+            </Typography>
+            <Typography className="pv2-term-lbl">LINKS</Typography>
+          </Box>
+          <Box className="pv2-term-sep" />
+          <Box className="pv2-term-item">
+            <Typography className="pv2-term-val" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+              {projectNumber}
+            </Typography>
+            <Typography className="pv2-term-lbl">INDEX</Typography>
+          </Box>
+          <Box sx={{ flex: 1 }} />
+          <Box className="pv2-verified-chip" style={{
+            background: `${accent.from}14`,
+            borderColor: `${accent.from}44`,
+            color: accent.from,
+            WebkitTextFillColor: accent.from,
+          }}>
+            ✦ SELECTED
+          </Box>
+        </Box>
       </Box>
+
+      {/* ── Watermark glyph ── */}
+      <Box className="pv2-watermark" style={{ WebkitTextFillColor: `${accent.from}08` }}>◈</Box>
+
     </Box>
   );
 }
@@ -1629,9 +1686,9 @@ case "skills":
                 {loading ? (
                   <Stack spacing={2}><Skeleton height={220} /><Skeleton height={220} /></Stack>
 ) : projects.length ? (
-  <Box className="proj-ultra-grid">
-    {projects.map((project, idx) => <ProjectCard key={project?.id ?? idx} project={project} index={idx} />)}
-  </Box>
+<Box className="pv2-ultra-grid">
+  {projects.map((project, idx) => <ProjectCard key={project?.id ?? idx} project={project} index={idx} />)}
+</Box>
                 ) : (
                   <GlassPanel sx={{ p: 3 }}><Typography>No projects yet. Add them in Admin → Projects.</Typography></GlassPanel>
                 )}
@@ -1646,8 +1703,8 @@ case "experience":
       initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
       <Box className="section-scroll-area">
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-          <SectionHeading title="Experience" subtitle="Career and internship timeline." />
-          <Stack spacing={2.5}>
+          <SectionHeading title="Experience" subtitle="Career timeline — each role a milestone in the journey." />
+          <Box className="exp-v4-root">
             {loading ? <Skeleton height={220} /> : experience.length ? (
               experience.map((item, idx) => {
                 const isCurrentRole = !safeString(item?.end).trim();
@@ -1656,70 +1713,149 @@ case "experience":
                 const yearsCount = startYear
                   ? (endYear ? parseInt(endYear) : new Date().getFullYear()) - parseInt(startYear)
                   : null;
+
+                const ACCENTS = [
+                  { from: "#f13024", to: "#f97316", glow: "rgba(241,48,36,0.40)", hue: "0" },
+                  { from: "#6366f1", to: "#a855f7", glow: "rgba(139,92,246,0.38)", hue: "260" },
+                  { from: "#06b6d4", to: "#3b82f6", glow: "rgba(59,130,246,0.35)", hue: "210" },
+                  { from: "#10b981", to: "#06b6d4", glow: "rgba(16,185,129,0.35)", hue: "170" },
+                  { from: "#f59e0b", to: "#ef4444", glow: "rgba(245,158,11,0.35)", hue: "38" },
+                ];
+                const accent = isCurrentRole ? ACCENTS[0] : ACCENTS[idx % ACCENTS.length];
+
                 return (
-                  <Box key={item?.id ?? idx} className={`exp-card-luxury ${isCurrentRole ? "exp-card-current" : ""}`}
-                    style={{ "--exp-idx": idx }}>
-                    <Box className="exp-slash-accent" />
-                    <Box className="exp-card-left-bar" />
-                    <Box className="exp-card-top-glow" />
-                    <Box className="exp-holographic-layer" />
-                    <Box sx={{ p: { xs: "22px 22px 0 28px", md: "26px 26px 0 32px" } }}>
-                      <Box className="exp-card-header">
-                        <Box className="exp-card-header-left">
-                          <Box className="exp-company-icon">
-                            {isCurrentRole ? "⚡" : "🏢"}
-                          </Box>
-                          <Box>
-                            <Typography className="exp-role">{safeString(item?.role) || "Role"}</Typography>
-                            <Typography className="exp-company">{safeString(item?.company) || "Company"}</Typography>
-                          </Box>
+                  <Box
+                    key={item?.id ?? idx}
+                    className={`exp-v4-card ${isCurrentRole ? "exp-v4-current" : ""}`}
+                    style={{
+                      "--ev4-from": accent.from,
+                      "--ev4-to": accent.to,
+                      "--ev4-glow": accent.glow,
+                      "--ev4-hue": accent.hue,
+                      "--ev4-idx": idx,
+                    }}
+                  >
+                    {/* ── DNA connector to next card ── */}
+                    {idx < experience.length - 1 && (
+                      <Box className="exp-v4-dna-connector">
+                        <svg className="exp-v4-dna-svg" viewBox="0 0 40 60" fill="none">
+                          <path d="M8 0 Q20 15 32 30 Q20 45 8 60" stroke={accent.from} strokeWidth="1.2" strokeDasharray="3 3" opacity="0.5" fill="none"/>
+                          <path d="M32 0 Q20 15 8 30 Q20 45 32 60" stroke={accent.to} strokeWidth="1.2" strokeDasharray="3 3" opacity="0.35" fill="none"/>
+                          {[10, 30, 50].map((y, i) => (
+                            <line key={i} x1="8" y1={y} x2="32" y2={y} stroke={accent.from} strokeWidth="0.8" opacity="0.3"/>
+                          ))}
+                        </svg>
+                      </Box>
+                    )}
+
+                    {/* ── Prismatic border (same as achievements) ── */}
+                    <Box className="exp-v4-prism" style={{ background: `conic-gradient(from 0deg, transparent, ${accent.from}, ${accent.to}, transparent, transparent)` }} />
+
+                    {/* ── Particle field ── */}
+                    <Box className="exp-v4-particles" />
+
+                    {/* ── Holo scan ── */}
+                    <Box className="exp-v4-scan" style={{ background: `linear-gradient(180deg, transparent, ${accent.from}10, ${accent.from}1a, ${accent.from}10, transparent)` }} />
+
+                    {/* ── Corner circuit traces ── */}
+                    <Box className="exp-v4-corner-tl" style={{ borderColor: `${accent.from}88` }} />
+                    <Box className="exp-v4-corner-br" style={{ borderColor: `${accent.to}66` }} />
+
+                    {/* ── macOS status bar ── */}
+                    <Box className="exp-v4-status-bar">
+                      <Box className="exp-v4-status-dots">
+                        <span className="exp-v4-sd exp-v4-sd-red" />
+                        <span className="exp-v4-sd exp-v4-sd-yellow" />
+                        <span className={`exp-v4-sd ${isCurrentRole ? "exp-v4-sd-green" : "exp-v4-sd-grey"}`} />
+                      </Box>
+                      <Box className="exp-v4-status-label" style={{ color: isCurrentRole ? "#22c55e" : "rgba(255,255,255,0.25)", WebkitTextFillColor: isCurrentRole ? "#22c55e" : "rgba(255,255,255,0.25)" }}>
+                        <span className={isCurrentRole ? "exp-v4-pulse" : "exp-v4-pulse-off"} />
+                        {isCurrentRole ? "ACTIVE ROLE" : "COMPLETED"}
+                      </Box>
+                      <Box className="exp-v4-index-stamp" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                        {String(idx + 1).padStart(2, "0")}
+                      </Box>
+                    </Box>
+
+                    {/* ── Main body ── */}
+                    <Box className="exp-v4-body">
+
+                      {/* Hex icon */}
+                      <Box className="exp-v4-hex-wrap">
+                        <Box className="exp-v4-hex-ring exp-v4-ring-1" style={{ borderColor: `${accent.from}55`, borderTopColor: `${accent.from}cc` }} />
+                        <Box className="exp-v4-hex-ring exp-v4-ring-2" style={{ borderColor: `${accent.to}33`, borderRightColor: `${accent.to}88` }} />
+                        <Box className="exp-v4-hex-core" style={{ background: `${accent.from}1a`, borderColor: `${accent.from}44`, boxShadow: `0 0 24px ${accent.glow}` }}>
+                          <Typography style={{ fontSize: "1.5rem", lineHeight: 1 }}>{isCurrentRole ? "⚡" : "🏢"}</Typography>
                         </Box>
-                        <Box className="exp-card-header-right">
-                          <Box className={`exp-date-badge ${isCurrentRole ? "exp-date-badge-current" : ""}`}>
+                        <Box className="exp-v4-hex-glow" style={{ background: `radial-gradient(circle, ${accent.from}44, transparent 70%)` }} />
+                      </Box>
+
+                      {/* Title block */}
+                      <Box className="exp-v4-title-block">
+                        <Typography className="exp-v4-role">{safeString(item?.role) || "Role"}</Typography>
+                        <Box className="exp-v4-company-row">
+                          <span className="exp-v4-company-beam" style={{ background: `linear-gradient(180deg, ${accent.from}, ${accent.to})`, boxShadow: `0 0 8px ${accent.from}88` }} />
+                          <Typography className="exp-v4-company" style={{ color: accent.from, WebkitTextFillColor: accent.from }}>{safeString(item?.company) || "Company"}</Typography>
+                        </Box>
+                        <Box className="exp-v4-date-row">
+                          <Box className="exp-v4-date-pill" style={{ background: `${accent.from}1a`, borderColor: `${accent.from}44`, color: accent.to, WebkitTextFillColor: accent.to }}>
                             {safeString(item?.start)}{safeString(item?.end) ? ` — ${safeString(item?.end)}` : " — Present"}
                           </Box>
                           {isCurrentRole && (
-                            <Box className="exp-current-dot-row">
-                              <span className="exp-green-dot" />
-                              <Typography sx={{ fontSize: "0.73rem", opacity: 0.5 }}>Currently here</Typography>
+                            <Box className="exp-v4-live-badge">
+                              <span className="exp-v4-live-dot" />
+                              <Typography sx={{ fontSize: "0.62rem", fontWeight: 800, color: "#22c55e", WebkitTextFillColor: "#22c55e", letterSpacing: "0.1em" }}>LIVE</Typography>
                             </Box>
                           )}
                         </Box>
                       </Box>
-                      {safeString(item?.description) ? (
-                        <Typography className="exp-description" sx={{ mt: 1.5 }}>{safeString(item?.description)}</Typography>
-                      ) : null}
                     </Box>
-                    {/* Stat strip */}
-                    <Box className="exp-stat-strip">
-                      <Box className="exp-stat-item">
-                        <Typography className="exp-stat-value">{idx + 1}</Typography>
-                        <Typography className="exp-stat-label">Position</Typography>
+
+                    {/* Divider */}
+                    <Box className="exp-v4-divider" style={{ background: `linear-gradient(90deg, ${accent.from}88, ${accent.to}44, transparent)` }} />
+
+                    {/* Description */}
+                    {safeString(item?.description) && (
+                      <Box className="exp-v4-desc-wrap">
+                        <Typography className="exp-v4-desc">{safeString(item?.description)}</Typography>
                       </Box>
-                      <Box className="exp-stat-divider" />
-                      {yearsCount !== null && yearsCount >= 0 && (
-                        <>
-                          <Box className="exp-stat-item">
-                            <Typography className="exp-stat-value">{yearsCount || "<1"}</Typography>
-                            <Typography className="exp-stat-label">{yearsCount === 1 ? "Year" : "Years"}</Typography>
-                          </Box>
-                          <Box className="exp-stat-divider" />
-                        </>
-                      )}
-                      <Box className="exp-stat-item">
-                        <Typography className="exp-stat-value">{isCurrentRole ? "Active" : "Done"}</Typography>
-                        <Typography className="exp-stat-label">Status</Typography>
-                      </Box>
-                      <Box sx={{ flex: 1 }} />
-                      <Box className={`exp-status-pill ${isCurrentRole ? "exp-status-pill-active" : "exp-status-pill-past"}`}>
-                        {isCurrentRole ? "● LIVE" : "✓ COMPLETED"}
+                    )}
+
+                    {/* ── Terminal data strip ── */}
+                    <Box className="exp-v4-terminal">
+                      <Box className="exp-v4-terminal-inner" style={{ borderTopColor: `${accent.from}1a`, background: `${accent.from}06` }}>
+                        <Box className="exp-v4-term-item">
+                          <Typography className="exp-v4-term-val" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                            {String(idx + 1).padStart(2, "0")}
+                          </Typography>
+                          <Typography className="exp-v4-term-lbl">POSITION</Typography>
+                        </Box>
+                        <Box className="exp-v4-term-sep" />
+                        {yearsCount !== null && yearsCount >= 0 && (
+                          <>
+                            <Box className="exp-v4-term-item">
+                              <Typography className="exp-v4-term-val" style={{ background: `linear-gradient(135deg, ${accent.to}, ${accent.from})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                                {yearsCount || "<1"}
+                              </Typography>
+                              <Typography className="exp-v4-term-lbl">{yearsCount === 1 ? "YEAR" : "YEARS"}</Typography>
+                            </Box>
+                            <Box className="exp-v4-term-sep" />
+                          </>
+                        )}
+                        <Box sx={{ flex: 1 }} />
+                        <Box className={`exp-v4-status-chip ${isCurrentRole ? "exp-v4-chip-active" : "exp-v4-chip-done"}`}>
+                          {isCurrentRole ? "● ACTIVE" : "✓ COMPLETED"}
+                        </Box>
                       </Box>
                     </Box>
+
+                    {/* Watermark */}
+                    <Box className="exp-v4-watermark">✦</Box>
                   </Box>
                 );
               })
             ) : <GlassPanel sx={{ p: 3 }}><Typography>No experience added yet.</Typography></GlassPanel>}
-          </Stack>
+          </Box>
         </MotionBox>
       </Box>
     </MotionBox>
@@ -1731,64 +1867,171 @@ case "education":
       initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
       <Box className="section-scroll-area">
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-          <SectionHeading title="Education" subtitle="Academic background and qualifications." />
-          <Box className="edu-timeline">
-            {loading ? <Skeleton height={220} /> : education.length ? (
-              education.map((item, idx) => (
-                <Box key={item?.id ?? idx} className="edu-card-luxury" style={{ "--edu-idx": idx }}>
-                  {idx < education.length - 1 && <Box className="edu-timeline-line" />}
-                  <Box className="edu-card-node">
-                    <Box className="edu-node-dot">
-                      <Box className="edu-node-orbit" />
-                      <Box className="edu-node-orbit edu-node-orbit-2" />
-                      <MdSchool style={{ fontSize: "1rem", color: "#f13024", position: "relative", zIndex: 2 }} />
+          <SectionHeading title="Education" subtitle="Academic foundation — the architecture of knowledge." />
+          <Box className="edu-v2-root">
+            {loading ? (
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                {[...Array(3)].map((_, i) => <Skeleton key={i} height={200} sx={{ borderRadius: 4 }} />)}
+              </Box>
+            ) : education.length ? (
+              education.map((item, idx) => {
+                const degree = safeString(item?.degree) || "Degree";
+                const institution = safeString(item?.institution) || "Institution";
+                const year = safeString(item?.year);
+                const details = safeString(item?.details);
+
+                const PALETTES = [
+                  { a: "#f13024", b: "#f97316", glow: "rgba(241,48,36,0.45)", tag: "PRIMARY" },
+                  { a: "#06b6d4", b: "#6366f1", glow: "rgba(99,102,241,0.40)", tag: "SECONDARY" },
+                  { a: "#10b981", b: "#06b6d4", glow: "rgba(16,185,129,0.38)", tag: "TERTIARY" },
+                  { a: "#f59e0b", b: "#ef4444", glow: "rgba(245,158,11,0.38)", tag: "MERIT" },
+                ];
+                const pal = PALETTES[idx % PALETTES.length];
+
+                return (
+                  <Box
+                    key={item?.id ?? idx}
+                    className="edu-v2-card"
+                    style={{
+                      "--ea": pal.a,
+                      "--eb": pal.b,
+                      "--eg": pal.glow,
+                      "--ei": idx,
+                    }}
+                  >
+                    {/* Spinning conic border beam */}
+                    <Box className="edu-v2-border-beam" style={{ background: `conic-gradient(from 0deg, transparent 60%, ${pal.a}, ${pal.b}, transparent)` }} />
+
+                    {/* Scanline sweep */}
+                    <Box className="edu-v2-scan" />
+
+                    {/* Grid texture overlay */}
+                    <Box className="edu-v2-grid-overlay" />
+
+                    {/* Corner brackets */}
+                    <Box className="edu-v2-corner edu-v2-corner--tl" style={{ borderColor: `${pal.a}99` }} />
+                    <Box className="edu-v2-corner edu-v2-corner--tr" style={{ borderColor: `${pal.a}99` }} />
+                    <Box className="edu-v2-corner edu-v2-corner--bl" style={{ borderColor: `${pal.b}77` }} />
+                    <Box className="edu-v2-corner edu-v2-corner--br" style={{ borderColor: `${pal.b}77` }} />
+
+                    {/* Top HUD bar */}
+                    <Box className="edu-v2-hud-bar">
+                      <Box className="edu-v2-hud-left">
+                        <Box className="edu-v2-hud-dot" style={{ background: pal.a, boxShadow: `0 0 8px ${pal.a}` }} />
+                        <Box className="edu-v2-hud-dot" style={{ background: pal.b, boxShadow: `0 0 8px ${pal.b}`, opacity: 0.7 }} />
+                        <Box className="edu-v2-hud-dot" style={{ background: "rgba(255,255,255,0.2)" }} />
+                        <Typography className="edu-v2-hud-tag" style={{ color: pal.a, WebkitTextFillColor: pal.a }}>
+                          EDU_{String(idx + 1).padStart(3, "0")}
+                        </Typography>
+                      </Box>
+                      <Box className="edu-v2-hud-right">
+                        <Box className="edu-v2-tier-badge" style={{ background: `${pal.a}18`, borderColor: `${pal.a}44`, color: pal.a, WebkitTextFillColor: pal.a }}>
+                          {pal.tag}
+                        </Box>
+                        <Box className="edu-v2-hud-signal">
+                          {[1,2,3,4].map(b => (
+                            <Box key={b} className="edu-v2-signal-bar" style={{ height: `${b * 3 + 2}px`, background: b <= 3 ? pal.a : "rgba(255,255,255,0.12)" }} />
+                          ))}
+                        </Box>
+                      </Box>
                     </Box>
-                    <Box className="edu-node-index">{String(idx + 1).padStart(2, "0")}</Box>
-                  </Box>
-                  <Box className="edu-card-content">
-                    <Box className="edu-card-inner">
-                      <Box className="edu-card-top-accent" />
-                      <Box className="edu-corner-ribbon"></Box>
-                      <Box sx={{ p: { xs: "20px", md: "24px 28px 20px" } }}>
-                        <Box className="edu-header-row">
-                          <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography className="edu-degree">{safeString(item?.degree) || "Degree"}</Typography>
-                            <Box className="edu-institution-row">
-                              <MdSchool style={{ fontSize: "0.85rem", color: "#f97316", flexShrink: 0 }} />
-                              <Typography className="edu-institution">{safeString(item?.institution) || "Institution"}</Typography>
+
+                    {/* Main content area */}
+                    <Box className="edu-v2-body">
+
+                      {/* Left: Holographic index column */}
+                      <Box className="edu-v2-left-col">
+                        <Box className="edu-v2-index-orb" style={{ background: `radial-gradient(circle at 35% 35%, ${pal.a}33, ${pal.b}1a, transparent)`, borderColor: `${pal.a}44`, boxShadow: `0 0 32px ${pal.glow}, inset 0 0 20px ${pal.a}0d` }}>
+                          <Box className="edu-v2-orb-ring edu-v2-orb-ring--1" style={{ borderTopColor: pal.a, borderColor: `${pal.a}22` }} />
+                          <Box className="edu-v2-orb-ring edu-v2-orb-ring--2" style={{ borderRightColor: pal.b, borderColor: `${pal.b}18` }} />
+                          <Box className="edu-v2-orb-ring edu-v2-orb-ring--3" style={{ borderBottomColor: `${pal.a}88`, borderColor: `${pal.a}0d` }} />
+                          <Typography className="edu-v2-orb-num" style={{ background: `linear-gradient(135deg, ${pal.a}, ${pal.b})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                            {String(idx + 1).padStart(2, "0")}
+                          </Typography>
+                          <Typography className="edu-v2-orb-label">RECORD</Typography>
+                        </Box>
+                        {/* Vertical connector to next card */}
+                        {idx < education.length - 1 && (
+                          <Box className="edu-v2-connector">
+                            <Box className="edu-v2-connector-line" style={{ background: `linear-gradient(180deg, ${pal.a}88, ${pal.b}22, transparent)` }} />
+                            <Box className="edu-v2-connector-node" style={{ background: pal.a, boxShadow: `0 0 8px ${pal.a}` }} />
+                          </Box>
+                        )}
+                      </Box>
+
+                      {/* Right: Main info */}
+                      <Box className="edu-v2-right-col">
+                        {/* Degree title */}
+                        <Box className="edu-v2-degree-wrap">
+                          <Box className="edu-v2-degree-beam" style={{ background: `linear-gradient(180deg, ${pal.a}, ${pal.b})`, boxShadow: `0 0 10px ${pal.a}88` }} />
+                          <Box>
+                            <Typography className="edu-v2-degree">{degree}</Typography>
+                            {/* Institution row */}
+                            <Box className="edu-v2-institution-row">
+                              <Box className="edu-v2-inst-icon" style={{ background: `${pal.a}18`, borderColor: `${pal.a}33` }}>
+                                <MdSchool style={{ fontSize: "0.8rem", color: pal.a }} />
+                              </Box>
+                              <Typography className="edu-v2-institution" style={{ color: pal.b, WebkitTextFillColor: pal.b }}>
+                                {institution}
+                              </Typography>
                             </Box>
                           </Box>
-                          {safeString(item?.year) ? (
-                            <Box className="edu-year-badge-stack">
-                              <Box className="edu-year-badge">{safeString(item?.year)}</Box>
-                              <Box className="edu-year-glow" />
-                            </Box>
-                          ) : null}
                         </Box>
-                        {safeString(item?.details) ? (
+
+                        {/* Data grid row */}
+                        <Box className="edu-v2-data-grid">
+                          {year && (
+                            <Box className="edu-v2-data-cell">
+                              <Typography className="edu-v2-data-val" style={{ background: `linear-gradient(135deg, ${pal.a}, ${pal.b})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                                {year}
+                              </Typography>
+                              <Typography className="edu-v2-data-key">YEAR</Typography>
+                            </Box>
+                          )}
+                          <Box className="edu-v2-data-cell">
+                            <Box className="edu-v2-status-dot-wrap">
+                              <span className="edu-v2-live-dot" style={{ background: pal.a, boxShadow: `0 0 8px ${pal.a}` }} />
+                              <Typography className="edu-v2-data-val" style={{ color: pal.a, WebkitTextFillColor: pal.a }}>ACAD</Typography>
+                            </Box>
+                            <Typography className="edu-v2-data-key">STATUS</Typography>
+                          </Box>
+                        </Box>
+
+                        {/* Details */}
+                        {details && (
                           <>
-                            <Box className="edu-divider" />
-                            <Typography className="edu-details">{safeString(item?.details)}</Typography>
+                            <Box className="edu-v2-details-divider" style={{ background: `linear-gradient(90deg, ${pal.a}66, ${pal.b}33, transparent)` }} />
+                            <Box className="edu-v2-details-wrap">
+                              <Box className="edu-v2-details-icon" style={{ color: pal.a }}>▸</Box>
+                              <Typography className="edu-v2-details">{details}</Typography>
+                            </Box>
                           </>
-                        ) : null}
-                      </Box>
-                      {/* Bottom indicator bar */}
-                      <Box className="edu-bottom-bar">
-                        <Box className="edu-bottom-fill" style={{ width: `${Math.min(100, (idx + 1) * 33)}%` }} />
-                        <Typography className="edu-bottom-label">Academic Record #{idx + 1}</Typography>
+                        )}
                       </Box>
                     </Box>
+
+                    {/* Bottom progress rail */}
+                    <Box className="edu-v2-rail">
+                      <Box className="edu-v2-rail-fill" style={{ width: `${((idx + 1) / education.length) * 100}%`, background: `linear-gradient(90deg, ${pal.a}, ${pal.b})`, boxShadow: `0 0 12px ${pal.glow}` }} />
+                      <Typography className="edu-v2-rail-label">
+                        {idx + 1} / {education.length} ACADEMIC RECORDS
+                      </Typography>
+                    </Box>
+
+                    {/* Watermark glyph */}
+                    <Box className="edu-v2-watermark" style={{ WebkitTextFillColor: `${pal.a}08` }}>◈</Box>
                   </Box>
-                </Box>
-              ))
-            ) : <GlassPanel sx={{ p: 3 }}><Typography>No education added yet.</Typography></GlassPanel>}
+                );
+              })
+            ) : (
+              <GlassPanel sx={{ p: 3 }}><Typography>No education added yet.</Typography></GlassPanel>
+            )}
           </Box>
         </MotionBox>
       </Box>
     </MotionBox>
   );
 
-      // ── CHANGED: achievements case — adds "View Certificate" button ──────
 case "achievements":
   return (
     <MotionBox key="achievements" custom={navDirection} variants={pageVariants}
@@ -1796,81 +2039,155 @@ case "achievements":
       <Box className="section-scroll-area">
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
           <SectionHeading title="Achievements" subtitle="Certifications, awards, and recognitions." />
-          <Box className="ach-masonry">
-            {loading ? <Skeleton height={220} /> : achievements.length ? (
+          <Box className="ach-ultra-grid">
+            {loading ? (
+              <Box className="ach-ultra-grid">
+                {[...Array(4)].map((_, i) => (
+                  <Skeleton key={i} height={280} sx={{ borderRadius: 4 }} />
+                ))}
+              </Box>
+            ) : achievements.length ? (
               achievements.map((item, idx) => (
-                <Box key={item?.id ?? idx} className="ach-card-luxury" style={{ "--ach-idx": idx }}>
-                  {/* Holographic foil layer */}
-                  <Box className="ach-foil-layer" />
-                  <Box className="ach-card-shimmer" />
-                  <Box className="ach-card-glow-corner" />
-                  {/* Corner ribbon stamp */}
-                  <Box className="ach-ribbon-corner">
-                    <Box className="ach-ribbon-text"></Box>
-                  </Box>
-                  <Box sx={{ p: { xs: "22px", md: "26px" }, position: "relative", zIndex: 1 }}>
-                    {/* Header row */}
-                    <Box className="ach-icon-row">
-                      <Box className="ach-trophy-icon">
-                        <MdEmojiEvents style={{ fontSize: "1.4rem", color: "#f13024" }} />
+                <Box key={item?.id ?? idx} className="ach-ultra-card" style={{ "--ach-idx": idx }}>
+
+                  {/* === Prismatic border beam === */}
+                  <Box className="ach-prism-beam" />
+
+                  {/* === Particle field background === */}
+                  <Box className="ach-particle-field" />
+
+                  {/* === Holographic scan === */}
+                  <Box className="ach-holo-scan" />
+
+                  {/* === Corner circuit traces === */}
+                  <Box className="ach-circuit-tl" />
+                  <Box className="ach-circuit-br" />
+
+{/* === Top status bar === */}
+{(() => {
+  const hasProof = !!(item?.certificateFileName || safeString(item?.link));
+  return (
+    <Box className="ach-status-bar">
+      <Box className="ach-status-dots">
+        <span className="ach-sd ach-sd-red" />
+        <span className="ach-sd ach-sd-yellow" />
+        <span className={`ach-sd ${hasProof ? "ach-sd-green" : "ach-sd-grey"}`} />
+      </Box>
+      <Box className={`ach-status-label ${hasProof ? "" : "ach-status-label--unverified"}`}>
+        <span className={hasProof ? "ach-status-pulse" : "ach-status-pulse-off"} />
+        {hasProof ? "VERIFIED" : "UNVERIFIED"}
+      </Box>
+      <Box className="ach-index-stamp">
+        {String(idx + 1).padStart(2, "0")}
+      </Box>
+    </Box>
+  );
+})()}
+
+                  {/* === Main body === */}
+                  <Box className="ach-ultra-body">
+
+                    {/* Trophy + hologram effect */}
+                    <Box className="ach-trophy-wrap">
+                      <Box className="ach-trophy-ring ach-ring-1" />
+                      <Box className="ach-trophy-ring ach-ring-2" />
+                      <Box className="ach-trophy-ring ach-ring-3" />
+                      <Box className="ach-trophy-core">
+                        <MdEmojiEvents style={{ fontSize: "1.6rem", color: "#f13024" }} />
                       </Box>
-                      <Box className="ach-index-label">{String(idx + 1).padStart(2, "0")}</Box>
+                      <Box className="ach-trophy-glow" />
                     </Box>
-                    <Typography className="ach-title">{safeString(item?.title) || "Achievement"}</Typography>
+
+                    {/* Title */}
+                    <Typography className="ach-ultra-title">
+                      {safeString(item?.title) || "Achievement"}
+                    </Typography>
+
+                    {/* Issuer */}
                     {safeString(item?.issuer) && (
-                      <Box className="ach-issuer-row">
-                        <Box className="ach-issuer-dot" />
-                        <Typography className="ach-issuer">{safeString(item?.issuer)}</Typography>
+                      <Box className="ach-ultra-issuer-row">
+                        <span className="ach-issuer-beam" />
+                        <Typography className="ach-ultra-issuer">
+                          {safeString(item?.issuer)}
+                        </Typography>
                       </Box>
                     )}
-                    {/* Star rating */}
-                    <Box className="ach-stars-row">
-                      {[1,2,3,4,5].map((s) => (
-                        <span key={s} className={`ach-star ${s <= 5 ? "ach-star-filled" : ""}`}>★</span>
-                      ))}
-                      <Typography className="ach-stars-label">Verified</Typography>
-                    </Box>
+
+{/* Star constellation */}
+{(() => {
+  const hasCert = !!item?.certificateFileName;
+  const hasLink = !!safeString(item?.link);
+  const starCount = hasCert ? 5 : hasLink ? 5 : 3;
+  const tagLabel = hasCert ? "CERTIFIED" : hasLink ? "VERIFIED" : null;
+  return (
+    <Box className="ach-constellation">
+      {[1, 2, 3, 4, 5].map((s) => (
+        <Box key={s} className="ach-star-wrap">
+          <span className={`ach-star-ultra ${s <= starCount ? "ach-star-filled" : "ach-star-dim"}`}>★</span>
+          {s <= starCount && <span className="ach-star-ray" />}
+        </Box>
+      ))}
+      {tagLabel && (
+        <Typography className="ach-verified-tag">{tagLabel}</Typography>
+      )}
+    </Box>
+  );
+})()}
+
+                    {/* Year + Divider */}
                     {safeString(item?.year) && (
-                      <Box className="ach-year-chip">{safeString(item?.year)}</Box>
+                      <Box className="ach-year-row">
+                        <Box className="ach-year-line" />
+                        <Box className="ach-year-ultra">{safeString(item?.year)}</Box>
+                        <Box className="ach-year-line" />
+                      </Box>
                     )}
-                    <Box className="ach-action-row">
+
+                    {/* Action buttons */}
+                    <Box className="ach-ultra-actions">
                       {safeString(item?.link) ? (
-                        <Button variant="outlined" startIcon={<MdLink />} size="small"
-                          sx={{
-                            borderRadius: 999, fontWeight: 700, fontSize: "0.78rem",
-                            borderColor: "rgba(241,48,36,0.45) !important",
-                            color: "#f13024 !important", px: 2,
-                            "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" },
-                          }}
-                          onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}>
+                        <button
+                          type="button"
+                          className="ach-action-btn ach-btn-outline"
+                          onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}
+                        >
+                          <MdLink style={{ fontSize: "0.9rem" }} />
                           View
-                        </Button>
+                        </button>
                       ) : null}
                       {item?.certificateFileName ? (
-                        <Button variant="contained" startIcon={<MdVisibility />} size="small"
-                          sx={{
-                            borderRadius: 999, fontWeight: 700, fontSize: "0.78rem",
-                            background: "linear-gradient(135deg, #f13024, #f97316) !important",
-                            color: "white !important", px: 2,
-                            boxShadow: "0 4px 16px rgba(241,48,36,0.28)",
-                            "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important" },
-                          }}
-                          onClick={() => onPreviewCertificate(item.id, safeString(item?.title))}>
+                        <button
+                          type="button"
+                          className="ach-action-btn ach-btn-solid"
+                          onClick={() => onPreviewCertificate(item.id, safeString(item?.title))}
+                        >
+                          <MdVisibility style={{ fontSize: "0.9rem" }} />
                           Certificate
-                        </Button>
+                        </button>
                       ) : null}
                     </Box>
-                    {/* Certified stamp */}
-                    {item?.certificateFileName && (
-                      <Box className="ach-certified-stamp">
-                        <Box className="ach-stamp-ring" />
-                        <Typography className="ach-stamp-text">CERTIFIED</Typography>
-                      </Box>
-                    )}
                   </Box>
+
+{/* === Bottom data strip === */}
+<Box className="ach-data-strip">
+  <Box className="ach-data-item" style={{ flex: 1 }}>
+    <Typography className="ach-data-val" style={{ fontSize: "0.6rem !important" }}>
+      {item?.certificateFileName ? "● FILE" : safeString(item?.link) ? "● LINK" : "● NONE"}
+    </Typography>
+    <Typography className="ach-data-lbl">TYPE</Typography>
+  </Box>
+</Box>
+
+                  {/* === Luxury corner watermark === */}
+                  <Box className="ach-watermark">✦</Box>
+
                 </Box>
               ))
-            ) : <GlassPanel sx={{ p: 3 }}><Typography>No achievements yet.</Typography></GlassPanel>}
+            ) : (
+              <GlassPanel sx={{ p: 3 }}>
+                <Typography>No achievements yet.</Typography>
+              </GlassPanel>
+            )}
           </Box>
         </MotionBox>
       </Box>
