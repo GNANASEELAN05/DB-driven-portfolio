@@ -1,24 +1,13 @@
 package com.portfolio.backend.config;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.*;
 
+/**
+ * CORS is handled entirely by SecurityConfig.corsConfigurationSource().
+ * Spring Security's CorsFilter runs before the MVC layer, so defining
+ * CORS here as well creates conflicts. This class is kept as a placeholder.
+ */
 @Configuration
 public class CorsConfig {
-
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")
-                        .allowedOriginPatterns("*")
-                        .allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
-                        .allowedHeaders("*")
-                        .exposedHeaders("Content-Disposition")
-                        .allowCredentials(false);
-            }
-        };
-    }
+    // intentionally empty
 }

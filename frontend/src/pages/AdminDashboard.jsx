@@ -522,6 +522,7 @@ const [pendingOrders, setPendingOrders] = useState({});
 // pendingOrders shape: { projects: {id: order}, achievements: {id: order}, ... }
 
 const openReorderMenu = (e, section, itemId) => {
+  e.stopPropagation();
   setReorderMenu({ open: true, section, itemId, anchorEl: e.currentTarget });
 };
 const closeReorderMenu = () => {
@@ -2140,12 +2141,14 @@ right={
           />
 
         {/* Reorder Menu */}
-        <Menu
-          anchorEl={reorderMenu.anchorEl}
-          open={reorderMenu.open}
-          onClose={closeReorderMenu}
-          PaperProps={{ className: isDark ? "adm-dialog" : "adm-dialog adm-dialog-light", sx: { minWidth: 140 } }}
-        >
+<Menu
+  anchorEl={reorderMenu.anchorEl}
+  open={reorderMenu.open}
+  onClose={closeReorderMenu}
+  anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+  transformOrigin={{ vertical: "top", horizontal: "left" }}
+  PaperProps={{ className: isDark ? "adm-dialog" : "adm-dialog adm-dialog-light", sx: { minWidth: 140 } }}
+>
           <Typography sx={{ px: 2, py: 0.8, fontSize: "0.75rem", fontWeight: 800, opacity: 0.5, letterSpacing: "0.08em", textTransform: "uppercase" }}>
             Move to position
           </Typography>

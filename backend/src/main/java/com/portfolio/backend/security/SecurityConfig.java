@@ -36,44 +36,39 @@ public class SecurityConfig {
         http
             .cors(Customizer.withDefaults())
             .csrf(csrf -> csrf.disable())
-
-            // allow iframe preview
             .headers(headers -> headers.frameOptions(frame -> frame.disable()))
-
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
             .authorizeHttpRequests(auth -> auth
 
-                // preflight
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // auth login
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // ===== PUBLIC VIEWER =====
+                // PUBLIC VIEWER
                 .requestMatchers(HttpMethod.GET, "/api/portfolio/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/projects/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/resume/**").permitAll()
-
-                // ===== PUBLIC: Profile Images (viewer reads them) =====
                 .requestMatchers(HttpMethod.GET, "/api/profile-image/**").permitAll()
 
-                // ===== ADMIN =====
-                .requestMatchers(HttpMethod.POST, "/api/projects/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT,  "/api/projects/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE,"/api/projects/**").hasRole("ADMIN")
+                // ADMIN — projects
+                .requestMatchers(HttpMethod.POST,   "/api/projects/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,    "/api/projects/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/projects/**").hasRole("ADMIN")
 
-                .requestMatchers(HttpMethod.PUT,  "/api/portfolio/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/portfolio/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE,"/api/portfolio/**").hasRole("ADMIN")
+                // ADMIN — portfolio
+                .requestMatchers(HttpMethod.PUT,    "/api/portfolio/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST,   "/api/portfolio/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/portfolio/**").hasRole("ADMIN")
 
-                .requestMatchers(HttpMethod.POST, "/api/resume/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.DELETE,"/api/resume/**").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.PUT,  "/api/resume/**").hasRole("ADMIN")
+                // ADMIN — resume
+                .requestMatchers(HttpMethod.POST,   "/api/resume/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/resume/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,    "/api/resume/**").hasRole("ADMIN")
 
-                // ===== ADMIN: Profile Image upload/delete =====
-                .requestMatchers(HttpMethod.POST, "/api/profile-image/**").hasRole("ADMIN")
+                // ADMIN — profile image
+                .requestMatchers(HttpMethod.POST,   "/api/profile-image/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.DELETE, "/api/profile-image/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,    "/api/profile-image/**").hasRole("ADMIN")
 
                 .anyRequest().permitAll()
             )
@@ -82,21 +77,36 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // 🌍 CORS FOR LOCAL + VERCEL LIVE
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
 
         cfg.setAllowedOrigins(List.of(
             "http://localhost:5173",
+            "http://localhost:5174",
             "http://127.0.0.1:5173",
             "https://gnanaseelan-v-portfolio.vercel.app"
         ));
 
-        // allow everything needed for admin + viewer
-        cfg.addAllowedHeader("*");
-        cfg.addAllowedMethod("*");
+        cfg.setAllowedMethods(List.of(
+            "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"
+        ));
+
+        cfg.setAllowedHeaders(List.of(
+            "Authorization",
+            "Content-Type",
+            "Accept",
+            "Origin",
+            "X-Requested-With"
+        ));
+
+        cfg.setExposedHeaders(List.of(
+            "Content-Disposition",
+            "Content-Type"
+        ));
+
         cfg.setAllowCredentials(true);
+        cfg.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);
