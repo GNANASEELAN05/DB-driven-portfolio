@@ -5263,7 +5263,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 /* Responsive */
 @media (max-width: 768px) {
   .lholo-card {
-    grid-template-columns: 72px 1fr 84px;
+    grid-template-columns: 90px 1fr 84px;
     min-height: 130px;
   }
   .lholo-orb-wrap { padding: 14px 0 14px 14px; }
@@ -5280,7 +5280,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   }
 
   .lholo-card {
-    grid-template-columns: 72px 1fr 80px;
+    grid-template-columns: 86px 1fr 80px;
     grid-template-rows: 1fr auto;
     min-height: 130px;
     border-radius: 16px;
@@ -5289,7 +5289,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .lholo-orb-wrap {
     grid-row: 1;
     grid-column: 1;
-    padding: 12px 0 12px 10px;
+    padding: 12px 0 12px 14px;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -5405,6 +5405,6 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   }
 
   .lholo-scan {
-    left: 72px;
+    left: 90px;
   }
 }
