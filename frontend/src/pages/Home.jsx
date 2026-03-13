@@ -919,6 +919,9 @@ function ProjectCard({ project, index = 0 }) {
   ];
   const accent = CARD_ACCENTS[index % CARD_ACCENTS.length];
 
+
+const cardBg = undefined;
+
   const handleMouseMove = useCallback((e) => {
     const el = ref.current;
     if (!el) return;
@@ -945,19 +948,19 @@ function ProjectCard({ project, index = 0 }) {
   const linkCount = (repoUrl ? 1 : 0) + (liveUrl ? 1 : 0);
 
   return (
-    <Box
-      ref={ref}
-      className={`proj-v2-card ${hovered ? "proj-v2-hovered" : ""}`}
-      style={{
-        "--pv2-from": accent.from,
-        "--pv2-to": accent.to,
-        "--pv2-glow": accent.glow,
-        "--pv2-mid": accent.mid,
-        "--pv2-hue": accent.hue,
-        "--pv2-mx": `${mousePos.x}%`,
-        "--pv2-my": `${mousePos.y}%`,
-        "--pv2-idx": index,
-      }}
+<Box
+  ref={ref}
+  className={`proj-v2-card ${hovered ? "proj-v2-hovered" : ""}`}
+style={{
+  "--pv2-from": accent.from,
+  "--pv2-to": accent.to,
+  "--pv2-glow": accent.glow,
+  "--pv2-mid": accent.mid,
+  "--pv2-hue": accent.hue,
+  "--pv2-mx": `${mousePos.x}%`,
+  "--pv2-my": `${mousePos.y}%`,
+  "--pv2-idx": index,
+}}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       onMouseEnter={() => setHovered(true)}
@@ -972,8 +975,6 @@ function ProjectCard({ project, index = 0 }) {
       }} />
 
       {/* ── Grid scan overlay ── */}
-      <Box className="pv2-grid-scan" />
-
       {/* ── Corner circuit brackets ── */}
       <Box className="pv2-corner pv2-corner--tl" style={{ borderColor: `${accent.from}99` }} />
       <Box className="pv2-corner pv2-corner--tr" style={{ borderColor: `${accent.from}66` }} />
@@ -981,7 +982,6 @@ function ProjectCard({ project, index = 0 }) {
       <Box className="pv2-corner pv2-corner--br" style={{ borderColor: `${accent.to}55` }} />
 
       {/* ── Horizontal scan beam ── */}
-      <Box className="pv2-scan-beam" style={{ background: `linear-gradient(90deg, transparent, ${accent.from}44, ${accent.to}33, transparent)` }} />
 
       {/* ── macOS top status bar ── */}
       <Box className="pv2-status-bar">
