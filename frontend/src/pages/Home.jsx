@@ -824,15 +824,100 @@ function BlackholeBadge({ initials, name }) {
 }
 
 // =============================================
-// PROJECT CARD — with neon border + 3D tilt
+// TECH CHIP COLOR ENGINE
 // =============================================
-function ProjectCard({ project }) {
+const TECH_COLORS = {
+  // Frontend
+  react: { bg: "rgba(97,218,251,0.13)", border: "rgba(97,218,251,0.40)", color: "#61dafb" },
+  "react.js": { bg: "rgba(97,218,251,0.13)", border: "rgba(97,218,251,0.40)", color: "#61dafb" },
+  nextjs: { bg: "rgba(255,255,255,0.10)", border: "rgba(255,255,255,0.28)", color: "#ffffff" },
+  "next.js": { bg: "rgba(255,255,255,0.10)", border: "rgba(255,255,255,0.28)", color: "#ffffff" },
+  vue: { bg: "rgba(66,184,131,0.13)", border: "rgba(66,184,131,0.40)", color: "#42b883" },
+  "vue.js": { bg: "rgba(66,184,131,0.13)", border: "rgba(66,184,131,0.40)", color: "#42b883" },
+  angular: { bg: "rgba(221,0,49,0.13)", border: "rgba(221,0,49,0.40)", color: "#dd0031" },
+  svelte: { bg: "rgba(255,62,0,0.13)", border: "rgba(255,62,0,0.40)", color: "#ff3e00" },
+  typescript: { bg: "rgba(49,120,198,0.13)", border: "rgba(49,120,198,0.40)", color: "#3178c6" },
+  javascript: { bg: "rgba(247,223,30,0.13)", border: "rgba(247,223,30,0.40)", color: "#f7df1e" },
+  js: { bg: "rgba(247,223,30,0.13)", border: "rgba(247,223,30,0.40)", color: "#f7df1e" },
+  html: { bg: "rgba(227,76,38,0.13)", border: "rgba(227,76,38,0.40)", color: "#e34c26" },
+  html5: { bg: "rgba(227,76,38,0.13)", border: "rgba(227,76,38,0.40)", color: "#e34c26" },
+  css: { bg: "rgba(38,77,228,0.13)", border: "rgba(38,77,228,0.40)", color: "#264de4" },
+  css3: { bg: "rgba(38,77,228,0.13)", border: "rgba(38,77,228,0.40)", color: "#264de4" },
+  tailwind: { bg: "rgba(56,189,248,0.13)", border: "rgba(56,189,248,0.40)", color: "#38bdf8" },
+  tailwindcss: { bg: "rgba(56,189,248,0.13)", border: "rgba(56,189,248,0.40)", color: "#38bdf8" },
+  // Backend
+  "node.js": { bg: "rgba(104,160,99,0.13)", border: "rgba(104,160,99,0.40)", color: "#68a063" },
+  nodejs: { bg: "rgba(104,160,99,0.13)", border: "rgba(104,160,99,0.40)", color: "#68a063" },
+  node: { bg: "rgba(104,160,99,0.13)", border: "rgba(104,160,99,0.40)", color: "#68a063" },
+  express: { bg: "rgba(255,255,255,0.08)", border: "rgba(255,255,255,0.22)", color: "#cccccc" },
+  "express.js": { bg: "rgba(255,255,255,0.08)", border: "rgba(255,255,255,0.22)", color: "#cccccc" },
+  python: { bg: "rgba(55,118,171,0.13)", border: "rgba(55,118,171,0.40)", color: "#3776ab" },
+  django: { bg: "rgba(9,150,100,0.13)", border: "rgba(9,150,100,0.40)", color: "#09960a" },
+  flask: { bg: "rgba(255,255,255,0.08)", border: "rgba(255,255,255,0.22)", color: "#cccccc" },
+  java: { bg: "rgba(248,152,32,0.13)", border: "rgba(248,152,32,0.40)", color: "#f89820" },
+  "spring boot": { bg: "rgba(109,179,63,0.13)", border: "rgba(109,179,63,0.40)", color: "#6db33f" },
+  spring: { bg: "rgba(109,179,63,0.13)", border: "rgba(109,179,63,0.40)", color: "#6db33f" },
+  php: { bg: "rgba(119,123,179,0.13)", border: "rgba(119,123,179,0.40)", color: "#777bb3" },
+  "c#": { bg: "rgba(104,33,122,0.13)", border: "rgba(104,33,122,0.40)", color: "#68217a" },
+  ".net": { bg: "rgba(104,33,122,0.13)", border: "rgba(104,33,122,0.40)", color: "#68217a" },
+  rust: { bg: "rgba(222,165,132,0.13)", border: "rgba(222,165,132,0.40)", color: "#dea584" },
+  go: { bg: "rgba(0,173,216,0.13)", border: "rgba(0,173,216,0.40)", color: "#00add8" },
+  golang: { bg: "rgba(0,173,216,0.13)", border: "rgba(0,173,216,0.40)", color: "#00add8" },
+  // Database
+  mongodb: { bg: "rgba(71,162,72,0.13)", border: "rgba(71,162,72,0.40)", color: "#47a248" },
+  mysql: { bg: "rgba(0,117,143,0.13)", border: "rgba(0,117,143,0.40)", color: "#00758f" },
+  postgresql: { bg: "rgba(51,103,145,0.13)", border: "rgba(51,103,145,0.40)", color: "#336791" },
+  postgres: { bg: "rgba(51,103,145,0.13)", border: "rgba(51,103,145,0.40)", color: "#336791" },
+  redis: { bg: "rgba(220,50,47,0.13)", border: "rgba(220,50,47,0.40)", color: "#dc322f" },
+  firebase: { bg: "rgba(255,196,0,0.13)", border: "rgba(255,196,0,0.40)", color: "#ffc400" },
+  supabase: { bg: "rgba(62,207,142,0.13)", border: "rgba(62,207,142,0.40)", color: "#3ecf8e" },
+  sqlite: { bg: "rgba(0,101,166,0.13)", border: "rgba(0,101,166,0.40)", color: "#0065a6" },
+  // Tools & Cloud
+  docker: { bg: "rgba(13,183,237,0.13)", border: "rgba(13,183,237,0.40)", color: "#0db7ed" },
+  kubernetes: { bg: "rgba(50,108,229,0.13)", border: "rgba(50,108,229,0.40)", color: "#326ce5" },
+  aws: { bg: "rgba(255,153,0,0.13)", border: "rgba(255,153,0,0.40)", color: "#ff9900" },
+  gcp: { bg: "rgba(66,133,244,0.13)", border: "rgba(66,133,244,0.40)", color: "#4285f4" },
+  "google cloud": { bg: "rgba(66,133,244,0.13)", border: "rgba(66,133,244,0.40)", color: "#4285f4" },
+  azure: { bg: "rgba(0,120,212,0.13)", border: "rgba(0,120,212,0.40)", color: "#0078d4" },
+  git: { bg: "rgba(240,80,50,0.13)", border: "rgba(240,80,50,0.40)", color: "#f05032" },
+  github: { bg: "rgba(255,255,255,0.10)", border: "rgba(255,255,255,0.28)", color: "#ffffff" },
+  graphql: { bg: "rgba(229,53,171,0.13)", border: "rgba(229,53,171,0.40)", color: "#e535ab" },
+  "three.js": { bg: "rgba(255,255,255,0.10)", border: "rgba(255,255,255,0.25)", color: "#dddddd" },
+  solidity: { bg: "rgba(155,135,255,0.13)", border: "rgba(155,135,255,0.40)", color: "#9b87ff" },
+  flutter: { bg: "rgba(84,182,240,0.13)", border: "rgba(84,182,240,0.40)", color: "#54b6f0" },
+  dart: { bg: "rgba(0,180,219,0.13)", border: "rgba(0,180,219,0.40)", color: "#00b4db" },
+  kotlin: { bg: "rgba(127,82,255,0.13)", border: "rgba(127,82,255,0.40)", color: "#7f52ff" },
+  swift: { bg: "rgba(240,81,56,0.13)", border: "rgba(240,81,56,0.40)", color: "#f05138" },
+};
+
+function getTechColor(tech) {
+  const key = safeString(tech).trim().toLowerCase();
+  return TECH_COLORS[key] || null;
+}
+
+// =============================================
+// PROJECT CARD — ULTRA LUXURY FUTURISTIC v2
+// =============================================
+function ProjectCard({ project, index = 0 }) {
   const title = safeString(project?.title) || "Untitled Project";
   const description = safeString(project?.description);
   const techList = splitCSV(project?.tech);
   const repoUrl = safeString(project?.repoUrl);
   const liveUrl = safeString(project?.liveUrl);
   const ref = useRef(null);
+  const [hovered, setHovered] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  // Assign a unique accent color per card index
+  const CARD_ACCENTS = [
+    { from: "#f13024", to: "#f97316", glow: "rgba(241,48,36,0.35)" },
+    { from: "#6366f1", to: "#a855f7", glow: "rgba(139,92,246,0.35)" },
+    { from: "#06b6d4", to: "#3b82f6", glow: "rgba(59,130,246,0.35)" },
+    { from: "#10b981", to: "#06b6d4", glow: "rgba(16,185,129,0.35)" },
+    { from: "#f59e0b", to: "#ef4444", glow: "rgba(245,158,11,0.35)" },
+    { from: "#ec4899", to: "#a855f7", glow: "rgba(236,72,153,0.35)" },
+  ];
+  const accent = CARD_ACCENTS[index % CARD_ACCENTS.length];
 
   const handleMouseMove = useCallback((e) => {
     const el = ref.current;
@@ -842,56 +927,162 @@ function ProjectCard({ project }) {
     const y = e.clientY - rect.top;
     const cx = rect.width / 2;
     const cy = rect.height / 2;
-    const rotX = ((y - cy) / cy) * -8;
-    const rotY = ((x - cx) / cx) * 8;
-    el.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(10px) translateY(-4px)`;
+    const rotX = ((y - cy) / cy) * -10;
+    const rotY = ((x - cx) / cx) * 10;
+    el.style.transform = `perspective(1000px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(12px) translateY(-6px)`;
+    setMousePos({ x: (x / rect.width) * 100, y: (y / rect.height) * 100 });
   }, []);
 
   const handleMouseLeave = useCallback(() => {
     const el = ref.current;
     if (!el) return;
-    el.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px) translateY(0px)";
+    el.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px) translateY(0px)";
+    setHovered(false);
   }, []);
 
+  const projectNumber = String(index + 1).padStart(2, "0");
+
   return (
-    <MotionPaper
+    <Box
       ref={ref}
-      variants={fadeUp}
-      className="project-card neon-card"
+      className="proj-card-ultra"
+      style={{ "--proj-from": accent.from, "--proj-to": accent.to, "--proj-glow": accent.glow, "--proj-idx": index }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onMouseEnter={() => setHovered(true)}
     >
-      <Typography className="project-title">{title}</Typography>
-      <Typography className="project-description">{description || "No description added yet."}</Typography>
-      {techList.length ? (
-        <Stack direction="row" flexWrap="wrap" gap={1} sx={{ mt: 2 }}>
-          {techList.map((tech, i) => <Chip key={`${tech}-${i}`} label={tech} size="small" className="project-chip" />)}
-        </Stack>
-      ) : null}
-      <Stack direction={{ xs: "column", sm: "row" }} sx={{ mt: 3, gap: 1.2 }}>
+      {/* Animated gradient border */}
+      <Box className="proj-border-beam" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to}, transparent, ${accent.from})` }} />
+
+      {/* Holographic foil background */}
+      <Box className="proj-foil" style={{
+        background: `radial-gradient(ellipse at ${mousePos.x}% ${mousePos.y}%, ${accent.from}18 0%, ${accent.to}0d 40%, transparent 70%)`,
+        opacity: hovered ? 1 : 0,
+      }} />
+
+      {/* Top scan line */}
+      <Box className="proj-scan-line" style={{ background: `linear-gradient(90deg, transparent, ${accent.from}, ${accent.to}, transparent)` }} />
+
+      {/* Corner accent */}
+      <Box className="proj-corner-tl" style={{ borderColor: `${accent.from}55` }} />
+      <Box className="proj-corner-br" style={{ borderColor: `${accent.to}55` }} />
+
+      {/* Header row */}
+      <Box className="proj-header">
+        <Box className="proj-number-badge" style={{ background: `linear-gradient(135deg, ${accent.from}22, ${accent.to}11)`, borderColor: `${accent.from}44` }}>
+          <Typography className="proj-number-text" style={{ background: `linear-gradient(135deg, ${accent.from}, ${accent.to})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            {projectNumber}
+          </Typography>
+        </Box>
+
+        <Box className="proj-header-dots">
+          <span className="proj-dot" style={{ background: accent.from }} />
+          <span className="proj-dot" style={{ background: accent.to, opacity: 0.6 }} />
+          <span className="proj-dot" style={{ background: "#ffffff", opacity: 0.2 }} />
+        </Box>
+
+        <Box className="proj-live-indicator" style={{ opacity: liveUrl ? 1 : 0 }}>
+          <span className="proj-live-dot" style={{ background: "#22c55e", boxShadow: `0 0 8px #22c55e` }} />
+          <Typography className="proj-live-text">LIVE</Typography>
+        </Box>
+      </Box>
+
+      {/* Title */}
+      <Typography className="proj-title-ultra" style={{
+        backgroundImage: hovered ? `linear-gradient(135deg, ${accent.from}, ${accent.to}, #ffffff)` : undefined,
+        WebkitBackgroundClip: hovered ? "text" : undefined,
+        WebkitTextFillColor: hovered ? "transparent" : undefined,
+        backgroundClip: hovered ? "text" : undefined,
+      }}>
+        {title}
+      </Typography>
+
+      {/* Divider */}
+      <Box className="proj-divider" style={{ background: `linear-gradient(90deg, ${accent.from}88, ${accent.to}44, transparent)` }} />
+
+      {/* Description */}
+      <Typography className="proj-desc-ultra">
+        {description || "No description added yet."}
+      </Typography>
+
+      {/* Tech stack */}
+      {techList.length > 0 && (
+        <Box className="proj-tech-wrap">
+          <Typography className="proj-tech-label">TECH STACK</Typography>
+          <Box className="proj-tech-row">
+            {techList.map((tech, i) => {
+              const tc = getTechColor(tech);
+              return (
+                <Box
+                  key={`${tech}-${i}`}
+                  className="proj-tech-chip"
+                  style={tc ? {
+                    background: tc.bg,
+                    borderColor: tc.border,
+                    color: tc.color,
+                    WebkitTextFillColor: tc.color,
+                    boxShadow: `0 0 12px ${tc.border}`,
+                  } : {
+                    background: `${accent.from}14`,
+                    borderColor: `${accent.from}38`,
+                    color: accent.from,
+                    WebkitTextFillColor: accent.from,
+                  }}
+                >
+                  <span className="proj-tech-dot" style={{ background: tc ? tc.color : accent.from }} />
+                  {tech}
+                </Box>
+              );
+            })}
+          </Box>
+        </Box>
+      )}
+
+      {/* Action buttons */}
+      <Box className="proj-actions">
         {repoUrl ? (
-          <Button variant="outlined" startIcon={<MdLink />}
+          <button
+            type="button"
+            className="proj-btn proj-btn-outline"
+            style={{ "--btn-color": accent.from }}
             onClick={() => window.open(repoUrl, "_blank", "noopener,noreferrer")}
-            sx={{
-              borderRadius: 999, fontWeight: 700,
-              borderColor: "rgba(241,48,36,0.5) !important",
-              color: "#f13024 !important",
-              "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" },
-            }}>Repository</Button>
+          >
+            <MdLink style={{ fontSize: "1rem" }} />
+            Repository
+          </button>
         ) : null}
         {liveUrl ? (
-          <Button variant="contained" startIcon={<MdArrowOutward />}
+          <button
+            type="button"
+            className="proj-btn proj-btn-solid"
+            style={{ "--btn-from": accent.from, "--btn-to": accent.to, "--btn-glow": accent.glow }}
             onClick={() => window.open(liveUrl, "_blank", "noopener,noreferrer")}
-            sx={{
-              borderRadius: 999, fontWeight: 700,
-              background: "linear-gradient(135deg, #f13024, #f97316) !important",
-              color: "white !important",
-              boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
-              "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important" },
-            }}>Live Preview</Button>
+          >
+            <MdArrowOutward style={{ fontSize: "1rem" }} />
+            Live Preview
+          </button>
         ) : null}
-      </Stack>
-    </MotionPaper>
+      </Box>
+
+      {/* Bottom stat bar */}
+      <Box className="proj-stat-bar" style={{ borderTopColor: `${accent.from}18` }}>
+        <Typography className="proj-stat-item">
+          <span style={{ color: accent.from, WebkitTextFillColor: accent.from }}>{techList.length}</span>
+          {" "}TECHNOLOGIES
+        </Typography>
+        <Box className="proj-stat-divider" />
+        <Typography className="proj-stat-item">
+          <span style={{ color: accent.to, WebkitTextFillColor: accent.to }}>
+            {(repoUrl ? 1 : 0) + (liveUrl ? 1 : 0)}
+          </span>
+          {" "}LINKS
+        </Typography>
+        <Box className="proj-stat-divider" />
+        <Typography className="proj-stat-item" style={{ color: "#22c55e", WebkitTextFillColor: "#22c55e" }}>
+          ✓ FEATURED
+        </Typography>
+      </Box>
+    </Box>
   );
 }
 
@@ -1434,13 +1625,13 @@ case "skills":
             initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
             <Box className="section-scroll-area">
               <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Work" subtitle="Featured projects in a modern portfolio card layout." />
+                <SectionHeading title="Work" subtitle="Crafted with precision — featured projects built to ship." />
                 {loading ? (
                   <Stack spacing={2}><Skeleton height={220} /><Skeleton height={220} /></Stack>
-                ) : projects.length ? (
-                  <Box className="project-grid">
-                    {projects.map((project, idx) => <ProjectCard key={project?.id ?? idx} project={project} />)}
-                  </Box>
+) : projects.length ? (
+  <Box className="proj-ultra-grid">
+    {projects.map((project, idx) => <ProjectCard key={project?.id ?? idx} project={project} index={idx} />)}
+  </Box>
                 ) : (
                   <GlassPanel sx={{ p: 3 }}><Typography>No projects yet. Add them in Admin → Projects.</Typography></GlassPanel>
                 )}
