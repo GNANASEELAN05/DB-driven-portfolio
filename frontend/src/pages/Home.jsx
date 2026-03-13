@@ -1440,110 +1440,171 @@ case "skills":
           </MotionBox>
         );
 
-      case "experience":
-        return (
-          <MotionBox key="experience" custom={navDirection} variants={pageVariants}
-            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-            <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Experience" subtitle="Career and internship timeline." />
-                <Stack spacing={2}>
-                  {loading ? <Skeleton height={220} /> : experience.length ? (
-                    experience.map((item, idx) => (
-                      <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
-                        <Typography className="timeline-title">{safeString(item?.role) || "Role"}</Typography>
-                        <Typography className="timeline-subtitle">{safeString(item?.company) || "Company"}</Typography>
-                        <Typography className="timeline-meta">
-                          {safeString(item?.start)}{safeString(item?.end) ? ` - ${safeString(item?.end)}` : ""}
-                        </Typography>
-                        {safeString(item?.description) ? (
-                          <Typography className="body-copy" sx={{ mt: 1.5 }}>{safeString(item?.description)}</Typography>
-                        ) : null}
-                      </GlassPanel>
-                    ))
-                  ) : <GlassPanel sx={{ p: 3 }}><Typography>No experience added yet.</Typography></GlassPanel>}
-                </Stack>
-              </MotionBox>
-            </Box>
-          </MotionBox>
-        );
+case "experience":
+  return (
+    <MotionBox key="experience" custom={navDirection} variants={pageVariants}
+      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+      <Box className="section-scroll-area">
+        <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+          <SectionHeading title="Experience" subtitle="Career and internship timeline." />
+          <Stack spacing={2}>
+            {loading ? <Skeleton height={220} /> : experience.length ? (
+              experience.map((item, idx) => {
+                const isCurrentRole = !safeString(item?.end).trim();
+                return (
+                  <Box key={item?.id ?? idx} className={`exp-card-luxury ${isCurrentRole ? "exp-card-current" : ""}`}>
+                    <Box className="exp-card-left-bar" />
+                    <Box className="exp-card-top-glow" />
+                    <Box sx={{ p: { xs: "22px 22px 22px 28px", md: "26px 26px 26px 32px" } }}>
+                      <Box className="exp-card-header">
+                        <Box className="exp-card-header-left">
+                          <Box className="exp-company-icon">🏢</Box>
+                          <Box>
+                            <Typography className="exp-role">{safeString(item?.role) || "Role"}</Typography>
+                            <Typography className="exp-company">{safeString(item?.company) || "Company"}</Typography>
+                          </Box>
+                        </Box>
+                        <Box className="exp-card-header-right">
+                          <Box className={`exp-date-badge ${isCurrentRole ? "exp-date-badge-current" : ""}`}>
+                            {safeString(item?.start)}{safeString(item?.end) ? ` — ${safeString(item?.end)}` : ""}
+                          </Box>
+                          {isCurrentRole && (
+                            <Box className="exp-current-dot-row">
+                              <span className="exp-green-dot" />
+                              <Typography sx={{ fontSize: "0.73rem", opacity: 0.5 }}>Current Role</Typography>
+                            </Box>
+                          )}
+                        </Box>
+                      </Box>
+                      <Box className="exp-card-divider" />
+                      {safeString(item?.description) ? (
+                        <Typography className="exp-description">{safeString(item?.description)}</Typography>
+                      ) : null}
+                    </Box>
+                  </Box>
+                );
+              })
+            ) : <GlassPanel sx={{ p: 3 }}><Typography>No experience added yet.</Typography></GlassPanel>}
+          </Stack>
+        </MotionBox>
+      </Box>
+    </MotionBox>
+  );
 
-      case "education":
-        return (
-          <MotionBox key="education" custom={navDirection} variants={pageVariants}
-            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-            <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Education" subtitle="Academic background and qualifications." />
-                <Stack spacing={2}>
-                  {loading ? <Skeleton height={220} /> : education.length ? (
-                    education.map((item, idx) => (
-                      <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
-                        <Typography className="timeline-title">{safeString(item?.degree) || "Degree"}</Typography>
-                        <Typography className="timeline-subtitle">{safeString(item?.institution) || "Institution"}</Typography>
-                        <Typography className="timeline-meta">{safeString(item?.year) || ""}</Typography>
+case "education":
+  return (
+    <MotionBox key="education" custom={navDirection} variants={pageVariants}
+      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+      <Box className="section-scroll-area">
+        <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+          <SectionHeading title="Education" subtitle="Academic background and qualifications." />
+          <Box className="edu-timeline">
+            {loading ? <Skeleton height={220} /> : education.length ? (
+              education.map((item, idx) => (
+                <Box key={item?.id ?? idx} className="edu-card-luxury">
+                  {/* Timeline connector */}
+                  {idx < education.length - 1 && <Box className="edu-timeline-line" />}
+                  <Box className="edu-card-node">
+                    <Box className="edu-node-dot">
+                      <MdSchool style={{ fontSize: "0.95rem", color: "#f13024" }} />
+                    </Box>
+                  </Box>
+                  <Box className="edu-card-content">
+                    <Box className="edu-card-inner">
+                      <Box className="edu-card-top-accent" />
+                      <Box sx={{ p: { xs: "20px", md: "24px 28px" } }}>
+                        <Box className="edu-header-row">
+                          <Box sx={{ flex: 1 }}>
+                            <Typography className="edu-degree">{safeString(item?.degree) || "Degree"}</Typography>
+                            <Typography className="edu-institution">{safeString(item?.institution) || "Institution"}</Typography>
+                          </Box>
+                          {safeString(item?.year) ? (
+                            <Box className="edu-year-badge">{safeString(item?.year)}</Box>
+                          ) : null}
+                        </Box>
                         {safeString(item?.details) ? (
-                          <Typography className="body-copy" sx={{ mt: 1.5 }}>{safeString(item?.details)}</Typography>
+                          <>
+                            <Box className="edu-divider" />
+                            <Typography className="edu-details">{safeString(item?.details)}</Typography>
+                          </>
                         ) : null}
-                      </GlassPanel>
-                    ))
-                  ) : <GlassPanel sx={{ p: 3 }}><Typography>No education added yet.</Typography></GlassPanel>}
-                </Stack>
-              </MotionBox>
-            </Box>
-          </MotionBox>
-        );
+                      </Box>
+                    </Box>
+                  </Box>
+                </Box>
+              ))
+            ) : <GlassPanel sx={{ p: 3 }}><Typography>No education added yet.</Typography></GlassPanel>}
+          </Box>
+        </MotionBox>
+      </Box>
+    </MotionBox>
+  );
 
       // ── CHANGED: achievements case — adds "View Certificate" button ──────
-      case "achievements":
-        return (
-          <MotionBox key="achievements" custom={navDirection} variants={pageVariants}
-            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-            <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Achievements" subtitle="Certifications, awards, and recognitions." />
-                <Box className="achievement-grid">
-                  {loading ? <Skeleton height={220} /> : achievements.length ? (
-                    achievements.map((item, idx) => (
-                      <GlassPanel key={item?.id ?? idx} sx={{ p: { xs: 2.5, md: 3 } }}>
-                        <Typography className="timeline-title">{safeString(item?.title) || "Achievement"}</Typography>
-                        <Typography className="timeline-subtitle">{safeString(item?.issuer) || ""}</Typography>
-                        <Typography className="timeline-meta">{safeString(item?.year) || ""}</Typography>
-                        <Stack direction="row" flexWrap="wrap" spacing={1} sx={{ mt: 2 }}>
-                          {safeString(item?.link) ? (
-                            <Button variant="outlined" startIcon={<MdLink />}
-                              sx={{
-                                borderRadius: 999, fontWeight: 700,
-                                borderColor: "rgba(241,48,36,0.5) !important",
-                                color: "#f13024 !important",
-                                "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" },
-                              }}
-                              onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}>
-                              View
-                            </Button>
-                          ) : null}
-                          {item?.certificateFileName ? (
-                            <Button variant="contained" startIcon={<MdVisibility />}
-                              sx={{
-                                borderRadius: 999, fontWeight: 700,
-                                background: "linear-gradient(135deg, #f13024, #f97316) !important",
-                                color: "white !important",
-                                boxShadow: "0 6px 20px rgba(241,48,36,0.3)",
-                                "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important" },
-                              }}
-                              onClick={() => onPreviewCertificate(item.id, safeString(item?.title))}>
-                              View Certificate
-                            </Button>
-                          ) : null}
-                        </Stack>
-                      </GlassPanel>
-                    ))
-                  ) : <GlassPanel sx={{ p: 3 }}><Typography>No achievements yet.</Typography></GlassPanel>}
+case "achievements":
+  return (
+    <MotionBox key="achievements" custom={navDirection} variants={pageVariants}
+      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+      <Box className="section-scroll-area">
+        <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+          <SectionHeading title="Achievements" subtitle="Certifications, awards, and recognitions." />
+          <Box className="ach-masonry">
+            {loading ? <Skeleton height={220} /> : achievements.length ? (
+              achievements.map((item, idx) => (
+                <Box key={item?.id ?? idx} className="ach-card-luxury" style={{ "--ach-idx": idx }}>
+                  <Box className="ach-card-shimmer" />
+                  <Box className="ach-card-glow-corner" />
+                  <Box sx={{ p: { xs: "22px", md: "26px" }, position: "relative", zIndex: 1 }}>
+                    {/* Trophy icon row */}
+                    <Box className="ach-icon-row">
+                      <Box className="ach-trophy-icon">
+                        <MdEmojiEvents style={{ fontSize: "1.3rem", color: "#f13024" }} />
+                      </Box>
+                      <Box className="ach-index-label">#{String(idx + 1).padStart(2, "0")}</Box>
+                    </Box>
+                    <Typography className="ach-title">{safeString(item?.title) || "Achievement"}</Typography>
+                    {safeString(item?.issuer) && (
+                      <Typography className="ach-issuer">{safeString(item?.issuer)}</Typography>
+                    )}
+                    {safeString(item?.year) && (
+                      <Box className="ach-year-chip">{safeString(item?.year)}</Box>
+                    )}
+                    <Box className="ach-action-row">
+                      {safeString(item?.link) ? (
+                        <Button variant="outlined" startIcon={<MdLink />} size="small"
+                          sx={{
+                            borderRadius: 999, fontWeight: 700, fontSize: "0.78rem",
+                            borderColor: "rgba(241,48,36,0.45) !important",
+                            color: "#f13024 !important", px: 2,
+                            "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" },
+                          }}
+                          onClick={() => window.open(safeString(item?.link), "_blank", "noopener,noreferrer")}>
+                          View
+                        </Button>
+                      ) : null}
+                      {item?.certificateFileName ? (
+                        <Button variant="contained" startIcon={<MdVisibility />} size="small"
+                          sx={{
+                            borderRadius: 999, fontWeight: 700, fontSize: "0.78rem",
+                            background: "linear-gradient(135deg, #f13024, #f97316) !important",
+                            color: "white !important", px: 2,
+                            boxShadow: "0 4px 16px rgba(241,48,36,0.28)",
+                            "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important" },
+                          }}
+                          onClick={() => onPreviewCertificate(item.id, safeString(item?.title))}>
+                          Certificate
+                        </Button>
+                      ) : null}
+                    </Box>
+                  </Box>
                 </Box>
-              </MotionBox>
-            </Box>
-          </MotionBox>
-        );
+              ))
+            ) : <GlassPanel sx={{ p: 3 }}><Typography>No achievements yet.</Typography></GlassPanel>}
+          </Box>
+        </MotionBox>
+      </Box>
+    </MotionBox>
+  );
 
 case "languages":
   return (

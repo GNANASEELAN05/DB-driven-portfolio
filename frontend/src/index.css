@@ -3073,3 +3073,525 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   .skillbox-item-name { font-size: 0.55rem !important; max-width: 52px; }
   .sbb-hint { display: none; }
 }
+
+
+/* ==============================================
+   EXPERIENCE — LUXURY CARDS
+   ============================================== */
+
+.exp-card-luxury {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+  animation: expCardIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes expCardIn {
+  from { opacity: 0; transform: translateX(-28px) scale(0.97); filter: blur(4px); }
+  to   { opacity: 1; transform: translateX(0) scale(1); filter: blur(0); }
+}
+
+.mode-dark .exp-card-luxury {
+  background: rgba(20, 22, 44, 0.62);
+}
+.mode-light .exp-card-luxury {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(17, 24, 39, 0.08);
+}
+
+.exp-card-luxury:hover {
+  transform: translateY(-4px) translateX(4px);
+  border-color: rgba(241, 48, 36, 0.35);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(241, 48, 36, 0.18);
+}
+
+/* Left accent bar */
+.exp-card-left-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, rgba(241, 48, 36, 0.5), rgba(249, 115, 22, 0.2));
+  border-radius: 0;
+  transition: background 0.3s ease;
+}
+
+.exp-card-current .exp-card-left-bar {
+  background: linear-gradient(180deg, #f13024, #f97316);
+  box-shadow: 0 0 16px rgba(241, 48, 36, 0.45);
+}
+
+/* Top glow line */
+.exp-card-top-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #f13024, rgba(249, 115, 22, 0.4), transparent);
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.exp-card-luxury:hover .exp-card-top-glow { opacity: 1; }
+
+/* Header layout */
+.exp-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.exp-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.exp-company-icon {
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  transition: transform 0.25s ease;
+}
+
+.mode-dark .exp-company-icon {
+  background: rgba(241, 48, 36, 0.10);
+  border: 1px solid rgba(241, 48, 36, 0.22);
+}
+.mode-light .exp-company-icon {
+  background: rgba(241, 48, 36, 0.07);
+  border: 1px solid rgba(241, 48, 36, 0.16);
+}
+
+.exp-card-luxury:hover .exp-company-icon { transform: rotate(-6deg) scale(1.1); }
+
+.exp-role {
+  font-size: 1.08rem !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.01em !important;
+}
+.mode-dark .exp-role { color: rgba(255,255,255,0.95) !important; -webkit-text-fill-color: rgba(255,255,255,0.95) !important; }
+.mode-light .exp-role { color: rgba(17,24,39,0.95) !important; -webkit-text-fill-color: rgba(17,24,39,0.95) !important; }
+
+.exp-company {
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
+  margin-top: 3px !important;
+}
+
+/* Right date area */
+.exp-card-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.exp-date-badge {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.70rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-family: "Inter", sans-serif;
+}
+
+.mode-dark .exp-date-badge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.50);
+}
+.mode-light .exp-date-badge {
+  background: rgba(17, 24, 39, 0.04);
+  border: 1px solid rgba(17, 24, 39, 0.10);
+  color: rgba(17, 24, 39, 0.50);
+}
+
+.exp-date-badge-current {
+  background: rgba(241, 48, 36, 0.12) !important;
+  border-color: rgba(241, 48, 36, 0.30) !important;
+  color: #f97316 !important;
+}
+
+.exp-current-dot-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.exp-green-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 6px #22c55e;
+  animation: greenPulse 2s ease-in-out infinite;
+}
+
+@keyframes greenPulse {
+  0%, 100% { box-shadow: 0 0 4px #22c55e; }
+  50% { box-shadow: 0 0 10px #22c55e, 0 0 18px rgba(34, 197, 94, 0.4); }
+}
+
+.exp-card-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(241, 48, 36, 0.22), transparent);
+  margin-bottom: 14px;
+}
+.mode-light .exp-card-divider {
+  background: linear-gradient(90deg, rgba(241, 48, 36, 0.15), transparent);
+}
+
+.exp-description {
+  font-size: 0.91rem !important;
+  line-height: 1.9 !important;
+  opacity: 0.78;
+}
+
+@media (max-width: 600px) {
+  .exp-card-header { flex-direction: column; gap: 10px; }
+  .exp-card-header-right { align-items: flex-start; }
+  .exp-date-badge { font-size: 0.65rem; }
+}
+
+
+/* ==============================================
+   EDUCATION — TIMELINE LUXURY
+   ============================================== */
+
+.edu-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.edu-card-luxury {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  position: relative;
+  margin-bottom: 24px;
+  animation: eduCardIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes eduCardIn {
+  from { opacity: 0; transform: translateY(22px) scale(0.97); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+/* Vertical connector line */
+.edu-timeline-line {
+  position: absolute;
+  left: 19px;
+  top: 48px;
+  bottom: -24px;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(241, 48, 36, 0.35), rgba(241, 48, 36, 0.05));
+  border-radius: 1px;
+}
+
+/* Node column */
+.edu-card-node {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 4px;
+  margin-right: 20px;
+  z-index: 1;
+}
+
+.edu-node-dot {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.mode-dark .edu-node-dot {
+  background: rgba(241, 48, 36, 0.14);
+  border: 1.5px solid rgba(241, 48, 36, 0.35);
+  box-shadow: 0 0 0 4px rgba(241, 48, 36, 0.06);
+}
+.mode-light .edu-node-dot {
+  background: rgba(241, 48, 36, 0.08);
+  border: 1.5px solid rgba(241, 48, 36, 0.25);
+  box-shadow: 0 0 0 4px rgba(241, 48, 36, 0.05);
+}
+
+.edu-card-luxury:hover .edu-node-dot {
+  transform: scale(1.15) rotate(-8deg);
+  box-shadow: 0 0 0 6px rgba(241, 48, 36, 0.14), 0 0 20px rgba(241, 48, 36, 0.2);
+}
+
+/* Card content */
+.edu-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.edu-card-inner {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px);
+  transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+}
+
+.mode-dark .edu-card-inner { background: rgba(20, 22, 44, 0.62); }
+.mode-light .edu-card-inner {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(17, 24, 39, 0.08);
+}
+
+.edu-card-luxury:hover .edu-card-inner {
+  transform: translateX(6px);
+  border-color: rgba(241, 48, 36, 0.30);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(241, 48, 36, 0.14);
+}
+
+.edu-card-top-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #f13024, rgba(249, 115, 22, 0.5), transparent);
+  opacity: 0.5;
+  transition: opacity 0.28s ease;
+}
+.edu-card-luxury:hover .edu-card-top-accent { opacity: 1; }
+
+.edu-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.edu-degree {
+  font-size: 1.08rem !important;
+  font-weight: 800 !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.01em !important;
+}
+.mode-dark .edu-degree { color: rgba(255,255,255,0.95) !important; -webkit-text-fill-color: rgba(255,255,255,0.95) !important; }
+.mode-light .edu-degree { color: rgba(17,24,39,0.95) !important; -webkit-text-fill-color: rgba(17,24,39,0.95) !important; }
+
+.edu-institution {
+  font-size: 0.9rem !important;
+  font-weight: 700 !important;
+  color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
+  margin-top: 4px !important;
+}
+
+.edu-year-badge {
+  flex-shrink: 0;
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  font-family: "Inter", sans-serif;
+  white-space: nowrap;
+  background: rgba(241, 48, 36, 0.10);
+  border: 1px solid rgba(241, 48, 36, 0.25);
+  color: #f97316;
+}
+
+.edu-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(241, 48, 36, 0.20), transparent);
+  margin: 14px 0;
+}
+
+.edu-details {
+  font-size: 0.90rem !important;
+  line-height: 1.88 !important;
+  opacity: 0.76;
+}
+
+@media (max-width: 600px) {
+  .edu-node-dot { width: 32px; height: 32px; }
+  .edu-timeline-line { left: 15px; }
+  .edu-card-node { margin-right: 14px; }
+  .edu-header-row { flex-direction: column; gap: 8px; }
+}
+
+
+/* ==============================================
+   ACHIEVEMENTS — LUXURY MASONRY GRID
+   ============================================== */
+
+.ach-masonry {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+@media (max-width: 899px) { .ach-masonry { grid-template-columns: 1fr; } }
+
+.ach-card-luxury {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  transition: transform 0.30s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+  animation: achCardIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--ach-idx, 0) * 0.07s);
+}
+
+@keyframes achCardIn {
+  from { opacity: 0; transform: translateY(26px) scale(0.94) rotate(-1deg); filter: blur(5px); }
+  to   { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); filter: blur(0); }
+}
+
+.mode-dark .ach-card-luxury {
+  background: rgba(18, 20, 42, 0.65);
+}
+.mode-light .ach-card-luxury {
+  background: rgba(255, 255, 255, 0.84);
+  border-color: rgba(17, 24, 39, 0.09);
+}
+
+.ach-card-luxury:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: rgba(241, 48, 36, 0.40);
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22), 0 0 0 1px rgba(241, 48, 36, 0.20);
+}
+
+/* Shimmer sweep on hover */
+.ach-card-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.06) 50%, transparent 65%);
+  background-size: 200% 100%;
+  background-position: -100% 0;
+  pointer-events: none;
+  transition: background-position 0.6s ease;
+  z-index: 0;
+}
+.ach-card-luxury:hover .ach-card-shimmer { background-position: 100% 0; }
+
+/* Glowing corner accent */
+.ach-card-glow-corner {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(241, 48, 36, 0.20), transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.30s ease;
+  z-index: 0;
+}
+.ach-card-luxury:hover .ach-card-glow-corner { opacity: 1; }
+
+/* Icon row */
+.ach-icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.ach-trophy-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.mode-dark .ach-trophy-icon {
+  background: rgba(241, 48, 36, 0.12);
+  border: 1px solid rgba(241, 48, 36, 0.25);
+}
+.mode-light .ach-trophy-icon {
+  background: rgba(241, 48, 36, 0.08);
+  border: 1px solid rgba(241, 48, 36, 0.18);
+}
+.ach-card-luxury:hover .ach-trophy-icon { transform: rotate(-8deg) scale(1.12); }
+
+.ach-index-label {
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  opacity: 0.22;
+  font-family: "Inter", sans-serif;
+}
+
+.ach-title {
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.01em !important;
+  margin-bottom: 7px !important;
+}
+.mode-dark .ach-title { color: rgba(255,255,255,0.95) !important; -webkit-text-fill-color: rgba(255,255,255,0.95) !important; }
+.mode-light .ach-title { color: rgba(17,24,39,0.95) !important; -webkit-text-fill-color: rgba(17,24,39,0.95) !important; }
+
+.ach-issuer {
+  font-size: 0.87rem !important;
+  font-weight: 700 !important;
+  color: #f97316 !important;
+  -webkit-text-fill-color: #f97316 !important;
+  margin-bottom: 10px !important;
+}
+
+.ach-year-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 0.70rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  font-family: "Inter", sans-serif;
+  margin-bottom: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.55);
+}
+.mode-light .ach-year-chip {
+  background: rgba(17, 24, 39, 0.05);
+  border-color: rgba(17, 24, 39, 0.10);
+  color: rgba(17, 24, 39, 0.55);
+}
+
+.ach-action-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
