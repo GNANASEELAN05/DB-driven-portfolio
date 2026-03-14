@@ -2293,54 +2293,215 @@ case "languages":
     </MotionBox>
   );
 
-      case "contact":
-        return (
-          <MotionBox key="contact" custom={navDirection} variants={pageVariants}
-            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-            <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="Contact" subtitle="Let's build something great together." />
-                <GlassPanel sx={{ p: { xs: 2.5, md: 3.5 }, mb: 3 }}>
-                  <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: { xs: 3, md: 4 } }}>
-                    <Box sx={{ flex: "0 0 auto", minWidth: 0, width: { xs: "100%", md: "38%" } }}>
-                      <Typography className="timeline-title" sx={{ mb: 2 }}>Get in touch</Typography>
-                      <Stack spacing={1.6}>
-                        {contactEmail && <Typography className="contact-line"><MdEmail style={{ marginRight: 10 }} />{contactEmail}</Typography>}
-                        {socials?.phone && <Typography className="contact-line"><MdPhone style={{ marginRight: 10 }} />{safeString(socials.phone)}</Typography>}
-                        {location && <Typography className="contact-line"><MdLocationOn style={{ marginRight: 10 }} />{location}</Typography>}
-                      </Stack>
-                      <Stack direction="row" flexWrap="wrap" sx={{ mt: 3, gap: 1.2 }}>
-                        {socials?.github && (
-                          <Button variant="outlined" startIcon={<FaGithub />}
-                            sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
-                            onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>GitHub</Button>
-                        )}
-                        {socials?.linkedin && (
-                          <Button variant="outlined" startIcon={<FaLinkedin />}
-                            sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
-                            onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>LinkedIn</Button>
-                        )}
-                        {socials?.website && (
-                          <Button variant="outlined" startIcon={<MdLink />}
-                            sx={{ borderRadius: 999, fontWeight: 700, borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}
-                            onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>Website</Button>
-                        )}
-                      </Stack>
-                    </Box>
-                    <Box sx={{ display: { xs: "none", md: "block" }, width: "1px", background: "rgba(241,48,36,0.18)", borderRadius: 4, flexShrink: 0 }} />
-                    <Box sx={{ display: { xs: "block", md: "none" }, height: "1px", background: "rgba(241,48,36,0.18)", borderRadius: 4 }} />
-                    <Box sx={{ flex: 1, minWidth: 0 }}>
-                      <ContactMessageCard contactEmail={contactEmail} name={name} />
-                    </Box>
-                  </Box>
-                </GlassPanel>
-                <Box className="portfolio-footer">
-                  <Typography>© {new Date().getFullYear()} {name}. All rights reserved.</Typography>
-                </Box>
-              </MotionBox>
+case "contact":
+  return (
+    <MotionBox key="contact" custom={navDirection} variants={pageVariants}
+      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+      <Box className="section-scroll-area">
+        <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+          <SectionHeading title="Contact" subtitle="Let's build something great together." />
+
+          {/* ── HERO SIGNAL BANNER ── */}
+          <Box className="contact-signal-banner">
+            <Box className="csb-prism" />
+            <Box className="csb-scan" />
+            <Box className="csb-corner csb-corner--tl" />
+            <Box className="csb-corner csb-corner--br" />
+            <Box className="csb-grid-overlay" />
+
+            {/* Status bar */}
+            <Box className="csb-status-bar">
+              <Box className="csb-dots">
+                <span className="csb-sd csb-sd-red" />
+                <span className="csb-sd csb-sd-yellow" />
+                <span className="csb-sd csb-sd-green" />
+              </Box>
+              <Box className="csb-status-label">
+                <span className="csb-live-dot" />
+                SIGNAL ACTIVE
+              </Box>
+              <Box className="csb-signal-bars">
+                {[1,2,3,4,5].map(b => (
+                  <Box key={b} className="csb-bar" style={{ height: `${b*3+3}px`, opacity: b <= 4 ? 1 : 0.25 }} />
+                ))}
+              </Box>
             </Box>
-          </MotionBox>
-        );
+
+            {/* Main banner content */}
+            <Box className="csb-body">
+              {/* Left: Avatar/Badge */}
+              <Box className="csb-avatar-col">
+                <Box className="csb-avatar-wrap">
+                  <Box className="csb-avatar-ring csb-ring-1" />
+                  <Box className="csb-avatar-ring csb-ring-2" />
+                  <Box className="csb-avatar-ring csb-ring-3" />
+                  <Box className="csb-avatar-core">
+                    <MdEmail style={{ fontSize: "2rem", color: "#f13024" }} />
+                  </Box>
+                  <Box className="csb-avatar-glow" />
+                </Box>
+                <Box className="csb-online-badge">
+                  <span className="csb-online-dot" />
+                  ONLINE
+                </Box>
+              </Box>
+
+              {/* Center: Contact Info */}
+              <Box className="csb-info-col">
+                <Typography className="csb-name">{name}</Typography>
+                <Typography className="csb-role">{title}</Typography>
+
+                <Box className="csb-divider" />
+
+                <Box className="csb-contact-items">
+                  {contactEmail && (
+                    <Box className="csb-contact-item" onClick={() => window.open(`mailto:${contactEmail}`, "_blank")}>
+                      <Box className="csb-contact-icon"><MdEmail style={{ fontSize: "1rem" }} /></Box>
+                      <Box className="csb-contact-text">
+                        <Typography className="csb-contact-label">EMAIL</Typography>
+                        <Typography className="csb-contact-value">{contactEmail}</Typography>
+                      </Box>
+                      <MdArrowOutward className="csb-contact-arrow" />
+                    </Box>
+                  )}
+                  {socials?.phone && (
+                    <Box className="csb-contact-item" onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank")}>
+                      <Box className="csb-contact-icon"><MdPhone style={{ fontSize: "1rem" }} /></Box>
+                      <Box className="csb-contact-text">
+                        <Typography className="csb-contact-label">PHONE</Typography>
+                        <Typography className="csb-contact-value">{safeString(socials.phone)}</Typography>
+                      </Box>
+                      <MdArrowOutward className="csb-contact-arrow" />
+                    </Box>
+                  )}
+                  {location && (
+                    <Box className="csb-contact-item">
+                      <Box className="csb-contact-icon"><MdLocationOn style={{ fontSize: "1rem" }} /></Box>
+                      <Box className="csb-contact-text">
+                        <Typography className="csb-contact-label">LOCATION</Typography>
+                        <Typography className="csb-contact-value">{location}</Typography>
+                      </Box>
+                    </Box>
+                  )}
+                </Box>
+              </Box>
+
+              {/* Right: Social Links */}
+              <Box className="csb-social-col">
+                <Typography className="csb-social-heading">CONNECT</Typography>
+                <Box className="csb-social-grid">
+                  {socials?.github && (
+                    <Box className="csb-social-card" onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}>
+                      <Box className="csb-social-card-prism" />
+                      <FaGithub style={{ fontSize: "1.4rem" }} />
+                      <Typography className="csb-social-label">GitHub</Typography>
+                      <Box className="csb-social-arrow"><MdArrowOutward /></Box>
+                    </Box>
+                  )}
+                  {socials?.linkedin && (
+                    <Box className="csb-social-card" onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}>
+                      <Box className="csb-social-card-prism" />
+                      <FaLinkedin style={{ fontSize: "1.4rem" }} />
+                      <Typography className="csb-social-label">LinkedIn</Typography>
+                      <Box className="csb-social-arrow"><MdArrowOutward /></Box>
+                    </Box>
+                  )}
+                  {socials?.website && (
+                    <Box className="csb-social-card" onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}>
+                      <Box className="csb-social-card-prism" />
+                      <MdLink style={{ fontSize: "1.4rem" }} />
+                      <Typography className="csb-social-label">Website</Typography>
+                      <Box className="csb-social-arrow"><MdArrowOutward /></Box>
+                    </Box>
+                  )}
+                </Box>
+
+                {/* Terminal data strip */}
+                <Box className="csb-terminal-strip">
+                  <Box className="csb-ts-item">
+                    <Typography className="csb-ts-val">24</Typography>
+                    <Typography className="csb-ts-lbl">HR REPLY</Typography>
+                  </Box>
+                  <Box className="csb-ts-sep" />
+                  <Box className="csb-ts-item">
+                    <Typography className="csb-ts-val">100</Typography>
+                    <Typography className="csb-ts-lbl">% OPEN</Typography>
+                  </Box>
+                  <Box className="csb-ts-sep" />
+                  <Box className="csb-ts-item">
+                    <Typography className="csb-ts-val">∞</Typography>
+                    <Typography className="csb-ts-lbl">COLLAB</Typography>
+                  </Box>
+                </Box>
+              </Box>
+            </Box>
+
+            <Box className="csb-watermark">✉</Box>
+          </Box>
+
+          {/* ── MESSAGE FORM CARD ── */}
+          <Box className="contact-form-card">
+            <Box className="cfc-prism" />
+            <Box className="cfc-scan" />
+            <Box className="cfc-corner cfc-corner--tl" />
+            <Box className="cfc-corner cfc-corner--br" />
+
+            {/* Status bar */}
+            <Box className="cfc-status-bar">
+              <Box className="cfc-dots">
+                <span className="cfc-sd cfc-sd-red" />
+                <span className="cfc-sd cfc-sd-yellow" />
+                <span className="cfc-sd cfc-sd-green" />
+              </Box>
+              <Box className="cfc-status-label">
+                <MdTerminal style={{ fontSize: "0.75rem" }} />
+                COMPOSE_MESSAGE.EXE
+              </Box>
+              <Box className="cfc-index-stamp">MSG_01</Box>
+            </Box>
+
+            <Box className="cfc-body">
+              {/* Left: decorative transmission panel */}
+              <Box className="cfc-left-panel">
+                <Box className="cfc-transmission-orb">
+                  <Box className="cfc-trans-ring cfc-trans-ring-1" />
+                  <Box className="cfc-trans-ring cfc-trans-ring-2" />
+                  <Box className="cfc-trans-ring cfc-trans-ring-3" />
+                  <Box className="cfc-trans-core">
+                    <MdEmail style={{ fontSize: "1.8rem", color: "#f13024" }} />
+                  </Box>
+                  <Box className="cfc-trans-glow" />
+                </Box>
+                <Typography className="cfc-left-title">Send a<br/>Message</Typography>
+                <Typography className="cfc-left-sub">Direct transmission to {name}</Typography>
+
+                {/* Decorative data lines */}
+                <Box className="cfc-data-lines">
+                  {["TO:", "FROM:", "SUBJECT:", "ENCRYPT:", "STATUS:"].map((label, i) => (
+                    <Box key={i} className="cfc-data-line">
+                      <Typography className="cfc-dl-key">{label}</Typography>
+                      <Box className="cfc-dl-bar" style={{ width: `${40 + i * 12}%`, animationDelay: `${i*0.2}s` }} />
+                    </Box>
+                  ))}
+                </Box>
+              </Box>
+
+              {/* Right: form */}
+              <Box className="cfc-form-area">
+                <ContactMessageCard contactEmail={contactEmail} name={name} />
+              </Box>
+            </Box>
+
+            <Box className="cfc-watermark">⌨</Box>
+          </Box>
+
+          <Box className="portfolio-footer">
+            <Typography>© {new Date().getFullYear()} {name}. All rights reserved.</Typography>
+          </Box>
+        </MotionBox>
+      </Box>
+    </MotionBox>
+  );
 
       default:
         return null;
