@@ -632,7 +632,7 @@ button { font-family: inherit; }
   display: flex;
   flex-direction: column;
   padding-left: 24px;
-  padding-right: 72px;
+  padding-right: 96px;
 }
 
 .portfolio-topbar {
@@ -3298,6 +3298,7 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   animation: eduBeamSpin 6s linear infinite;
   pointer-events: none;
   z-index: 0;
+  opacity: 0.18; 
 }
 @keyframes eduBeamSpin {
   from { transform: rotate(0deg); }
@@ -5698,6 +5699,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   margin-bottom: 24px;
   cursor: default;
   display: flex;
+  margin-left: 8px;   /* ADD THIS */
+  margin-right: 8px;  /* ADD THIS */
   flex-direction: column;
   transition: transform 0.40s cubic-bezier(0.23,1,0.32,1), box-shadow 0.35s ease;
   animation: csbIn 0.7s cubic-bezier(0.34,1.56,0.64,1) both;
@@ -5940,6 +5943,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 .contact-form-card {
   position:relative; border-radius:28px; overflow:hidden; backdrop-filter:blur(30px);
   margin-bottom:24px; cursor:default; display:flex; flex-direction:column;
+  margin-left: 8px;   /* ADD THIS */
+  margin-right: 8px;  /* ADD THIS */
   transition:transform 0.40s cubic-bezier(0.23,1,0.32,1), box-shadow 0.35s ease;
   animation:csbIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.12s both;
 }
