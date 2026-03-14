@@ -6918,18 +6918,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
 /* Photo frame corner brackets */
 .hpf-corner {
-  position: absolute;
-  width: 28px; height: 28px;
-  z-index: 6;
-  pointer-events: none;
-  border: 2px solid rgba(249,115,22,0.60);
-  transition: all 0.35s ease;
+  display: none;
 }
-.hpf-corner--tl { top:0; left:0; border-right:none; border-bottom:none; border-radius:24px 0 0 0; }
-.hpf-corner--tr { top:0; right:0; border-left:none; border-bottom:none; border-radius:0 24px 0 0; }
-.hpf-corner--bl { bottom:0; left:0; border-right:none; border-top:none; border-radius:0 0 0 24px; }
-.hpf-corner--br { bottom:0; right:0; border-left:none; border-top:none; border-radius:0 0 24px 0; }
-.hero-holo-root:hover .hpf-corner { width:48px; height:48px; border-color:rgba(241,48,36,0.85); }
 
 /* Side data strip tags */
 .hpf-side-strip {
@@ -6973,11 +6963,10 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   flex: 1;
   min-height: 0;
 }
-.hero-holo-root .hero-left-expanded {
-  padding-bottom: 16px;
-  overflow-y: hidden;
-}
-
+  .hero-holo-root .hero-left-expanded {
+    padding-bottom: 6px;
+    overflow-y: hidden;
+  }
 /* Desktop: hero holo root fills height, no scroll */
 .hero-holo-root {
   flex: 1;
@@ -7012,21 +7001,22 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
     font-size: clamp(1.8rem, 3.2vw, 3.2rem) !important;
     margin-bottom: 8px !important;
   }
+
+  .hero-holo-root .hero-terminal {
+    margin-top: 12px;
+  }
+
   .hero-holo-root .hero-description {
     margin-top: 10px !important;
     font-size: 0.93rem !important;
     line-height: 1.75 !important;
-    display: -webkit-box;
-    -webkit-line-clamp: 4;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
   }
-  .hero-holo-root .hero-action-buttons {
-    margin-top: 12px !important;
+.hero-holo-root .hero-action-buttons {
+    margin-top: 8px !important;
   }
   .hero-holo-root .hero-social-row {
-    margin-top: 10px !important;
-    padding-bottom: 8px !important;
+    margin-top: 6px !important;
+    padding-bottom: 4px !important;
   }
   .hero-holo-data-row {
     margin-top: 10px;
