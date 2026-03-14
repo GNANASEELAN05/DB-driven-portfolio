@@ -2336,7 +2336,7 @@ case "contact":
                   <Box className="csb-avatar-ring csb-ring-2" />
                   <Box className="csb-avatar-ring csb-ring-3" />
                   <Box className="csb-avatar-core">
-                    <MdEmail style={{ fontSize: "2rem", color: "#f13024" }} />
+                    <MdContacts style={{ fontSize: "2rem", color: "#f13024" }} />
                   </Box>
                   <Box className="csb-avatar-glow" />
                 </Box>
