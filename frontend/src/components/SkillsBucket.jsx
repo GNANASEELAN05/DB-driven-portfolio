@@ -491,6 +491,9 @@ function BucketCanvas({ allBalls, isDark }) {
 
 const initBalls = useCallback((W, H, balls) => {
     const dynamicR = W < 480 ? 18 : W < 768 ? 22 : BALL_R;
+    const uprightFloorY = H - 18;
+    const fallenFloorY  = H - 110;
+
     ballsRef.current = balls.map(({ name, category }) => {
       const b = makeBall(
         name, category,
@@ -501,14 +504,15 @@ const initBalls = useCallback((W, H, balls) => {
       loadSkillImage(name, (img) => { b.img = img; b.imgLoaded = true; });
       return b;
     });
+
     bucketRef.current = {
       ...getBucketStateDefault(),
       centerX:      W / 2,
-      baseY:        H - 18,
-      floorY:       H - 18,   // upright resting floor
-      fallenFloorY: H - 110,  // fallen resting floor (accounts for rotated height)
+      baseY:        uprightFloorY,
+      floorY:       uprightFloorY,
+      fallenFloorY: fallenFloorY,
       prevDragX:    W / 2,
-      prevDragY:    H - 18,
+      prevDragY:    uprightFloorY,
     };
   }, []);
 
@@ -522,15 +526,21 @@ const initBalls = useCallback((W, H, balls) => {
         const W = Math.floor(entry.contentRect.width);
         const H = Math.floor(entry.contentRect.height);
         if (!W || !H) return;
+
+        const prevW = sizeRef.current.W;
+        const prevH = sizeRef.current.H;
+
         canvas.width  = W;
         canvas.height = H;
         sizeRef.current = { W, H };
-        if (!initDoneRef.current) {
+
+        // Re-initialize if: first time, OR viewport changed significantly
+        const widthChanged  = Math.abs(W - prevW) > 60;
+        const heightChanged = Math.abs(H - prevH) > 60;
+
+        if (!initDoneRef.current || widthChanged || heightChanged) {
           initDoneRef.current = true;
           initBalls(W, H, allBalls);
-        } else {
-          if (bucketRef.current.centerX == null) bucketRef.current.centerX = W / 2;
-          if (bucketRef.current.baseY   == null) bucketRef.current.baseY   = H - 18;
         }
       }
     });
@@ -546,8 +556,9 @@ const initBalls = useCallback((W, H, balls) => {
       ctx.clearRect(0, 0, W, H);
 
 // ── Bucket tilt + gravity physics ──────────────────────────────────
-      const uprightFloorY = bucket.floorY       ?? (H - 18);
-      const fallenFloorY  = bucket.fallenFloorY ?? (H - 110);
+
+const uprightFloorY = bucket.floorY ?? (H - 18);
+const fallenFloorY  = bucket.fallenFloorY ?? (H - 110);
 
       if (bucket.spilling && !bucket.fallen) {
         // Auto-spill: accelerate tilt rightward
