@@ -759,10 +759,22 @@ button { font-family: inherit; }
 
 /* FIXED: home can scroll too so social icons will not be cut */
 .home-scroll-area {
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
-  padding-bottom: 40px;
-  -webkit-overflow-scrolling: touch;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 899px) {
+  .home-scroll-area {
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: 100%;
+    padding-bottom: 96px;
+    -webkit-overflow-scrolling: touch;
+    display: block;
+  }
 }
 
 @media (max-width: 899px) {
@@ -801,9 +813,23 @@ button { font-family: inherit; }
 }
 
 .hero-section {
-  padding-top: 8px;
-  padding-bottom: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
   justify-content: flex-start;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 899px) {
+  .hero-section {
+    padding-top: 8px;
+    padding-bottom: 36px;
+    height: auto;
+    flex: none;
+  }
 }
 
 .hero-layout {
@@ -816,8 +842,8 @@ button { font-family: inherit; }
 .hero-layout-two-col {
   grid-template-columns: 1fr 380px;
   align-items: stretch;
-  min-height: calc(100vh - 140px);
-  height: auto;
+  height: 100%;
+  min-height: 0;
   max-height: none;
 }
 
@@ -6943,23 +6969,71 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
 /* Pad hero content inside root card */
 .hero-holo-root .hero-layout {
-  padding: 20px 28px 0;
+  padding: 14px 28px 0;
+  flex: 1;
+  min-height: 0;
 }
 .hero-holo-root .hero-left-expanded {
-  padding-bottom: 28px;
+  padding-bottom: 16px;
+  overflow-y: hidden;
+}
+
+/* Desktop: hero holo root fills height, no scroll */
+.hero-holo-root {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Mobile responsive for hero holo ── */
 @media (max-width: 899px) {
-  .hero-holo-root { border-radius: 22px; margin: 0 4px; }
-  .hero-holo-root .hero-layout { padding: 16px 16px 0; }
-  .hero-holo-root .hero-left-expanded { padding-bottom: 20px; }
+  .hero-holo-root {
+    border-radius: 22px;
+    margin: 0 4px;
+    flex: none;
+    min-height: auto;
+    height: auto;
+  }
+  .hero-holo-root .hero-layout { padding: 16px 16px 0; flex: none; }
+  .hero-holo-root .hero-left-expanded { padding-bottom: 20px; overflow-y: visible; }
   .hero-holo-data-row { max-width: 100%; }
   .hero-holo-dc-val { font-size: 0.58rem !important; }
   .hpf-side-strip { display: none; }
   .hero-holo-terminal { max-width: 100%; }
   .hero-holo-corner { width: 32px; height: 32px; }
   .hero-holo-root:hover .hero-holo-corner { width: 52px; height: 52px; }
+}
+
+
+/* Desktop compact spacing so hero fits viewport */
+@media (min-width: 900px) {
+  .hero-holo-root .hero-title {
+    font-size: clamp(1.8rem, 3.2vw, 3.2rem) !important;
+    margin-bottom: 8px !important;
+  }
+  .hero-holo-root .hero-description {
+    margin-top: 10px !important;
+    font-size: 0.93rem !important;
+    line-height: 1.75 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .hero-holo-root .hero-action-buttons {
+    margin-top: 12px !important;
+  }
+  .hero-holo-root .hero-social-row {
+    margin-top: 10px !important;
+    padding-bottom: 8px !important;
+  }
+  .hero-holo-data-row {
+    margin-top: 10px;
+  }
+  .hero-holo-terminal {
+    margin-top: 12px;
+  }
 }
 
 @media (max-width: 600px) {
