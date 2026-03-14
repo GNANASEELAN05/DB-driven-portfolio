@@ -5,7 +5,7 @@ import React, {
 import { motion, AnimatePresence } from "framer-motion";
 import { Box, Typography, Skeleton } from "@mui/material";
 import { useTheme } from "@mui/material/styles";
-import { MdGridView, MdOutlineShoppingBasket } from "react-icons/md";
+import { MdGridView, MdOutlineShoppingBasket, MdCode, MdTerminal, MdStorage, MdBuild } from "react-icons/md";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 function safeString(v) {
@@ -820,19 +820,65 @@ const handlePointerUp = useCallback(() => {
     bucket.tiltVel  = 0;
   }, [allBalls, initBalls]);
 
-  return (
-    <div ref={wrapRef} className="skillsbucket-canvas-wrap">
-      <canvas
-        ref={canvasRef}
-        className="skillsbucket-canvas"
-        onMouseDown={handlePointerDown}
-        onMouseMove={handlePointerMove}
-        onMouseUp={handlePointerUp}
-        onMouseLeave={handlePointerUp}
-        onDoubleClick={handleDoubleClick}
-      />
+return (
+  <div ref={wrapRef} className="skillsbucket-canvas-wrap">
+    <canvas
+      ref={canvasRef}
+      className="skillsbucket-canvas"
+      onMouseDown={handlePointerDown}
+      onMouseMove={handlePointerMove}
+      onMouseUp={handlePointerUp}
+      onMouseLeave={handlePointerUp}
+      onDoubleClick={handleDoubleClick}
+    />
+    {/* HUD Overlay */}
+    <div className="skillsbucket-hud">
+      {/* Corner brackets */}
+      <div className="shud-corner shud-corner--tl" />
+      <div className="shud-corner shud-corner--tr" />
+      <div className="shud-corner shud-corner--bl" />
+      <div className="shud-corner shud-corner--br" />
+
+      {/* Scan line */}
+      <div className="shud-scan-line" />
+
+      {/* Top-left: title tags */}
+      <div className="skillsbucket-hud-tl">
+        <span className="shud-tag">SKILL_FORGE</span>
+        <span className="shud-tag" style={{ opacity: 0.6, fontSize: "0.50rem" }}>
+          PHYSICS_SIM_v2
+        </span>
+      </div>
+
+      {/* Top-right: live indicator + signal */}
+      <div className="skillsbucket-hud-tr">
+        <div className="shud-signal">
+          {[1,2,3,4].map(b => (
+            <div key={b} className="shud-signal-bar" style={{
+              height: `${b*3+2}px`,
+              background: b <= 3 ? "rgba(241,48,36,0.7)" : "rgba(255,255,255,0.12)",
+            }} />
+          ))}
+        </div>
+        <span className="shud-live">
+          <span className="shud-live-dot" />
+          LIVE
+        </span>
+      </div>
+
+      {/* Bottom-left: skill count + hint */}
+      <div className="skillsbucket-hud-bl">
+        <span className="shud-count-pill">{allBalls.length} SKILLS LOADED</span>
+        <span className="shud-hint-text">drag • double-click to spill • double-click again to reset</span>
+      </div>
+
+      {/* Bottom-right: mode tag */}
+      <div className="skillsbucket-hud-br">
+        <span className="shud-tag">BUCKET_MODE</span>
+      </div>
     </div>
-  );
+  </div>
+);
 }
 
 // ── Mini physics canvas (inside arranged category box) ───────────────────────
@@ -999,69 +1045,258 @@ function SkillImg({ name, size = 26 }) {
 }
 
 // ── Category box ──────────────────────────────────────────────────────────────
+// ── Skill logo image helper for forge grid ────────────────────────────────────
+function ForgeSkillImg({ name, size = 22 }) {
+  const urls = resolveSkillLogo(name) || [];
+  const [idx, setIdx] = useState(0);
+  const initials = safeString(name).slice(0, 3).toUpperCase();
+  if (!urls[idx]) {
+    return (
+      <span className="sfallback" style={{
+        background: "linear-gradient(135deg, #f13024, #f97316)",
+        WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+        fontSize: "0.60rem", fontWeight: 900, fontFamily: "Inter, sans-serif",
+      }}>{initials}</span>
+    );
+  }
+  return (
+    <img src={urls[idx]} alt={name} width={size} height={size}
+      style={{ objectFit: "contain", display: "block", userSelect: "none", pointerEvents: "none" }}
+      onError={() => setIdx((p) => p + 1)} loading="lazy" />
+  );
+}
+
+// ── Category box — FORGE PANEL ────────────────────────────────────────────────
 function CategoryBox({ category, items }) {
-  const col = CATEGORY_META[category]?.color || "#f13024";
+  const FORGE_PALETTES = {
+    Frontend: {
+      a: "#f13024", b: "#f97316",
+      glow: "rgba(241,48,36,0.42)", dim: "rgba(241,48,36,0.12)",
+      icon: <MdCode style={{ fontSize: "1.25rem", color: "#f13024" }} />, tag: "UI_LAYER", idx: 0,
+    },
+    Backend: {
+      a: "#f97316", b: "#fbbf24",
+      glow: "rgba(249,115,22,0.38)", dim: "rgba(249,115,22,0.12)",
+      icon: <MdTerminal style={{ fontSize: "1.25rem", color: "#f97316" }} />, tag: "SRV_LAYER", idx: 1,
+    },
+    Database: {
+      a: "#3b82f6", b: "#06b6d4",
+      glow: "rgba(59,130,246,0.38)", dim: "rgba(59,130,246,0.12)",
+      icon: <MdStorage style={{ fontSize: "1.25rem", color: "#3b82f6" }} />, tag: "DB_LAYER", idx: 2,
+    },
+    Tools: {
+      a: "#a855f7", b: "#ec4899",
+      glow: "rgba(168,85,247,0.38)", dim: "rgba(168,85,247,0.12)",
+      icon: <MdBuild style={{ fontSize: "1.25rem", color: "#a855f7" }} />, tag: "TOOLCHAIN", idx: 3,
+    },
+  };
+  const pal = FORGE_PALETTES[category] || FORGE_PALETTES.Frontend;
   const [gridMode, setGridMode] = useState(false);
 
   return (
-    <Box className="skillbox-card">
-      <Box className="skillbox-header">
-        <Box className="skillbox-dot" style={{ background: col, boxShadow: `0 0 8px ${col}` }} />
-        <Typography className="skillbox-title" style={{ color: col, WebkitTextFillColor: col }}>
-          {category}
-        </Typography>
-        <Typography className="skillbox-count">{items.length} skills</Typography>
+    <Box
+      className="sforge-card"
+      style={{
+        "--sfc-a": pal.a,
+        "--sfc-b": pal.b,
+        "--sfc-g": pal.glow,
+        animationDelay: `${pal.idx * 0.10}s`,
+      }}
+    >
+      {/* Prismatic spinning border */}
+      <Box className="sforge-prism" style={{
+        background: `conic-gradient(from 0deg, transparent 50%, ${pal.a}, ${pal.b}, transparent)`,
+      }} />
+
+      {/* Holo scan */}
+      <Box className="sforge-scan" style={{
+        background: `linear-gradient(180deg, transparent, ${pal.a}14, ${pal.a}22, ${pal.a}14, transparent)`,
+      }} />
+
+      {/* Corner brackets */}
+      <Box className="sforge-corner sforge-corner--tl" style={{ borderColor: `${pal.a}88` }} />
+      <Box className="sforge-corner sforge-corner--tr" style={{ borderColor: `${pal.a}66` }} />
+      <Box className="sforge-corner sforge-corner--bl" style={{ borderColor: `${pal.b}66` }} />
+      <Box className="sforge-corner sforge-corner--br" style={{ borderColor: `${pal.b}44` }} />
+
+      {/* Status bar */}
+      <Box className="sforge-status-bar">
+        <Box className="sforge-dots">
+          <span className="sforge-sd sforge-sd-red" />
+          <span className="sforge-sd sforge-sd-yellow" />
+          <span className="sforge-sd sforge-sd-green" />
+        </Box>
+        <Box className="sforge-cat-label" style={{ color: pal.a, WebkitTextFillColor: pal.a }}>
+          {pal.tag}
+        </Box>
+        <Box className="sforge-count-chip" style={{
+          background: `${pal.a}18`, borderColor: `${pal.a}44`,
+          color: pal.b, WebkitTextFillColor: pal.b,
+        }}>
+          {String(items.length).padStart(2, "0")} SKILLS
+        </Box>
+        <Box className="sforge-signal">
+          {[1,2,3,4].map(b => (
+            <Box key={b} className="sforge-signal-bar" style={{
+              height: `${b*3+2}px`,
+              background: b <= 3 ? pal.a : "rgba(255,255,255,0.12)",
+            }} />
+          ))}
+        </Box>
         <button
-          className="skillbox-arrange-btn"
-          style={{ borderColor: `${col}66`, color: col }}
-          title={gridMode ? "Physics mode" : "Arrange in grid"}
-          onClick={() => setGridMode((p) => !p)}
+          className="sforge-mode-btn"
+          style={{ borderColor: `${pal.a}55`, color: pal.a }}
+          title={gridMode ? "Physics mode" : "Grid view"}
+          onClick={() => setGridMode(p => !p)}
         >
           {gridMode ? (
-<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-  <circle cx="12" cy="12" r="2"/>
-  <ellipse cx="12" cy="12" rx="10" ry="4"/>
-  <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/>
-  <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>
-</svg>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="2"/>
+              <ellipse cx="12" cy="12" rx="10" ry="4"/>
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(60 12 12)"/>
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(120 12 12)"/>
+            </svg>
           ) : "⊞"}
         </button>
       </Box>
 
-      <Box className="skillbox-body">
-        {gridMode ? (
-          <Box className="skillbox-grid">
-            {items.map((name, i) => (
-              <Box key={i} className="skillbox-item" style={{ animationDelay: `${i * 0.04}s` }}>
-                <Box className="skillbox-item-logo" style={{ borderColor: `${col}44`, background: `${col}11`, transition: "box-shadow 0.22s ease" }}
-                  onMouseEnter={e => e.currentTarget.style.boxShadow = `0 0 14px ${col}66, inset 0 0 8px ${col}22`}
-                  onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}
-                >
-                  <SkillImg name={name} size={26} />
-                </Box>
-                <Typography className="skillbox-item-name">{name}</Typography>
-              </Box>
-            ))}
+      {/* Main body */}
+      <Box className="sforge-body">
+
+        {/* Left: category orb */}
+        <Box className="sforge-icon-col">
+          <Box className="sforge-orb-wrap">
+            <Box className="sforge-orb-ring sforge-orb-ring-1" style={{
+              borderTopColor: pal.a, borderColor: `${pal.a}44`,
+            }} />
+            <Box className="sforge-orb-ring sforge-orb-ring-2" style={{
+              borderRightColor: pal.b, borderColor: `${pal.b}28`,
+            }} />
+            <Box className="sforge-orb-core" style={{
+              background: `radial-gradient(circle at 35% 35%, ${pal.a}28, ${pal.b}14, transparent)`,
+              borderColor: `${pal.a}44`,
+              boxShadow: `0 0 24px ${pal.glow}, inset 0 0 16px ${pal.a}0d`,
+            }}>
+              {pal.icon}
+            </Box>
           </Box>
-        ) : (
-          <MiniPhysicsCanvas items={items} />
-        )}
+          {/* Category name vertical */}
+          <Box style={{
+            writingMode: "vertical-rl",
+            textOrientation: "mixed",
+            transform: "rotate(180deg)",
+            fontFamily: "Inter, sans-serif",
+            fontSize: "0.52rem",
+            fontWeight: 900,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            background: `linear-gradient(180deg, ${pal.a}, ${pal.b})`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+            opacity: 0.75,
+            userSelect: "none",
+          }}>
+            {category}
+          </Box>
+        </Box>
+
+        {/* Right: skills area */}
+        <Box className="sforge-skills-area">
+          {gridMode ? (
+            <Box className="sforge-grid">
+              {items.map((name, i) => (
+                <Box
+                  key={i}
+                  className="sforge-skill-item"
+                  style={{ animationDelay: `${i * 0.03}s` }}
+                  title={name}
+                >
+                  <Box className="sforge-skill-logo" style={{
+                    background: `${pal.a}14`,
+                    border: `1px solid ${pal.a}33`,
+                  }}
+                    onMouseEnter={e => {
+                      e.currentTarget.style.background = `${pal.a}28`;
+                      e.currentTarget.style.boxShadow = `0 0 12px ${pal.glow}`;
+                    }}
+                    onMouseLeave={e => {
+                      e.currentTarget.style.background = `${pal.a}14`;
+                      e.currentTarget.style.boxShadow = "none";
+                    }}
+                  >
+                    <ForgeSkillImg name={name} size={22} />
+                  </Box>
+                  <span className="sforge-skill-name">{name}</span>
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            <Box className="sforge-physics-wrap">
+              <MiniPhysicsCanvas items={items} />
+            </Box>
+          )}
+        </Box>
       </Box>
 
+      {/* Names chips */}
       {!gridMode && (
-        <Box className="skillbox-names">
+        <Box className="sforge-names">
           {items.map((name, i) => (
-            <Box key={i} className="skillbox-name-chip"
-              style={{ borderColor: `${col}44`, background: `${col}11`, color: col, WebkitTextFillColor: col }}>
+            <Box key={i} className="sforge-name-chip" style={{
+              borderColor: `${pal.a}44`,
+              background: `${pal.a}0e`,
+              color: pal.a,
+              WebkitTextFillColor: pal.a,
+            }}>
               {name}
             </Box>
           ))}
         </Box>
       )}
+
+      {/* Terminal data strip */}
+      <Box className="sforge-terminal">
+        <Box className="sforge-terminal-inner">
+          <Box className="sforge-term-item">
+            <span className="sforge-term-val" style={{
+              background: `linear-gradient(135deg, ${pal.a}, ${pal.b})`,
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            }}>{String(items.length).padStart(2,"0")}</span>
+            <span className="sforge-term-lbl">SKILLS</span>
+          </Box>
+          <Box className="sforge-term-sep" />
+          <Box className="sforge-term-item">
+            <span className="sforge-term-val" style={{
+              background: `linear-gradient(135deg, ${pal.b}, ${pal.a})`,
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            }}>{gridMode ? "GRID" : "PHYS"}</span>
+            <span className="sforge-term-lbl">MODE</span>
+          </Box>
+          <Box sx={{ flex: 1 }} />
+          <Box style={{
+            padding: "4px 12px",
+            borderRadius: "999px",
+            fontFamily: "Inter, sans-serif",
+            fontSize: "0.56rem",
+            fontWeight: 900,
+            letterSpacing: "0.13em",
+            background: `${pal.a}14`,
+            border: `1px solid ${pal.a}40`,
+            color: pal.a,
+            WebkitTextFillColor: pal.a,
+            animation: "sforgeGreenPulse 2.8s ease-in-out infinite",
+          }}>
+            ✦ {category.toUpperCase()}
+          </Box>
+        </Box>
+      </Box>
+
+      {/* Watermark */}
+      <Box className="sforge-watermark" style={{ WebkitTextFillColor: `${pal.a}07` }}>⬡</Box>
     </Box>
   );
 }
-
 // ── Main export ───────────────────────────────────────────────────────────────
 export default function SkillsBucketSection({ skills, loading }) {
   const theme  = useTheme();
