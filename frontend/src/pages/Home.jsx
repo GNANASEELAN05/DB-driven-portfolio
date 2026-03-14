@@ -2455,9 +2455,8 @@ case "contact":
               </Box>
               <Box className="cfc-status-label">
                 <MdTerminal style={{ fontSize: "0.75rem" }} />
-                COMPOSE_MESSAGE.EXE
               </Box>
-              <Box className="cfc-index-stamp">MSG_01</Box>
+              <Box className="cfc-index-stamp"></Box>
             </Box>
 
             <Box className="cfc-body">
@@ -2473,7 +2472,7 @@ case "contact":
                   <Box className="cfc-trans-glow" />
                 </Box>
                 <Typography className="cfc-left-title">Send a<br/>Message</Typography>
-                <Typography className="cfc-left-sub">Direct transmission to {name}</Typography>
+                <Typography className="cfc-left-sub">Direct Email to {name}</Typography>
 
                 {/* Decorative data lines */}
                 <Box className="cfc-data-lines">

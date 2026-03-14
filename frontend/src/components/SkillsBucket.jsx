@@ -269,10 +269,11 @@ function getBucketStateDefault() {
 function getBucketGeometry(W, H, bucketState) {
   const cx    = bucketState.centerX ?? (W / 2);
   const baseY = bucketState.baseY   ?? (H - 18);
-  const BW    = 170;
-  const BTW   = 200;
-  const BH    = 150;
-  const topY  = baseY - BH;
+  const scale = W < 480 ? 0.52 : W < 768 ? 0.68 : 1.0;
+  const BW    = Math.round(170 * scale);
+  const BTW   = Math.round(200 * scale);
+  const BH    = Math.round(150 * scale);
+  const topY = baseY - BH;
   return {
     cx, baseY, BW, BTW, BH, topY,
     leftTop:  cx - BTW / 2,
@@ -488,13 +489,14 @@ function BucketCanvas({ allBalls, isDark }) {
   const pointerRef  = useRef({ x: -9999, y: -9999, down: false });
   const bucketRef   = useRef(getBucketStateDefault());
 
-  const initBalls = useCallback((W, H, balls) => {
+const initBalls = useCallback((W, H, balls) => {
+    const dynamicR = W < 480 ? 18 : W < 768 ? 22 : BALL_R;
     ballsRef.current = balls.map(({ name, category }) => {
       const b = makeBall(
         name, category,
         W / 2 + (Math.random() - 0.5) * 60,
         H / 2 - Math.random() * 100 - 30,
-        BALL_R
+        dynamicR
       );
       loadSkillImage(name, (img) => { b.img = img; b.imgLoaded = true; });
       return b;
@@ -904,11 +906,12 @@ function MiniPhysicsCanvas({ items }) {
         if (!initRef.current) {
           initRef.current = true;
           ballsRef.current = items.map((name) => {
+            const dynamicMiniR = W < 480 ? 20 : W < 768 ? 26 : MINI_BALL_R;
             const b = makeBall(
               name, "mini",
               W / 2 + (Math.random() - 0.5) * 60,
               H / 2 + (Math.random() - 0.5) * 30,
-              MINI_BALL_R
+              dynamicMiniR
             );
             loadSkillImage(name, (img) => { b.img = img; b.imgLoaded = true; });
             return b;

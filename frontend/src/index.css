@@ -2660,8 +2660,12 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 
 /* Responsive */
 @media (max-width: 899px) {
-  .skillsbucket-canvas-wrap { height: 380px; }
+  .skillsbucket-canvas-wrap { height: 320px; }
   .sforge-physics-wrap { height: 160px; }
+}
+
+@media (max-width: 480px) {
+  .skillsbucket-canvas-wrap { height: 260px; }
 }
 
 @media (max-width: 600px) {
