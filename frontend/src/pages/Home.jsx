@@ -1650,88 +1650,336 @@ const resolvedOriginalSrc = useMemo(() => {
   const renderSection = () => {
     switch (activeSection) {
 
-      case "home":
-        return (
-          <MotionBox key="home" custom={navDirection} variants={pageVariants}
-            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-            <Box className="section-scroll-area home-scroll-area">
-              <MotionBox className="portfolio-section hero-section" initial="hidden" animate="show" variants={fadeUp}>
-                <Box className="hero-layout hero-layout-two-col">
-                  <Box className="hero-left hero-left-expanded">
-                    <MotionBox variants={fadeUp}>
-                      <Box className="hero-name-row">
-                        <BlackholeBadge initials={profileInitials} name={name} />
-                        <Box className="hero-name-text-block">
-                          <Typography className="hero-name hero-name-display">{name}</Typography>
-                          <Stack spacing={0.8} className="hero-meta-stack">
-                            <Typography className="hero-role-line">{title}</Typography>
-                            {location ? (
-                              <Typography className="hero-detail-line">
-                                <MdLocationOn style={{ marginRight: 5, flexShrink: 0 }} />{location}
-                              </Typography>
-                            ) : null}
-                            {contactEmail ? (
-                              <Typography className="hero-detail-line">
-                                <MdEmail style={{ marginRight: 5, flexShrink: 0 }} />{contactEmail}
-                              </Typography>
-                            ) : null}
-                          </Stack>
-                        </Box>
-                      </Box>
-                      <Typography className="hero-title">
-                        {typewriterText}
-                        <span className={`typewriter-cursor ${typewriterDone ? "cursor-blink" : ""}`}>|</span>
-                      </Typography>
-                      <Typography className="hero-description">{about}</Typography>
-                      <Stack className="hero-action-buttons" direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ mt: 3 }}>
-                        <HeroActionButton variant="contained" startIcon={<MdArrowOutward />} onClick={() => jumpTo("projects")}
-                          sx={{ background: "linear-gradient(135deg, #f13024, #f97316) !important", color: "white !important", border: "none !important", boxShadow: "0 8px 24px rgba(241,48,36,0.35) !important", "&:hover": { background: "linear-gradient(135deg, #d42a1e, #e8650a) !important", boxShadow: "0 12px 32px rgba(241,48,36,0.5) !important", transform: "translateY(-2px)" } }}>
-                          View Work
-                        </HeroActionButton>
-                        <HeroActionButton variant="outlined" startIcon={<MdDownload />} onClick={onDownloadResume} disabled={downloading}
-                          sx={{ borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}>
-                          {downloading ? "Downloading..." : "Download Resume"}
-                        </HeroActionButton>
-                        <HeroActionButton variant="outlined" startIcon={<MdVisibility />} onClick={onPreviewResume}
-                          sx={{ borderColor: "rgba(241,48,36,0.5) !important", color: "#f13024 !important", "&:hover": { borderColor: "#f13024 !important", background: "rgba(241,48,36,0.08) !important" } }}>
-                          Preview Resume
-                        </HeroActionButton>
-                      </Stack>
-                      <Stack className="hero-social-row" direction="row" spacing={1.2} sx={{ mt: 3, flexWrap: "wrap" }}>
-                        {socials?.github   && <IconButton className="hero-social-btn" onClick={() => window.open(socials.github, "_blank", "noopener,noreferrer")}><FaGithub /></IconButton>}
-                        {socials?.linkedin && <IconButton className="hero-social-btn" onClick={() => window.open(socials.linkedin, "_blank", "noopener,noreferrer")}><FaLinkedin /></IconButton>}
-                        {contactEmail     && <IconButton className="hero-social-btn" onClick={() => window.open(`mailto:${contactEmail}`, "_blank", "noopener,noreferrer")}><MdEmail /></IconButton>}
-                        {socials?.phone   && <IconButton className="hero-social-btn" onClick={() => window.open(`tel:${safeString(socials.phone)}`, "_blank", "noopener,noreferrer")}><MdPhone /></IconButton>}
-                        {socials?.website && <IconButton className="hero-social-btn" onClick={() => window.open(safeString(socials.website), "_blank", "noopener,noreferrer")}><MdLink /></IconButton>}
-                      </Stack>
-                    </MotionBox>
-                  </Box>
-                  {/* ── CHANGED: pass resolved src props ── */}
-<Box className="hero-right">
-  <ProfilePhotoCard
-    key={`photo-${imageBust}`}
-    animatedSrc={resolvedAnimatedSrc}
-    originalSrc={resolvedOriginalSrc}
-  />
-</Box>
-                </Box>
-              </MotionBox>
-            </Box>
-          </MotionBox>
-        );
+case "home":
+  return (
+    <MotionBox key="home" custom={navDirection} variants={pageVariants}
+      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+      <Box className="section-scroll-area home-scroll-area">
+        <MotionBox className="portfolio-section hero-section" initial="hidden" animate="show" variants={fadeUp}>
+          <Box className="hero-holo-root">
 
-      case "about":
-        return (
-          <MotionBox key="about" custom={navDirection} variants={pageVariants}
-            initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
-            <Box className="section-scroll-area">
-              <MotionBox className="portfolio-section section-static about-section-plain" variants={fadeUp} initial="hidden" animate="show">
-                <SectionHeading title="About" subtitle="A short introduction and profile summary." />
-                {loading ? <Skeleton height={180} /> : <Typography className="body-copy about-body-copy">{about}</Typography>}
-              </MotionBox>
+            {/* ── PRISMATIC BORDER ── */}
+            <Box className="hero-holo-prism" />
+            {/* ── SCAN LINE ── */}
+            <Box className="hero-holo-scan" />
+            {/* ── PARTICLE FIELD ── */}
+            <Box className="hero-holo-particles" />
+            {/* ── CORNER BRACKETS ── */}
+            <Box className="hero-holo-corner hero-holo-corner--tl" />
+            <Box className="hero-holo-corner hero-holo-corner--tr" />
+            <Box className="hero-holo-corner hero-holo-corner--bl" />
+            <Box className="hero-holo-corner hero-holo-corner--br" />
+            {/* ── CIRCUIT TRACES (decorative) ── */}
+            <Box className="hero-holo-circuit-h hero-holo-circuit-h--top" />
+            <Box className="hero-holo-circuit-h hero-holo-circuit-h--bot" />
+
+            {/* ── macOS STATUS BAR ── */}
+            <Box className="hero-holo-status-bar">
+              <Box className="hero-holo-dots">
+                <span className="hero-holo-sd hero-holo-sd-red" />
+                <span className="hero-holo-sd hero-holo-sd-yellow" />
+                <span className="hero-holo-sd hero-holo-sd-green" />
+              </Box>
+              <Box className="hero-holo-status-label">
+                <span className="hero-holo-status-pulse" />
+                IDENTITY_CORE :: PROFILE_v2.sys
+              </Box>
+              <Box className="hero-holo-signal">
+                {[1,2,3,4,5].map(b => (
+                  <Box key={b} className="hero-holo-signal-bar" style={{ height: `${b*3+2}px`, opacity: b<=4?1:0.22 }} />
+                ))}
+              </Box>
+              <Box className="hero-holo-live-pill">
+                <span className="hero-holo-live-dot" />
+                <Typography sx={{ fontSize:"0.52rem",fontWeight:900,color:"#22c55e",WebkitTextFillColor:"#22c55e",letterSpacing:"0.18em" }}>LIVE</Typography>
+              </Box>
             </Box>
-          </MotionBox>
-        );
+
+            {/* ── MAIN HERO LAYOUT ── */}
+            <Box className="hero-layout hero-layout-two-col" sx={{ position:"relative",zIndex:2 }}>
+              <Box className="hero-left hero-left-expanded">
+                <MotionBox variants={fadeUp}>
+
+                  {/* Identity index stamp */}
+                  <Box className="hero-holo-idx-stamp">ID_001</Box>
+
+                  <Box className="hero-name-row">
+                    <BlackholeBadge initials={profileInitials} name={name} />
+                    <Box className="hero-name-text-block">
+                      <Typography className="hero-name hero-name-display">{name}</Typography>
+                      <Stack spacing={0.8} className="hero-meta-stack">
+                        <Typography className="hero-role-line">{title}</Typography>
+                        {location ? (
+                          <Typography className="hero-detail-line">
+                            <MdLocationOn style={{ marginRight:5,flexShrink:0 }} />{location}
+                          </Typography>
+                        ) : null}
+                        {contactEmail ? (
+                          <Typography className="hero-detail-line">
+                            <MdEmail style={{ marginRight:5,flexShrink:0 }} />{contactEmail}
+                          </Typography>
+                        ) : null}
+                      </Stack>
+                    </Box>
+                  </Box>
+
+                  {/* Divider beam under name row */}
+                  <Box className="hero-holo-name-divider" />
+
+                  <Typography className="hero-title">
+                    {typewriterText}
+                    <span className={`typewriter-cursor ${typewriterDone ? "cursor-blink" : ""}`}>|</span>
+                  </Typography>
+                  <Typography className="hero-description">{about}</Typography>
+
+                  {/* ── DATA INDICATOR ROW (decorative, above buttons) ── */}
+                  <Box className="hero-holo-data-row">
+                    {[
+                      { label:"STATUS",   val:"ACTIVE",       color:"#22c55e" },
+                      { label:"MODE",     val:"FULL-STACK",   color:"#f13024" },
+                      { label:"AVAIL",    val:"OPEN",         color:"#f97316" },
+                      { label:"STACK",    val:"REACT+SPRING", color:"#06b6d4" },
+                    ].map(item => (
+                      <Box key={item.label} className="hero-holo-data-cell">
+                        <Typography className="hero-holo-dc-val" style={{ color:item.color, WebkitTextFillColor:item.color }}>{item.val}</Typography>
+                        <Typography className="hero-holo-dc-lbl">{item.label}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+
+                  <Stack className="hero-action-buttons" direction={{ xs:"column",sm:"row" }} spacing={1.5} sx={{ mt:2 }}>
+                    <HeroActionButton variant="contained" startIcon={<MdArrowOutward />} onClick={() => jumpTo("projects")}
+                      sx={{ background:"linear-gradient(135deg,#f13024,#f97316) !important",color:"white !important",border:"none !important",boxShadow:"0 8px 24px rgba(241,48,36,0.35) !important","&:hover":{background:"linear-gradient(135deg,#d42a1e,#e8650a) !important",boxShadow:"0 12px 32px rgba(241,48,36,0.5) !important",transform:"translateY(-2px)"} }}>
+                      View Work
+                    </HeroActionButton>
+                    <HeroActionButton variant="outlined" startIcon={<MdDownload />} onClick={onDownloadResume} disabled={downloading}
+                      sx={{ borderColor:"rgba(241,48,36,0.5) !important",color:"#f13024 !important","&:hover":{borderColor:"#f13024 !important",background:"rgba(241,48,36,0.08) !important"} }}>
+                      {downloading ? "Downloading..." : "Download Resume"}
+                    </HeroActionButton>
+                    <HeroActionButton variant="outlined" startIcon={<MdVisibility />} onClick={onPreviewResume}
+                      sx={{ borderColor:"rgba(241,48,36,0.5) !important",color:"#f13024 !important","&:hover":{borderColor:"#f13024 !important",background:"rgba(241,48,36,0.08) !important"} }}>
+                      Preview Resume
+                    </HeroActionButton>
+                  </Stack>
+
+                  <Stack className="hero-social-row" direction="row" spacing={1.2} sx={{ mt:2.5,flexWrap:"wrap" }}>
+                    {socials?.github   && <IconButton className="hero-social-btn" onClick={() => window.open(socials.github,"_blank","noopener,noreferrer")}><FaGithub /></IconButton>}
+                    {socials?.linkedin && <IconButton className="hero-social-btn" onClick={() => window.open(socials.linkedin,"_blank","noopener,noreferrer")}><FaLinkedin /></IconButton>}
+                    {contactEmail     && <IconButton className="hero-social-btn" onClick={() => window.open(`mailto:${contactEmail}`,"_blank","noopener,noreferrer")}><MdEmail /></IconButton>}
+                    {socials?.phone   && <IconButton className="hero-social-btn" onClick={() => window.open(`tel:${safeString(socials.phone)}`,"_blank","noopener,noreferrer")}><MdPhone /></IconButton>}
+                    {socials?.website && <IconButton className="hero-social-btn" onClick={() => window.open(safeString(socials.website),"_blank","noopener,noreferrer")}><MdLink /></IconButton>}
+                  </Stack>
+
+                  {/* ── TERMINAL DATA STRIP (bottom of left col) ── */}
+                  <Box className="hero-holo-terminal">
+                    <Box className="hero-holo-term-item">
+                      <Typography className="hero-holo-term-val">FS</Typography>
+                      <Typography className="hero-holo-term-lbl">STACK</Typography>
+                    </Box>
+                    <Box className="hero-holo-term-sep" />
+                    <Box className="hero-holo-term-item">
+                      <Typography className="hero-holo-term-val">{new Date().getFullYear()}</Typography>
+                      <Typography className="hero-holo-term-lbl">ACTIVE</Typography>
+                    </Box>
+                    <Box className="hero-holo-term-sep" />
+                    <Box className="hero-holo-term-item">
+                      <Typography className="hero-holo-term-val">∞</Typography>
+                      <Typography className="hero-holo-term-lbl">DRIVEN</Typography>
+                    </Box>
+                    <Box sx={{ flex:1 }} />
+                    <Box className="hero-holo-verified">✦ PORTFOLIO</Box>
+                  </Box>
+
+                </MotionBox>
+              </Box>
+
+              {/* ── PHOTO PANEL (right col) with luxury frame ── */}
+              <Box className="hero-right">
+                <Box className="hero-photo-frame">
+                  {/* photo frame corner accents */}
+                  <Box className="hpf-corner hpf-corner--tl" />
+                  <Box className="hpf-corner hpf-corner--tr" />
+                  <Box className="hpf-corner hpf-corner--bl" />
+                  <Box className="hpf-corner hpf-corner--br" />
+                  {/* photo frame prism */}
+                  <Box className="hpf-prism" />
+                  {/* side data strip */}
+                  <Box className="hpf-side-strip">
+                    {["DEV","UI","API","DB","ML"].map((t,i) => (
+                      <Box key={t} className="hpf-strip-tag" style={{ animationDelay:`${i*0.15}s` }}>{t}</Box>
+                    ))}
+                  </Box>
+                  <ProfilePhotoCard
+                    key={`photo-${imageBust}`}
+                    animatedSrc={resolvedAnimatedSrc}
+                    originalSrc={resolvedOriginalSrc}
+                  />
+                </Box>
+              </Box>
+            </Box>
+
+            {/* Watermark glyph */}
+            <Box className="hero-holo-watermark">◈</Box>
+          </Box>
+        </MotionBox>
+      </Box>
+    </MotionBox>
+  );
+
+case "about":
+  return (
+    <MotionBox key="about" custom={navDirection} variants={pageVariants}
+      initial="enter" animate="center" exit="exit" className="portfolio-page-frame">
+      <Box className="section-scroll-area">
+        <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
+          <SectionHeading title="About" subtitle="Decoding the architect behind the code." />
+
+          {loading ? (
+            <Stack spacing={2}><Skeleton height={300} sx={{ borderRadius: 4 }} /><Skeleton height={140} sx={{ borderRadius: 3 }} /></Stack>
+          ) : (
+            <Box className="about-neural-root">
+
+              {/* ── MAIN PROFILE CARD ── */}
+              <Box className="about-main-card">
+                <Box className="about-prism" />
+                <Box className="about-particles" />
+                <Box className="about-scan" />
+                <Box className="about-corner about-corner--tl" />
+                <Box className="about-corner about-corner--br" />
+
+                {/* Status bar */}
+                <Box className="about-status-bar">
+                  <Box className="about-dots">
+                    <span className="about-dot about-dot-red" />
+                    <span className="about-dot about-dot-yellow" />
+                    <span className="about-dot about-dot-green" />
+                  </Box>
+                  <Box className="about-status-tag">NEURAL_ARCHIVE :: PROFILE_DATA.md</Box>
+                  <Box className="about-live-badge">
+                    <span className="about-live-dot" />
+                    <Typography sx={{ fontSize: "0.52rem", fontWeight: 900, color: "#22c55e", WebkitTextFillColor: "#22c55e", letterSpacing: "0.18em" }}>LIVE</Typography>
+                  </Box>
+                </Box>
+
+                {/* Body */}
+                <Box className="about-body">
+                  {/* Left orb column */}
+                  <Box className="about-orb-col">
+                    <Box className="about-orb-wrap">
+                      <Box className="about-orb-ring about-ring-1" />
+                      <Box className="about-orb-ring about-ring-2" />
+                      <Box className="about-orb-ring about-ring-3" />
+                      <Box className="about-orb-core">
+                        <MdPerson style={{ fontSize: "1.8rem", color: "#f13024" }} />
+                      </Box>
+                      <Box className="about-orb-glow" />
+                    </Box>
+                    <Box className="about-stat-pills">
+                      {[
+                        { label: "DEV", color: "#f13024" },
+                        { label: "BUILD", color: "#f97316" },
+                        { label: "SHIP", color: "#fbbf24" },
+                      ].map((t) => (
+                        <Box key={t.label} className="about-stat-pill"
+                          style={{ background: `${t.color}14`, borderColor: `${t.color}44`, color: t.color, WebkitTextFillColor: t.color }}>
+                          {t.label}
+                        </Box>
+                      ))}
+                    </Box>
+                  </Box>
+
+                  {/* Right text column */}
+                  <Box className="about-text-col">
+                    <Box className="about-identity-row">
+                      <Box className="about-identity-beam" />
+                      <Typography className="about-identity-label">ABOUT.me — PERSONAL RECORD</Typography>
+                    </Box>
+                    <Typography className="about-text-content">{about}</Typography>
+                  </Box>
+                </Box>
+
+                {/* Trait chips */}
+                {(() => {
+                  const traits = [
+                    { label: "Full Stack", color: "#f13024" },
+                    { label: "Problem Solver", color: "#f97316" },
+                    { label: "Clean Code", color: "#06b6d4" },
+                    { label: "Open Source", color: "#10b981" },
+                    { label: "Fast Learner", color: "#a855f7" },
+                    { label: "Team Player", color: "#fbbf24" },
+                  ];
+                  return (
+                    <Box className="about-traits-row">
+                      {traits.map((t) => (
+                        <Box key={t.label} className="about-trait-chip"
+                          style={{ background: `${t.color}14`, borderColor: `${t.color}44`, color: t.color, WebkitTextFillColor: t.color }}>
+                          <span className="about-trait-dot" style={{ background: t.color, boxShadow: `0 0 6px ${t.color}` }} />
+                          {t.label}
+                        </Box>
+                      ))}
+                    </Box>
+                  );
+                })()}
+
+                {/* Terminal data strip */}
+                <Box className="about-terminal">
+                  <Box className="about-term-item">
+                    <Typography className="about-term-val">FS</Typography>
+                    <Typography className="about-term-lbl">STACK</Typography>
+                  </Box>
+                  <Box className="about-term-sep" />
+                  <Box className="about-term-item">
+                    <Typography className="about-term-val">{new Date().getFullYear()}</Typography>
+                    <Typography className="about-term-lbl">ACTIVE</Typography>
+                  </Box>
+                  <Box className="about-term-sep" />
+                  <Box className="about-term-item">
+                    <Typography className="about-term-val">∞</Typography>
+                    <Typography className="about-term-lbl">DRIVEN</Typography>
+                  </Box>
+                  <Box sx={{ flex: 1 }} />
+                  <Box sx={{
+                    padding: "5px 14px", borderRadius: "999px",
+                    background: "rgba(241,48,36,0.12)", border: "1px solid rgba(241,48,36,0.35)",
+                    color: "#f13024", WebkitTextFillColor: "#f13024",
+                    fontSize: "0.60rem", fontWeight: 900, letterSpacing: "0.13em",
+                    animation: "aboutGreenPulse 2.5s ease-in-out infinite",
+                  }}>
+                    ✦ ONLINE
+                  </Box>
+                </Box>
+
+                <Box className="about-watermark">◈</Box>
+              </Box>
+
+              {/* ── STATS GRID ── */}
+              <Box className="about-stats-grid">
+                {[
+                  { icon: "⚡", val: "100%", lbl: "COMMITMENT", a: "#f13024", g: "rgba(241,48,36,0.38)" },
+                  { icon: "🚀", val: "SHIP", lbl: "MENTALITY", a: "#f97316", g: "rgba(249,115,22,0.35)" },
+                  { icon: "🧠", val: "∞+1", lbl: "CURIOSITY", a: "#a855f7", g: "rgba(168,85,247,0.35)" },
+                ].map((s) => (
+                  <Box key={s.lbl} className="about-stat-card" style={{ "--asc-a": s.a, "--asc-g": s.g }}>
+                    <Box className="about-stat-corner" style={{ borderColor: s.a }} />
+                    <Box className="about-stat-card-icon"
+                      style={{ background: `${s.a}18`, borderColor: `${s.a}44`, boxShadow: `0 0 18px ${s.g}` }}>
+                      <span style={{ fontSize: "1.3rem", lineHeight: 1 }}>{s.icon}</span>
+                    </Box>
+                    <Typography className="about-stat-card-val"
+                      style={{ background: `linear-gradient(135deg, ${s.a}, ${s.g.replace(/[^,]+\)/, "1)")})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                      {s.val}
+                    </Typography>
+                    <Typography className="about-stat-card-lbl">{s.lbl}</Typography>
+                  </Box>
+                ))}
+              </Box>
+
+            </Box>
+          )}
+        </MotionBox>
+      </Box>
+    </MotionBox>
+  );
 
 case "skills":
   return (
