@@ -898,6 +898,7 @@
   -webkit-text-fill-color: rgba(255,255,255,0.55) !important;
   padding: 14px 16px !important;
   font-family: "Space Grotesk", sans-serif !important;
+  vertical-align: middle !important;
 }
 .adm-th-light {
   background: rgba(241,48,36,0.04) !important;
@@ -921,6 +922,7 @@
   padding: 13px 16px !important;
   color: rgba(255,255,255,0.80) !important;
   -webkit-text-fill-color: rgba(255,255,255,0.80) !important;
+  vertical-align: middle !important;
 }
 .adm-td-light {
   border-bottom: 1px solid rgba(17,24,39,0.06) !important;

@@ -1102,19 +1102,23 @@ const IconDel = ({ onClick }) => (
     </TableHead>
   );
 
-  const TRow = ({ children }) => (
-    <TableRow className={`adm-tr`}>{children}</TableRow>
-  );
-
-  const TC = ({ children, bold, sx, colSpan }) => (
-    <TableCell
-      colSpan={colSpan}
-      className={`adm-td ${isDark ? "" : "adm-td-light"}`}
-      sx={{ fontWeight: bold ? 800 : undefined, ...sx }}
-    >
-      {children}
-    </TableCell>
-  );
+const TRow = ({ children }) => (
+  <TableRow
+    className={`adm-tr`}
+    sx={{ "& .MuiTableCell-root": { verticalAlign: "middle" } }}
+  >
+    {children}
+  </TableRow>
+);
+const TC = ({ children, bold, sx, colSpan }) => (
+  <TableCell
+    colSpan={colSpan}
+    className={`adm-td ${isDark ? "" : "adm-td-light"}`}
+    sx={{ fontWeight: bold ? 800 : undefined, verticalAlign: "middle", ...sx }}
+  >
+    {children}
+  </TableCell>
+);
 
   const drawer = (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -1561,55 +1565,119 @@ right={
 }              />
               <TableWrap>
                 <Table>
-                  <THead cols={[{ label: "Title" }, { label: "Issuer" }, { label: "Year" }, { label: "Certificate" }, { label: "Actions", sx: { width: 160 } }]} />
+<THead
+  cols={[
+    { label: "Title" },
+    { label: "Issuer" },
+    { label: "Year" },
+    { label: "Certificate", sx: { width: 270, minWidth: 270, maxWidth: 270 } },
+    { label: "Actions", sx: { width: 160, minWidth: 160, maxWidth: 160, whiteSpace: "nowrap" } },
+  ]}
+/>
                   <TableBody>
                     {achievements.map((a) => (
                       <TRow key={a.id || a.title}>
                         <TC bold>{a.title}</TC>
                         <TC sx={{ opacity: 0.80 }}>{a.issuer}</TC>
                         <TC sx={{ opacity: 0.80 }}>{a.year}</TC>
-                        <TC>
-                          {a.certificateFileName ? (
-                            <Stack direction="row" spacing={0.8} alignItems="center">
-                              <Chip
-                                size="small"
-                                label={a.certificateFileName.length > 16 ? a.certificateFileName.slice(0, 14) + "…" : a.certificateFileName}
-                                className="adm-chip-yes"
-                              />
-                              <Tooltip title="View Certificate">
-                                <IconButton
-                                  size="small"
-                                  className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
-                                  onClick={() => onPreviewCertificate(a)}
-                                >
-                                  <MdVisibility />
-                                </IconButton>
-                              </Tooltip>
-                              <Tooltip title="Delete Certificate">
-                                <IconButton size="small" className="adm-icon-btn-err" onClick={() => onDeleteCertificate(a.id)}>
-                                  <MdDelete />
-                                </IconButton>
-                              </Tooltip>
-                            </Stack>
-                          ) : (
-                            <Button
-                              component="label"
-                              size="small"
-                              className="adm-btn-outlined"
-                              startIcon={certUploading === a.id ? null : <MdUpload />}
-                              disabled={certUploading === a.id || !a.id || a.id > 1e12}
-                            >
-                              {certUploading === a.id ? "Uploading…" : "Upload"}
-                              <input
-                                hidden
-                                type="file"
-                                accept="application/pdf,image/jpeg,image/jpg,image/png"
-                                onChange={(e) => e.target.files?.[0] && onUploadCertificate(a.id, e.target.files[0])}
-                              />
-                            </Button>
-                          )}
-                        </TC>
-                        <TC><Stack direction="row" spacing={0.8}><IconOrder onClickBtn={(el) => openReorderMenu(el, "achievements", a.id)} /><IconEdit onClick={() => openAchEdit(a)} /><IconDel onClick={() => deleteAchLocal(a.id)} /></Stack></TC>
+<TC
+  sx={{
+    verticalAlign: "middle",
+    width: 270,
+    minWidth: 270,
+    maxWidth: 270,
+    whiteSpace: "nowrap",
+  }}
+>
+  {a.certificateFileName ? (
+    <Stack
+      direction="row"
+      spacing={0.8}
+      alignItems="center"
+      flexWrap="nowrap"
+      sx={{
+        width: "100%",
+        minWidth: 0,
+      }}
+    >
+      <Chip
+        size="small"
+        label={
+          a.certificateFileName.length > 18
+            ? a.certificateFileName.slice(0, 18) + "…"
+            : a.certificateFileName
+        }
+        className="adm-chip-yes"
+        sx={{
+          width: 150,
+          minWidth: 150,
+          maxWidth: 150,
+          justifyContent: "flex-start",
+          "& .MuiChip-label": {
+            display: "block",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            width: "100%",
+          },
+        }}
+      />
+      <Tooltip title="View Certificate">
+        <IconButton
+          size="small"
+          className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`}
+          onClick={() => onPreviewCertificate(a)}
+        >
+          <MdVisibility />
+        </IconButton>
+      </Tooltip>
+      <Tooltip title="Delete Certificate">
+        <IconButton
+          size="small"
+          className="adm-icon-btn-err"
+          onClick={() => onDeleteCertificate(a.id)}
+        >
+          <MdDelete />
+        </IconButton>
+      </Tooltip>
+    </Stack>
+  ) : (
+    <Button
+      component="label"
+      size="small"
+      className="adm-btn-outlined"
+      startIcon={certUploading === a.id ? null : <MdUpload />}
+      disabled={certUploading === a.id || !a.id || a.id > 1e12}
+      sx={{
+        width: 150,
+        minWidth: 150,
+        maxWidth: 150,
+      }}
+    >
+      {certUploading === a.id ? "Uploading…" : "Upload"}
+      <input
+        hidden
+        type="file"
+        accept="application/pdf,image/jpeg,image/jpg,image/png"
+        onChange={(e) => e.target.files?.[0] && onUploadCertificate(a.id, e.target.files[0])}
+      />
+    </Button>
+  )}
+</TC>
+<TC sx={{ whiteSpace: "nowrap", minWidth: 170 }}>
+  <Stack
+    direction="row"
+    spacing={0.8}
+    alignItems="center"
+    justifyContent="center"
+    flexWrap="nowrap"
+    sx={{ width: "100%" }}
+  >
+    <IconOrder onClickBtn={(el) => openReorderMenu(el, "achievements", a.id)} />
+    <IconEdit onClick={() => openAchEdit(a)} />
+    <IconDel onClick={() => deleteAchLocal(a.id)} />
+  </Stack>
+</TC>
                       </TRow>
                     ))}
                     {achievements.length === 0 && <TRow><TC colSpan={5} sx={{ opacity: 0.55 }}>No achievements yet.</TC></TRow>}
