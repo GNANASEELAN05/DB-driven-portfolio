@@ -18,7 +18,7 @@ function splitCSV(s) {
 }
 function toDeviconSlug(name) {
   const raw = safeString(name).trim().toLowerCase();
-  const overrides = {
+const overrides = {
     html: "html5", html5: "html5", css: "css3", css3: "css3",
     js: "javascript", "javascript (js)": "javascript",
     node: "nodejs", "node.js": "nodejs", nodejs: "nodejs",
@@ -29,10 +29,14 @@ function toDeviconSlug(name) {
     postgres: "postgresql", sql: "mysql", "c++": "cplusplus", "c#": "csharp",
     "android studio": "androidstudio", vs: "vscode", "vs code": "vscode",
     "google cloud": "googlecloud", gcp: "googlecloud", aws: "amazonwebservices",
-    solidity: "solidity", "spring boot": "spring", "three.js": "threejs",
+    solidity: "solidity",
+    "spring boot": "spring", springboot: "spring",   // ← fixed: springboot → spring
+    "three.js": "threejs",
     "nuxt.js": "nuxtjs", nuxt: "nuxtjs",
+    nosql: null,   // ← no devicon exists; forces initials fallback immediately
+    "no sql": null,
   };
-  if (overrides[raw]) return overrides[raw];
+  if (raw in overrides) return overrides[raw];
   return raw
     .replace(/\.js$/i, "js")
     .replace(/\./g, "")
@@ -225,14 +229,26 @@ function drawUltraBall(ctx, ball, isDark) {
   if (ball.img && ball.imgLoaded) {
     const s = r * 1.10;
     ctx.drawImage(ball.img, x - s / 2, y - s / 2, s, s);
-  } else {
-    ctx.fillStyle    = "rgba(255,255,255,0.96)";
-    ctx.font         = `900 ${Math.floor(r * 0.42)}px Inter,sans-serif`;
-    ctx.textAlign    = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillText(ball.name.slice(0, 3).toUpperCase(), x, y);
   }
   ctx.restore();
+
+  // Draw initials OUTSIDE clip — ensures visibility for no-logo skills like NoSQL
+  if (!ball.img || !ball.imgLoaded) {
+    // Dark backing disc for contrast against bright metallic surface
+    ctx.beginPath();
+    ctx.arc(x, y, r * 0.52, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(20,24,30,0.60)";
+    ctx.fill();
+    // White initials text
+    ctx.fillStyle    = "rgba(255,255,255,0.96)";
+    ctx.font         = `900 ${Math.floor(r * 0.40)}px Inter,sans-serif`;
+    ctx.textAlign    = "center";
+    ctx.textBaseline = "middle";
+    ctx.shadowColor  = "rgba(0,0,0,0.8)";
+    ctx.shadowBlur   = 5;
+    ctx.fillText(ball.name.slice(0, 3).toUpperCase(), x, y);
+    ctx.shadowBlur   = 0;
+  }
 
   // Tiny specular dot
   ctx.beginPath();

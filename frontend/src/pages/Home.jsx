@@ -391,45 +391,26 @@ function LanguageLogoCard({ lang, index }) {
 function toDeviconSlug(name) {
   const raw = safeString(name).trim().toLowerCase();
 
-  const overrides = {
-    "html":           "html5",
-    "html5":          "html5",
-    "css":            "css3",
-    "css3":           "css3",
-    "js":             "javascript",
-    "javascript (js)":"javascript",
-    "node":           "nodejs",
-    "node.js":        "nodejs",
-    "nodejs":         "nodejs",
-    "react":          "react",
-    "react.js":       "react",
-    "reactjs":        "react",
-    "next.js":        "nextjs",
-    "nextjs":         "nextjs",
-    "vue":            "vuejs",
-    "vue.js":         "vuejs",
-    "tailwind":       "tailwindcss",
-    "tailwindcss":    "tailwindcss",
-    "express":        "express",
-    "express.js":     "express",
-    "postgres":       "postgresql",
-    "sql":            "mysql",
-    "c++":            "cplusplus",
-    "c#":             "csharp",
-    "android studio": "androidstudio",
-    "vs":             "vscode",
-    "vs code":        "vscode",
-    "google cloud":   "googlecloud",
-    "gcp":            "googlecloud",
-    "aws":            "amazonwebservices",
-    "solidity":       "solidity",
-    "spring boot":    "spring",
-    "three.js":       "threejs",
-    "nuxt.js":        "nuxtjs",
-    "nuxt":           "nuxtjs",
+const overrides = {
+    html: "html5", html5: "html5", css: "css3", css3: "css3",
+    js: "javascript", "javascript (js)": "javascript",
+    node: "nodejs", "node.js": "nodejs", nodejs: "nodejs",
+    react: "react", "react.js": "react", reactjs: "react",
+    "next.js": "nextjs", nextjs: "nextjs", vue: "vuejs", "vue.js": "vuejs",
+    tailwind: "tailwindcss", tailwindcss: "tailwindcss",
+    express: "express", "express.js": "express",
+    postgres: "postgresql", sql: "mysql", "c++": "cplusplus", "c#": "csharp",
+    "android studio": "androidstudio", vs: "vscode", "vs code": "vscode",
+    "google cloud": "googlecloud", gcp: "googlecloud", aws: "amazonwebservices",
+    solidity: "solidity",
+    "spring boot": "spring", springboot: "spring",   // ← fixed: springboot → spring
+    "three.js": "threejs",
+    "nuxt.js": "nuxtjs", nuxt: "nuxtjs",
+    nosql: null,   // ← no devicon exists; forces initials fallback immediately
+    "no sql": null,
   };
 
-  if (overrides[raw]) return overrides[raw];
+  if (raw in overrides) return overrides[raw];
 
   return raw
     .replace(/\.js$/i, "js")
