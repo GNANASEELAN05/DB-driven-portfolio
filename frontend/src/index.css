@@ -637,15 +637,16 @@ button { font-family: inherit; }
 
 .portfolio-topbar {
   position: fixed;
-  top: 10px;
-  right: 20px;
+  top: 16px;
+  right: 16px;
+  transform: none;
   z-index: 25;
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 10px;
-  padding: 8px 12px;
+  gap: 6px;
+  padding: 10px 6px;
   border-radius: 999px;
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -674,6 +675,8 @@ button { font-family: inherit; }
     position: sticky;
     top: 10px;
     right: auto;
+    transform: none;
+    flex-direction: row;
     align-self: flex-end;
     margin-left: auto;
     border-radius: 24px;
@@ -759,12 +762,17 @@ button { font-family: inherit; }
 
 /* FIXED: home can scroll too so social icons will not be cut */
 .home-scroll-area {
-  overflow-y: hidden;
+  overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
   display: flex;
   flex-direction: column;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 16px;
 }
+
+.home-scroll-area::-webkit-scrollbar { width: 0; height: 0; }
 
 @media (max-width: 899px) {
   .home-scroll-area {
@@ -819,6 +827,13 @@ button { font-family: inherit; }
   flex: 1;
   min-height: 0;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-section > * {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -1827,6 +1842,132 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   }
 }
 
+
+
+/* ==============================================
+   MOBILE PERFORMANCE — decorative overlays only
+   Desktop keeps ALL animations intact.
+   Only pure-decoration elements are hidden on mobile.
+   ============================================== */
+@media (max-width: 768px) {
+
+  /* ── Hide spinning prismatic border beams ── */
+  .hero-holo-prism,
+  .hpf-prism,
+  .about-prism,
+  .exp-v4-prism,
+  .edu-v2-border-beam,
+  .ach-prism-beam,
+  .pv2-prism,
+  .sforge-prism,
+  .lholo-prism,
+  .csb-prism,
+  .cfc-prism {
+    display: none !important;
+  }
+
+  /* ── Hide scan line sweeps ── */
+  .hero-holo-scan,
+  .about-scan,
+  .exp-v4-scan,
+  .edu-v2-scan,
+  .ach-holo-scan,
+  .pv2-scan-beam,
+  .sforge-scan,
+  .lholo-scan,
+  .csb-scan,
+  .cfc-scan {
+    display: none !important;
+  }
+
+  /* ── Hide particle fields ── */
+  .hero-holo-particles,
+  .about-particles,
+  .exp-v4-particles,
+  .ach-particle-field {
+    display: none !important;
+  }
+
+  /* ── Disable spinning ring animations on orbs (keep the ring visible, just stop spinning) ── */
+  .exp-v4-ring-1,
+  .exp-v4-ring-2,
+  .edu-v2-orb-ring,
+  .ach-ring-1,
+  .ach-ring-2,
+  .ach-ring-3,
+  .pv2-orb-ring,
+  .sforge-orb-ring,
+  .lholo-orb-ring,
+  .lholo-ring-1,
+  .lholo-ring-2,
+  .csb-avatar-ring,
+  .cfc-trans-ring,
+  .about-ring-1,
+  .about-ring-2,
+  .about-ring-3 {
+    animation: none !important;
+  }
+
+  /* ── Stop background shimmer sweep on glass cards ── */
+  .adm-glass::after,
+  .shimmer-panel::after {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+
+  /* ── Stop the HUD scan line in bucket canvas ── */
+  .shud-scan-line {
+    display: none !important;
+  }
+
+  /* ── Stop NetworkCanvas-heavy animations on background orbs ── */
+  .portfolio-orb {
+    animation: none !important;
+  }
+
+  /* ── Reduce page enter blur filter (expensive on mobile) ── */
+  .portfolio-page-frame {
+    animation: none !important;
+  }
+
+  /* ── Stop cursor spotlight (unused on touch) ── */
+  .cursor-spotlight {
+    display: none !important;
+  }
+
+  /* ── Stop noise/scan background effects ── */
+  .portfolio-noise,
+  .portfolio-scan {
+    display: none !important;
+  }
+
+  /* ── Stop background mesh/orb floating animations ── */
+  .portfolio-bg::before {
+    animation: none !important;
+  }
+
+  /* ── Stop the BlackholeBadge gear/wheel spins on hero ── */
+  .gw-bezel-svg,
+  .gw-gear-svg,
+  .gw-compass-svg {
+    animation: none !important;
+  }
+  .gw-outer-ring,
+  .gw-mid-band {
+    animation: none !important;
+  }
+
+  /* ── Keep content rise animation but remove blur (blur is expensive) ── */
+  @keyframes contentRise {
+    0%   { opacity: 0; transform: translateY(14px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes sectionWarpIn {
+    0%   { opacity: 0; transform: scale(0.99) translateY(10px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+}
 
 /* ==============================================
    SKILLS LOGO GRID — ULTRA FUTURISTIC FORGE v2
@@ -6489,6 +6630,8 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   display: flex;
   flex-direction: column;
   margin: 0 8px;
+  flex: 1;
+  min-height: 0;
   animation: heroHoloIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   transition: transform 0.40s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.35s ease;
 }
@@ -6963,9 +7106,9 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
   flex: 1;
   min-height: 0;
 }
-  .hero-holo-root .hero-left-expanded {
-    padding-bottom: 6px;
-    overflow-y: hidden;
+.hero-holo-root .hero-left-expanded {
+    padding-bottom: 18px;
+    overflow-y: visible;
   }
 /* Desktop: hero holo root fills height, no scroll */
 .hero-holo-root {
@@ -6998,31 +7141,44 @@ table th, table td { border-color: rgba(127, 127, 127, 0.18) !important; }
 /* Desktop compact spacing so hero fits viewport */
 @media (min-width: 900px) {
   .hero-holo-root .hero-title {
-    font-size: clamp(1.8rem, 3.2vw, 3.2rem) !important;
-    margin-bottom: 8px !important;
+    font-size: clamp(1.6rem, 2.8vw, 2.8rem) !important;
+    margin-bottom: 6px !important;
   }
 
   .hero-holo-root .hero-terminal {
-    margin-top: 12px;
+    margin-top: 8px;
   }
 
   .hero-holo-root .hero-description {
-    margin-top: 10px !important;
-    font-size: 0.93rem !important;
-    line-height: 1.75 !important;
-  }
-.hero-holo-root .hero-action-buttons {
     margin-top: 8px !important;
+    font-size: 0.88rem !important;
+    line-height: 1.65 !important;
   }
-  .hero-holo-root .hero-social-row {
+
+  .hero-holo-root .hero-action-buttons {
     margin-top: 6px !important;
-    padding-bottom: 4px !important;
   }
+
+  .hero-holo-root .hero-social-row {
+    margin-top: 4px !important;
+    padding-bottom: 0px !important;
+  }
+
   .hero-holo-data-row {
-    margin-top: 10px;
+    margin-top: 8px;
   }
+
   .hero-holo-terminal {
-    margin-top: 12px;
+    margin-top: 8px;
+    padding-bottom: 0;
+  }
+
+  .hero-holo-root .hero-name-row {
+    margin-bottom: 8px;
+  }
+
+  .hero-holo-root .hero-description {
+    margin-bottom: 0 !important;
   }
 }
 

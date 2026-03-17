@@ -562,7 +562,8 @@ const initBalls = useCallback((W, H, balls) => {
     });
     ro.observe(wrap);
 
-    const draw = () => {
+      const draw = () => {
+      if (document.hidden) { animRef.current = requestAnimationFrame(draw); return; }
       const { W, H } = sizeRef.current;
       if (!W || !H) { animRef.current = requestAnimationFrame(draw); return; }
 
@@ -948,7 +949,20 @@ function MiniPhysicsCanvas({ items }) {
     });
     ro.observe(canvas);
 
-    const draw = () => {
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) {
+          cancelAnimationFrame(animRef.current);
+        } else {
+          animRef.current = requestAnimationFrame(draw);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    io.observe(canvas);
+
+const draw = () => {
+      if (document.hidden) { animRef.current = requestAnimationFrame(draw); return; }
       if (!canvas.width || !canvas.height) { animRef.current = requestAnimationFrame(draw); return; }
       const CW = canvas.width, CH = canvas.height;
       const ctx = canvas.getContext("2d");
@@ -1002,7 +1016,7 @@ function MiniPhysicsCanvas({ items }) {
     };
 
     animRef.current = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(animRef.current); ro.disconnect(); initRef.current = false; };
+        return () => { cancelAnimationFrame(animRef.current); ro.disconnect(); io.disconnect(); initRef.current = false; };
   }, [items]);
 
   const getLocalPoint = useCallback((e) => {

@@ -1338,6 +1338,7 @@ export default function Home({ toggleTheme }) {
   const mode = theme.palette.mode;
 
   const [loading, setLoading] = useState(true);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   const [reloadTick, setReloadTick] = useState(0);
   const [profile, setProfile] = useState(null);
   const [skills, setSkills] = useState(null);
@@ -1478,31 +1479,32 @@ useEffect(() => {
           setResumeName(`${pn.replace(/\s+/g, "_")}_Resume.pdf`);
         }
       } catch {}
-      finally { if (alive) setLoading(false); }
+      finally {
+        if (alive) {
+          setLoading(false);
+          setInitialLoadDone(true);
+        }
+      }
     };
     load();
     return () => { alive = false; };
   }, [reloadTick]);
 
 useEffect(() => {
-  const sync = () => {
-    reload();
-    setImageBust(Date.now()); // ← add this line
-  };
+  // Only re-fetch when admin saves data (cross-tab storage event)
+  // NOT on every focus or tab switch — same behaviour as AdminDashboard
   const onStorage = (e) => {
     if (!e) return;
-    if (e.key === "content_version" || e.key === "active_resume_file_name" || e.key === "resume_file_name") sync();
+    if (e.key === "content_version" || e.key === "active_resume_file_name" || e.key === "resume_file_name") {
+      reload();
+      setImageBust(Date.now());
+    }
   };
-    const onVis = () => { if (document.visibilityState === "visible") sync(); };
-    window.addEventListener("storage", onStorage);
-    window.addEventListener("focus", sync);
-    document.addEventListener("visibilitychange", onVis);
-    return () => {
-      window.removeEventListener("storage", onStorage);
-      window.removeEventListener("focus", sync);
-      document.removeEventListener("visibilitychange", onVis);
-    };
-  }, []);
+  window.addEventListener("storage", onStorage);
+  return () => {
+    window.removeEventListener("storage", onStorage);
+  };
+}, []);
 
   useEffect(() => {
     const target = rootRef.current;
@@ -1626,6 +1628,44 @@ const resolvedOriginalSrc = useMemo(() => {
   if (hasPrimary) return `${BACKEND_BASE}/api/profile-image/original?t=${imageBust}`;
   return OriginalPhoto;
 }, [profileImages, imageBust]);
+  // ─────────────────────────────────────────────────────────────────────────
+
+// ── dataReady: once true, never show skeletons again (like AdminDashboard) ──
+  const dataReady = initialLoadDone;
+
+  // ── Full-page loading screen — shown only on first ever load ──────────────
+  if (!initialLoadDone) {
+    return (
+      <Box sx={{
+        position: "fixed", inset: 0, zIndex: 9999,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center",
+        background: mode === "dark"
+          ? "linear-gradient(180deg, #0f1020 0%, #12142a 100%)"
+          : "linear-gradient(180deg, #f6f8fc 0%, #eef2f9 100%)",
+        gap: 3,
+      }}>
+        <Box sx={{
+          width: 72, height: 72, borderRadius: "50%",
+          border: "3px solid transparent",
+          borderTopColor: "#f13024",
+          borderRightColor: "#f97316",
+          animation: "spin 0.9s linear infinite",
+          "@keyframes spin": { to: { transform: "rotate(360deg)" } },
+          boxShadow: "0 0 32px rgba(241,48,36,0.35)",
+        }} />
+        <Typography sx={{
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 800, fontSize: "0.85rem",
+          letterSpacing: "0.18em", textTransform: "uppercase",
+          background: "linear-gradient(135deg, #f13024, #f97316)",
+          WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+        }}>
+          Loading Portfolio…
+        </Typography>
+      </Box>
+    );
+  }
   // ─────────────────────────────────────────────────────────────────────────
 
   const renderSection = () => {
@@ -1815,7 +1855,7 @@ case "about":
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
           <SectionHeading title="About" subtitle="Decoding the architect behind the code." />
 
-          {loading ? (
+          {!dataReady ? (
             <Stack spacing={2}><Skeleton height={300} sx={{ borderRadius: 4 }} /><Skeleton height={140} sx={{ borderRadius: 3 }} /></Stack>
           ) : (
             <Box className="about-neural-root">
@@ -1969,7 +2009,7 @@ case "skills":
       <Box className="section-scroll-area">
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
           <SectionHeading title="Skills" subtitle="Technologies I build with — toss 'em in the bucket or arrange by category." />
-          <SkillsBucketSection skills={skills} loading={loading} />
+          <SkillsBucketSection skills={skills} loading={!dataReady} />
         </MotionBox>
       </Box>
     </MotionBox>
@@ -1982,7 +2022,7 @@ case "skills":
             <Box className="section-scroll-area">
               <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
                 <SectionHeading title="Work" subtitle="Crafted with precision — featured projects built to ship." />
-                {loading ? (
+                {!dataReady ? (
                   <Stack spacing={2}><Skeleton height={220} /><Skeleton height={220} /></Stack>
 ) : projects.length ? (
 <Box className="pv2-ultra-grid">
@@ -2004,7 +2044,7 @@ case "experience":
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
           <SectionHeading title="Experience" subtitle="Career timeline — each role a milestone in the journey." />
           <Box className="exp-v4-root">
-            {loading ? <Skeleton height={220} /> : experience.length ? (
+            {!dataReady ? <Skeleton height={220} /> : experience.length ? (
               experience.map((item, idx) => {
                 const isCurrentRole = !safeString(item?.end).trim();
                 const startYear = safeString(item?.start).match(/\d{4}/)?.[0];
@@ -2168,7 +2208,7 @@ case "education":
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
           <SectionHeading title="Education" subtitle="Academic foundation — the architecture of knowledge." />
           <Box className="edu-v2-root">
-            {loading ? (
+            {!dataReady ? (
               <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
                 {[...Array(3)].map((_, i) => <Skeleton key={i} height={200} sx={{ borderRadius: 4 }} />)}
               </Box>
@@ -2339,7 +2379,7 @@ case "achievements":
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
           <SectionHeading title="Achievements" subtitle="Certifications, awards, and recognitions." />
           <Box className="ach-ultra-grid">
-            {loading ? (
+            {!dataReady ? (
               <Box className="ach-ultra-grid">
                 {[...Array(4)].map((_, i) => (
                   <Skeleton key={i} height={280} sx={{ borderRadius: 4 }} />
@@ -2500,7 +2540,7 @@ case "languages":
       <Box className="section-scroll-area">
         <MotionBox className="portfolio-section section-static" variants={fadeUp} initial="hidden" animate="show">
           <SectionHeading title="Programming Languages" subtitle="Mastery metrics — experience depth and proficiency levels." />
-          {loading ? (
+          {!dataReady ? (
             <Box className="lholo-grid">
               {[...Array(6)].map((_, i) => (
                 <Skeleton key={i} height={170} sx={{ borderRadius: 4 }} />
@@ -2750,23 +2790,21 @@ case "contact":
       </Box>
       <VerticalNav items={sectionIds} activeId={activeSection} onJump={jumpTo} />
       <Box className="portfolio-shell">
-        <Box className="portfolio-topbar">
-          <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: "auto" }}>
-            <Tooltip title="Reload">
-              <IconButton onClick={reload} className="topbar-icon-btn"><MdRefresh /></IconButton>
-            </Tooltip>
-            <Tooltip title={mode === "dark" ? "Light Mode" : "Dark Mode"}>
-              <IconButton onClick={toggleTheme} className="topbar-icon-btn">
-                {mode === "dark" ? <MdLightMode /> : <MdDarkMode />}
-              </IconButton>
-            </Tooltip>
-            <Tooltip title="Admin">
-              <IconButton onClick={() => navigate("/admin")} className="topbar-icon-btn accent">
-                <MdAdminPanelSettings />
-              </IconButton>
-            </Tooltip>
-          </Stack>
-        </Box>
+<Box className="portfolio-topbar">
+  <Tooltip title="Reload" placement="left" arrow>
+    <IconButton onClick={reload} className="topbar-icon-btn"><MdRefresh /></IconButton>
+  </Tooltip>
+  <Tooltip title={mode === "dark" ? "Light Mode" : "Dark Mode"} placement="left" arrow>
+    <IconButton onClick={toggleTheme} className="topbar-icon-btn">
+      {mode === "dark" ? <MdLightMode /> : <MdDarkMode />}
+    </IconButton>
+  </Tooltip>
+  <Tooltip title="Admin" placement="left" arrow>
+    <IconButton onClick={() => navigate("/admin")} className="topbar-icon-btn accent">
+      <MdAdminPanelSettings />
+    </IconButton>
+  </Tooltip>
+</Box>
         <Box className="portfolio-page-stage">
           <AnimatePresence mode="wait" custom={navDirection}>
             {renderSection()}
@@ -2884,8 +2922,9 @@ function NetworkCanvas({ mode }) {
     const ctx = canvas.getContext("2d");
     let animationId;
     let nodes = [];
-    const NODE_COUNT = 55;
-    const MAX_DIST   = 160;
+const isMobileDevice = window.innerWidth < 768;
+const NODE_COUNT = isMobileDevice ? 22 : 55;
+const MAX_DIST   = isMobileDevice ? 110 : 160;
     const isDark = mode === "dark";
     const nodeColor       = isDark ? "rgba(255,255,255,0.55)"  : "rgba(17,24,39,0.45)";
     const lineColor       = isDark ? "rgba(255,255,255,0.09)"  : "rgba(17,24,39,0.08)";
@@ -2902,7 +2941,9 @@ function NetworkCanvas({ mode }) {
         accent: i < 6,
       }));
     };
+    
     const draw = () => {
+      if (document.hidden) { animationId = requestAnimationFrame(draw); return; }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       nodes.forEach((n) => {
         n.x += n.vx; n.y += n.vy;
