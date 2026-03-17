@@ -3,7 +3,7 @@ import axios from "axios";
 
 const baseURL =
   import.meta.env.VITE_API_URL ||
-  "https://portfolio-backend-cok2.onrender.com/api";
+  "https://db-driven-portfolio-idt9.onrender.com/api";
 
 // create instance
 const http = axios.create({

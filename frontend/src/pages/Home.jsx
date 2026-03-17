@@ -1631,7 +1631,7 @@ const onPreviewCertificate = async (achId, achTitle) => {
 // Change /api/profile-image/animated → /api/profile-image/view/animated
 const BACKEND_BASE = (
   import.meta.env.VITE_API_URL ||
-  "https://portfolio-backend-cok2.onrender.com/api"
+  "https://db-driven-portfolio-idt9.onrender.com/api"
 ).replace(/\/api$/, "");
 
 const resolvedAnimatedSrc = useMemo(() => {
@@ -2839,7 +2839,7 @@ case "contact":
     <iframe
       key={`cert-mobile-${certPreviewAchId}`}
       src={`https://docs.google.com/viewer?url=${encodeURIComponent(
-        `${(import.meta.env.VITE_API_URL || "").replace(/^\/api$/, "https://portfolio-backend-cok2.onrender.com/api") || "https://portfolio-backend-cok2.onrender.com/api"}/portfolio/achievements/${certPreviewAchId}/certificate`
+        `${(import.meta.env.VITE_API_URL || "").replace(/^\/api$/, "https://db-driven-portfolio-idt9.onrender.com/api") || "https://db-driven-portfolio-idt9.onrender.com/api"}/portfolio/achievements/${certPreviewAchId}/certificate`
       )}&embedded=true`}
       title={certPreviewTitle}
       style={{
