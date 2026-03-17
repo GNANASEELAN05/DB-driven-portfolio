@@ -1361,7 +1361,28 @@ export default function SkillsBucketSection({ skills, loading }) {
     [skillGroups]
   );
 
-  const [mode, setMode] = useState("bucket");
+const [isMobile, setIsMobile] = useState(() => 
+    typeof window !== "undefined" && window.innerWidth < 768
+  );
+  const [mode, setMode] = useState(() => 
+    typeof window !== "undefined" && window.innerWidth < 768 ? "arranged" : "bucket"
+  );
+
+  useEffect(() => {
+    const handleResize = () => {
+      const mobile = window.innerWidth < 768;
+      setIsMobile(prev => {
+        if (prev !== mobile) {
+          // When switching from mobile to desktop, go to bucket
+          // When switching from desktop to mobile, go to arranged
+          setMode(mobile ? "arranged" : "bucket");
+        }
+        return mobile;
+      });
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (loading) {
     return (
@@ -1398,7 +1419,7 @@ export default function SkillsBucketSection({ skills, loading }) {
           Arrange in Order
         </button>
 
-        {mode === "bucket" && (
+        {!isMobile && mode === "bucket" && (
           <Typography className="sbb-hint">
             Drag balls or bucket • Double-click bucket to spill • Double-click again to reset
           </Typography>
