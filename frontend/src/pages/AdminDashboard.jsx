@@ -1850,20 +1850,29 @@ right={
               </TableWrap>
               <SimpleItemDialog open={langDlgOpen} title={langEditingId ? "Edit Language" : "Add Language"} onClose={() => setLangDlgOpen(false)} onSave={saveLangLocal}>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}><SmallTextField label="Language" value={langForm.language} onChange={(e) => setLangForm((p) => ({ ...p, language: e.target.value }))} /></Grid>
-                  <Grid item xs={12} md={3}>
+                  <Grid item xs={12} md={4}><SmallTextField label="Language" value={langForm.language} onChange={(e) => setLangForm((p) => ({ ...p, language: e.target.value }))} /></Grid>
+                  <Grid item xs={12} md={4}>
                     <FormControl fullWidth size="small" sx={tfSx}>
-                      <InputLabel shrink>Level</InputLabel>
-                      <Select value={langForm.level} label="Level" onChange={(e) => setLangForm((p) => ({ ...p, level: e.target.value }))} notched>
+                      <InputLabel id="lang-level-label" shrink>Level</InputLabel>
+                      <Select labelId="lang-level-label" value={langForm.level} label="Level" onChange={(e) => setLangForm((p) => ({ ...p, level: e.target.value }))} notched>
                         {["Beginner", "Intermediate", "Advanced"].map(v => <MenuItem key={v} value={v}>{v}</MenuItem>)}
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid item xs={12} md={3}>
+                  <Grid item xs={12} md={4}>
                     <FormControl fullWidth size="small" sx={tfSx}>
-                      <InputLabel shrink>Years</InputLabel>
-                      <Select value={langForm.years} label="Years" onChange={(e) => setLangForm((p) => ({ ...p, years: Number(e.target.value) }))} notched>
-                        {Array.from({ length: 10 }).map((_, i) => <MenuItem key={i + 1} value={i + 1}>{i + 1}</MenuItem>)}
+                      <InputLabel id="lang-years-label" shrink>Years</InputLabel>
+                      <Select
+                        labelId="lang-years-label"
+                        value={langForm.years}
+                        label="Years"
+                        notched
+                        onChange={(e) => setLangForm((p) => ({ ...p, years: Number(e.target.value) }))}
+                        renderValue={(v) => `${v} yr${v > 1 ? "s" : ""}`}
+                      >
+                        {Array.from({ length: 10 }).map((_, i) => (
+                          <MenuItem key={i + 1} value={i + 1}>{i + 1} year{i > 0 ? "s" : ""}</MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                   </Grid>
