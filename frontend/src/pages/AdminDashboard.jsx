@@ -220,7 +220,7 @@ function SimpleItemDialog({ open, title, children, onClose, onSave, saveText = "
       className={isDark ? "adm-dialog" : "adm-dialog adm-dialog-light"}
     >
       <DialogTitle className="adm-dialog-title" sx={{ pb: 1 }}>{title}</DialogTitle>
-      <DialogContent sx={{ pt: 2 }}>{children}</DialogContent>
+      <DialogContent sx={{ pt: 4, overflow: "visible" }}>{children}</DialogContent>
       <DialogActions sx={{ p: 2, gap: 1 }}>
         <Button onClick={onClose} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>Cancel</Button>
         <Button onClick={onSave} size="small" className="adm-btn-primary" startIcon={<MdSave />}>{saveText}</Button>
@@ -274,7 +274,7 @@ function ProjectEditorDialog({ open, mode, initial, onClose, onSave }) {
         {mode === "edit" ? "Edit Project" : "Add Project"}
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 2 }}>
+      <DialogContent sx={{ pt: 4, overflow: "visible" }}>
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}><SmallTextField label="Project Title" value={form.title} onChange={handleChange("title")} /></Grid>
           <Grid item xs={12} md={6}><SmallTextField label="Tech Stack (comma separated)" value={form.tech} onChange={handleChange("tech")} /></Grid>
@@ -388,6 +388,63 @@ function ResumeUploadSuccessDialog({ open, fileName, onClose }) {
         <Button className="adm-btn-primary" onClick={onClose}>OK</Button>
       </DialogActions>
     </Dialog>
+  );
+}
+
+
+
+// ── SkillEditRow — isolated so its own state changes don't re-render the parent ──
+function SkillEditRow({ skill, index, isEditing, initialValue, isDark, onStartEdit, onSave, onCancel, onDelete }) {
+  const [localVal, setLocalVal] = React.useState(initialValue);
+
+  React.useEffect(() => {
+    if (isEditing) setLocalVal(initialValue);
+  }, [isEditing, initialValue]);
+
+  return (
+    <TableRow className="adm-tr" sx={{ "& .MuiTableCell-root": { verticalAlign: "middle" } }}>
+      <TableCell className={`adm-td ${isDark ? "" : "adm-td-light"}`} sx={{ fontWeight: 800, textTransform: "capitalize", verticalAlign: "middle" }}>
+        {skill.category}
+      </TableCell>
+      <TableCell className={`adm-td ${isDark ? "" : "adm-td-light"}`} sx={{ verticalAlign: "middle" }}>
+        {isEditing ? (
+          <input
+            autoFocus
+            value={localVal}
+            onChange={(e) => setLocalVal(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") onSave(localVal);
+              if (e.key === "Escape") onCancel();
+            }}
+            style={{
+              background: "rgba(255,255,255,0.06)",
+              border: "1.5px solid rgba(198,128,242,0.45)",
+              borderRadius: "8px",
+              color: "inherit",
+              fontSize: "14px",
+              padding: "7px 12px",
+              width: "100%",
+              outline: "none",
+              fontFamily: "inherit",
+              boxSizing: "border-box",
+            }}
+          />
+        ) : skill.name}
+      </TableCell>
+      <TableCell className={`adm-td ${isDark ? "" : "adm-td-light"}`} sx={{ verticalAlign: "middle" }}>
+        <Stack direction="row" spacing={0.8}>
+          {isEditing ? (
+            <>
+              <IconButton size="small" sx={{ color: "#4ade80" }} onClick={() => onSave(localVal)}><MdSave /></IconButton>
+              <IconButton size="small" sx={{ color: "#f97316" }} onMouseDown={(e) => { e.preventDefault(); onCancel(); }}><MdClose /></IconButton>
+            </>
+          ) : (
+            <IconButton size="small" className={`adm-icon-btn ${isDark ? "" : "adm-icon-btn-light"}`} onClick={onStartEdit}><MdEdit /></IconButton>
+          )}
+          <IconButton size="small" className="adm-icon-btn-err" onClick={onDelete}><MdDelete /></IconButton>
+        </Stack>
+      </TableCell>
+    </TableRow>
   );
 }
 
@@ -1185,7 +1242,12 @@ const TC = ({ children, bold, sx, colSpan }) => (
         position="fixed"
         elevation={0}
         className={isDark ? "adm-appbar" : "adm-appbar adm-appbar-light"}
-        sx={{ zIndex: (t) => t.zIndex.drawer + 1, color: "text.primary" }}
+        sx={{
+          zIndex: (t) => t.zIndex.drawer - 1,
+          color: "text.primary",
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          ml: { md: `${drawerWidth}px` },
+        }}
       >
         <Toolbar sx={{ gap: 1 }}>
           <IconButton
@@ -1440,25 +1502,21 @@ const TC = ({ children, bold, sx, colSpan }) => (
                   <TableBody>
                     {skillTable.length === 0 && <TRow><TC colSpan={3} sx={{ opacity: 0.5 }}>No skills added</TC></TRow>}
                     {skillTable.map((s, i) => (
-                      <TRow key={i}>
-                        <TC bold sx={{ textTransform: "capitalize" }}>{s.category}</TC>
-                        <TC>
-                          {editIndex === i
-                            ? <SmallTextField value={editValue} onChange={(e) => setEditValue(e.target.value)} />
-                            : s.name}
-                        </TC>
-                        <TC>
-                          <Stack direction="row" spacing={0.8}>
-{editIndex === i ? (
-  <>
-    <IconButton size="small" sx={{ color: "#4ade80" }} onClick={() => saveEditSkill(i)}><MdSave /></IconButton>
-    <IconButton size="small" sx={{ color: "#f97316" }} onClick={() => setEditIndex(null)}><MdClose /></IconButton>
-  </>
-) : <IconEdit onClick={() => startEditSkill(i)} />}
-<IconDel onClick={() => deleteSkill(i)} />
-                          </Stack>
-                        </TC>
-                      </TRow>
+                      <SkillEditRow
+                        key={i}
+                        skill={s}
+                        index={i}
+                        isEditing={editIndex === i}
+                        initialValue={editIndex === i ? editValue : s.name}
+                        isDark={isDark}
+                        onStartEdit={() => startEditSkill(i)}
+                        onSave={(val) => {
+                          setSkillTable(p => p.map((x, idx) => idx === i ? { ...x, name: val } : x));
+                          setEditIndex(null);
+                        }}
+                        onCancel={() => setEditIndex(null)}
+                        onDelete={() => deleteSkill(i)}
+                      />
                     ))}
                   </TableBody>
                 </Table>
