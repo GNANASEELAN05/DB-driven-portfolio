@@ -266,27 +266,65 @@ function ProjectEditorDialog({ open, mode, initial, onClose, onSave }) {
   const canSave = form.title.trim().length >= 2;
 
   return (
-    <Dialog
+<Dialog
       open={open} onClose={onClose} fullWidth maxWidth="sm"
       className={isDark ? "adm-dialog" : "adm-dialog adm-dialog-light"}
+      PaperProps={{
+        sx: {
+          display: "flex",
+          flexDirection: "column",
+          height: { xs: "92vh", md: "85vh" },
+          maxHeight: { xs: "92vh", md: "85vh" },
+          m: { xs: 1, md: 2 },
+          overflow: "hidden",
+        }
+      }}
     >
-      <DialogTitle className="adm-dialog-title">
+      <DialogTitle className="adm-dialog-title" sx={{ flexShrink: 0 }}>
         {mode === "edit" ? "Edit Project" : "Add Project"}
       </DialogTitle>
 
-      <DialogContent sx={{ pt: 4, overflow: "visible" }}>
+      <DialogContent
+        sx={{
+          flex: 1,
+          overflowY: "auto",
+          pt: { xs: 2, md: 3 },
+          px: { xs: 2, md: 3 },
+          pb: 1,
+          scrollbarWidth: "thin",
+          msOverflowStyle: "auto",
+          "&::-webkit-scrollbar": { width: "4px" },
+          "&::-webkit-scrollbar-track": { background: "transparent" },
+          "&::-webkit-scrollbar-thumb": { background: "rgba(241,48,36,0.30)", borderRadius: "4px" },
+        }}
+      >
         <Grid container spacing={2}>
           <Grid item xs={12} md={6}><SmallTextField label="Project Title" value={form.title} onChange={handleChange("title")} /></Grid>
           <Grid item xs={12} md={6}><SmallTextField label="Tech Stack (comma separated)" value={form.tech} onChange={handleChange("tech")} /></Grid>
           <Grid item xs={12} md={6}><SmallTextField label="Repo URL" value={form.repoUrl} onChange={handleChange("repoUrl")} /></Grid>
           <Grid item xs={12} md={6}><SmallTextField label="Live URL" value={form.liveUrl} onChange={handleChange("liveUrl")} /></Grid>
 
-          <Grid item xs={12} sx={{ width: "100%" }}>
+<Grid item xs={12} sx={{ width: "100%" }}>
             <SmallTextField
               label="Description" value={form.description || ""} onChange={handleChange("description")}
               fullWidth multiline
-              InputProps={{ inputComponent: TextareaAutosize, inputProps: { minRows: 2 } }}
-              sx={{ width: "100%", "& .MuiInputBase-root": { width: "100%", alignItems: "flex-start" }, "& textarea": { width: "100%", boxSizing: "border-box", resize: "none", overflow: "hidden", whiteSpace: "pre-wrap", overflowWrap: "break-word" } }}
+              InputProps={{ inputComponent: TextareaAutosize, inputProps: { minRows: 3 } }}
+              sx={{
+                width: "100%",
+                "& .MuiInputBase-root": { width: "100%", alignItems: "flex-start" },
+                "& textarea": {
+                  width: "100%",
+                  boxSizing: "border-box",
+                  resize: "none",
+                  overflow: "auto !important",
+                  whiteSpace: "pre-wrap",
+                  overflowWrap: "break-word",
+                  maxHeight: "280px",
+                  scrollbarWidth: "thin",
+                  "&::-webkit-scrollbar": { width: "4px" },
+                  "&::-webkit-scrollbar-thumb": { background: "rgba(241,48,36,0.30)", borderRadius: "4px" },
+                },
+              }}
             />
           </Grid>
 
@@ -305,12 +343,23 @@ function ProjectEditorDialog({ open, mode, initial, onClose, onSave }) {
         </Grid>
       </DialogContent>
 
-      <DialogActions sx={{ p: 2, gap: 1 }}>
-        <Button onClick={onClose} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>Cancel</Button>
-        <Button disabled={!canSave} onClick={() => onSave(form)} size="small" className="adm-btn-primary" startIcon={<MdSave />}>
-          {mode === "edit" ? "Save Changes" : "Add Project"}
-        </Button>
-      </DialogActions>
+<Box
+        sx={{
+          flexShrink: 0,
+          px: 2,
+          pt: 1.5,
+          pb: 2,
+          borderTop: isDark ? "1px solid rgba(255,255,255,0.07)" : "1px solid rgba(0,0,0,0.08)",
+          background: "inherit",
+        }}
+      >
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
+          <Button onClick={onClose} size="small" className="adm-btn-outlined" startIcon={<MdClose />}>Cancel</Button>
+          <Button disabled={!canSave} onClick={() => onSave(form)} size="small" className="adm-btn-primary" startIcon={<MdSave />}>
+            {mode === "edit" ? "Save Changes" : "Add Project"}
+          </Button>
+        </Stack>
+      </Box>
     </Dialog>
   );
 }
@@ -1929,7 +1978,29 @@ right={
                   <Grid item xs={12} md={6}><SmallTextField label="Degree" value={eduForm.degree} onChange={(e) => setEduForm((p) => ({ ...p, degree: e.target.value }))} /></Grid>
                   <Grid item xs={12} md={6}><SmallTextField label="Institution" value={eduForm.institution} onChange={(e) => setEduForm((p) => ({ ...p, institution: e.target.value }))} /></Grid>
                   <Grid item xs={12} md={6}><SmallTextField label="Year" value={eduForm.year} onChange={(e) => setEduForm((p) => ({ ...p, year: e.target.value }))} /></Grid>
-                  <Grid item xs={12}><SmallTextField label="Details (optional)" value={eduForm.details} onChange={(e) => setEduForm((p) => ({ ...p, details: e.target.value }))} multiline minRows={3} /></Grid>
+<Grid item xs={12} sx={{ width: "100%" }}>
+                    <SmallTextField
+                      label="Details (optional)" value={eduForm.details} onChange={(e) => setEduForm((p) => ({ ...p, details: e.target.value }))}
+                      fullWidth multiline
+                      InputProps={{ inputComponent: TextareaAutosize, inputProps: { minRows: 3 } }}
+                      sx={{
+                        width: "100%",
+                        "& .MuiInputBase-root": { width: "100%", alignItems: "flex-start" },
+                        "& textarea": {
+                          width: "100%",
+                          boxSizing: "border-box",
+                          resize: "none",
+                          overflow: "auto !important",
+                          whiteSpace: "pre-wrap",
+                          overflowWrap: "break-word",
+                          maxHeight: "280px",
+                          scrollbarWidth: "thin",
+                          "&::-webkit-scrollbar": { width: "4px" },
+                          "&::-webkit-scrollbar-thumb": { background: "rgba(241,48,36,0.30)", borderRadius: "4px" },
+                        },
+                      }}
+                    />
+                  </Grid>
                 </Grid>
               </SimpleItemDialog>
             </Box>
@@ -1984,11 +2055,27 @@ right={
                   <Grid item xs={12} md={6}><SmallTextField label="Role" value={expForm.role} onChange={(e) => setExpForm((p) => ({ ...p, role: e.target.value }))} /></Grid>
                   <Grid item xs={12} md={6}><SmallTextField label="Start" value={expForm.start} onChange={(e) => setExpForm((p) => ({ ...p, start: e.target.value }))} /></Grid>
                   <Grid item xs={12} md={6}><SmallTextField label="End" value={expForm.end} onChange={(e) => setExpForm((p) => ({ ...p, end: e.target.value }))} /></Grid>
-                  <Grid item xs={12} sx={{ width: "100%" }}>
+<Grid item xs={12} sx={{ width: "100%" }}>
                     <SmallTextField
                       label="Description" value={expForm.description || ""} onChange={(e) => setExpForm((p) => ({ ...p, description: e.target.value }))}
-                      fullWidth multiline InputProps={{ inputComponent: TextareaAutosize, inputProps: { minRows: 2 } }}
-                      sx={{ width: "100%", "& .MuiInputBase-root": { width: "100%", alignItems: "flex-start" }, "& textarea": { width: "100%", boxSizing: "border-box", resize: "none", overflow: "hidden", whiteSpace: "pre-wrap", overflowWrap: "break-word" } }}
+                      fullWidth multiline
+                      InputProps={{ inputComponent: TextareaAutosize, inputProps: { minRows: 3 } }}
+                      sx={{
+                        width: "100%",
+                        "& .MuiInputBase-root": { width: "100%", alignItems: "flex-start" },
+                        "& textarea": {
+                          width: "100%",
+                          boxSizing: "border-box",
+                          resize: "none",
+                          overflow: "auto !important",
+                          whiteSpace: "pre-wrap",
+                          overflowWrap: "break-word",
+                          maxHeight: "280px",
+                          scrollbarWidth: "thin",
+                          "&::-webkit-scrollbar": { width: "4px" },
+                          "&::-webkit-scrollbar-thumb": { background: "rgba(241,48,36,0.30)", borderRadius: "4px" },
+                        },
+                      }}
                     />
                   </Grid>
                 </Grid>
